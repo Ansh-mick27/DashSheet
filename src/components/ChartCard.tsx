@@ -1,0 +1,25 @@
+// ==========================================
+// DashSheet — Chart Card Wrapper
+// ==========================================
+import { ReactNode } from 'react';
+
+interface ChartCardProps {
+  title: string;
+  subtitle?: string;
+  children: ReactNode;
+  className?: string;
+}
+
+export default function ChartCard({ title, subtitle, children, className = '' }: ChartCardProps) {
+  return (
+    <div className={`chart-card ${className}`}>
+      <div className="chart-card__header">
+        <h3 className="chart-card__title">{title}</h3>
+        {subtitle && <p className="chart-card__subtitle">{subtitle}</p>}
+      </div>
+      <div className="chart-card__body">
+        {children}
+      </div>
+    </div>
+  );
+}
