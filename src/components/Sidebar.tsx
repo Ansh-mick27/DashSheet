@@ -4,7 +4,7 @@
 import { NavLink } from 'react-router-dom';
 import {
   LayoutDashboard, BookOpen, ClipboardList, Users,
-  LogOut, ChevronLeft, ChevronRight
+  LogOut, ChevronLeft, ChevronRight, Settings
 } from 'lucide-react';
 import { useAuth } from '../contexts/AuthContext';
 import { useState } from 'react';
@@ -14,6 +14,7 @@ const NAV_ITEMS = [
   { path: '/training', icon: BookOpen, label: 'Training Reports' },
   { path: '/work', icon: ClipboardList, label: 'Work Reports' },
   { path: '/members', icon: Users, label: 'Members' },
+  { path: '/settings', icon: Settings, label: 'Settings' },
 ];
 
 export default function Sidebar() {

@@ -12,6 +12,7 @@ import TrainingReportsPage from './pages/TrainingReportsPage';
 import WorkReportsPage from './pages/WorkReportsPage';
 import MembersPage from './pages/MembersPage';
 import MemberDetailPage from './pages/MemberDetailPage';
+import SettingsPage from './pages/SettingsPage';
 import { useAuth } from './contexts/AuthContext';
 import { fetchSheetData, refreshData, parseDate } from './services/sheetsApi';
 import { Member, TrainingReport, WorkReport, DashboardFilters } from './types';
@@ -153,6 +154,10 @@ function DashboardLayout() {
                   workReports={workReports}
                 />
               }
+            />
+            <Route
+              path="/settings"
+              element={<SettingsPage />}
             />
           </Routes>
         </div>

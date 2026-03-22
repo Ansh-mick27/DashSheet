@@ -6,7 +6,15 @@ import { generateMembers, generateTrainingReports, generateWorkReports } from '.
 
 // For development, use mock data
 // For production, replace with Google Apps Script API calls
-const APPS_SCRIPT_URL = import.meta.env.VITE_APPS_SCRIPT_URL || '';
+
+export function getAppsScriptUrl(): string {
+  return localStorage.getItem('APPS_SCRIPT_URL') || import.meta.env.VITE_APPS_SCRIPT_URL || '';
+}
+
+export function setAppsScriptUrl(url: string): void {
+  localStorage.setItem('APPS_SCRIPT_URL', url);
+  refreshData();
+}
 
 interface SheetData {
   members: Member[];
@@ -19,9 +27,11 @@ let cachedData: SheetData | null = null;
 export async function fetchSheetData(): Promise<SheetData> {
   if (cachedData) return cachedData;
 
-  if (APPS_SCRIPT_URL) {
+  const url = getAppsScriptUrl();
+
+  if (url) {
     try {
-      const response = await fetch(APPS_SCRIPT_URL);
+      const response = await fetch(url);
       const data = await response.json();
       cachedData = data;
       return data;
