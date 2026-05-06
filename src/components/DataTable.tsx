@@ -2,7 +2,7 @@
 // DashSheet — Data Table Component
 // ==========================================
 import { useState, useMemo } from 'react';
-import { ChevronUp, ChevronDown } from 'lucide-react';
+import { ChevronUp, ChevronDown, Download } from 'lucide-react';
 
 interface Column<T> {
   key: string;
@@ -10,6 +10,7 @@ interface Column<T> {
   render?: (item: T) => React.ReactNode;
   sortable?: boolean;
   width?: string;
+  csvValue?: (item: T) => string;
 }
 
 interface DataTableProps<T> {
@@ -18,10 +19,12 @@ interface DataTableProps<T> {
   rowKey: (item: T, index: number) => string;
   pageSize?: number;
   emptyMessage?: string;
+  exportFilename?: string;
 }
 
 export default function DataTable<T>({
-  columns, data, rowKey, pageSize = 10, emptyMessage = 'No data found'
+  columns, data, rowKey, pageSize = 10,
+  emptyMessage = 'No data found', exportFilename
 }: DataTableProps<T>) {
   const [sortCol, setSortCol] = useState<string>('');
   const [sortDir, setSortDir] = useState<'asc' | 'desc'>('asc');
@@ -49,8 +52,35 @@ export default function DataTable<T>({
     }
   };
 
+  const exportCSV = () => {
+    const headers = columns.map(c => `"${c.header}"`).join(',');
+    const rows = sortedData.map(item =>
+      columns.map(col => {
+        const raw = col.csvValue
+          ? col.csvValue(item)
+          : String((item as Record<string, unknown>)[col.key] ?? '');
+        return `"${raw.replace(/"/g, '""')}"`;
+      }).join(',')
+    );
+    const csv = [headers, ...rows].join('\n');
+    const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `${exportFilename || 'export'}_${new Date().toISOString().slice(0, 10)}.csv`;
+    a.click();
+    URL.revokeObjectURL(url);
+  };
+
   return (
     <div className="data-table-wrapper">
+      {exportFilename && (
+        <div className="data-table__toolbar">
+          <button className="btn btn--ghost btn--sm" onClick={exportCSV} title="Export to CSV">
+            <Download size={14} /> Export CSV
+          </button>
+        </div>
+      )}
       <div className="data-table-scroll">
         <table className="data-table">
           <thead>
@@ -101,18 +131,10 @@ export default function DataTable<T>({
             Page {page + 1} of {totalPages} ({sortedData.length} records)
           </span>
           <div className="data-table__page-buttons">
-            <button
-              disabled={page === 0}
-              onClick={() => setPage(p => p - 1)}
-              className="data-table__page-btn"
-            >
+            <button disabled={page === 0} onClick={() => setPage(p => p - 1)} className="data-table__page-btn">
               Previous
             </button>
-            <button
-              disabled={page >= totalPages - 1}
-              onClick={() => setPage(p => p + 1)}
-              className="data-table__page-btn"
-            >
+            <button disabled={page >= totalPages - 1} onClick={() => setPage(p => p + 1)} className="data-table__page-btn">
               Next
             </button>
           </div>

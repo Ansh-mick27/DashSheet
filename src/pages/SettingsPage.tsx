@@ -1,19 +1,16 @@
 import { useState, useEffect } from 'react';
-import { Save, AlertCircle, CheckCircle2 } from 'lucide-react';
+import { Save, AlertCircle, CheckCircle2, ShieldAlert, ExternalLink } from 'lucide-react';
 import { getAppsScriptUrl, setAppsScriptUrl } from '../services/sheetsApi';
 
 export default function SettingsPage() {
   const [url, setUrl] = useState('');
   const [status, setStatus] = useState<'idle' | 'saving' | 'success' | 'error'>('idle');
 
-  useEffect(() => {
-    setUrl(getAppsScriptUrl());
-  }, []);
+  useEffect(() => { setUrl(getAppsScriptUrl()); }, []);
 
   const handleSave = (e: React.FormEvent) => {
     e.preventDefault();
     setStatus('saving');
-    
     try {
       setAppsScriptUrl(url.trim());
       setStatus('success');
@@ -25,79 +22,79 @@ export default function SettingsPage() {
   };
 
   return (
-    <div className="settings-page" style={{ padding: '32px', maxWidth: '800px', margin: '0 auto' }}>
-      <div className="page-header" style={{ marginBottom: '24px' }}>
-        <h2 className="page-title" style={{ fontSize: '24px', fontWeight: 'bold', color: '#1e293b' }}>Settings</h2>
-        <p className="page-subtitle" style={{ color: '#64748b', marginTop: '4px' }}>Configure your dashboard's data connection</p>
+    <div className="settings-page">
+      <div className="page-header">
+        <h2 className="page-title">Settings</h2>
+        <p className="page-subtitle">Configure your dashboard's data connection</p>
       </div>
 
-      <div className="card" style={{ background: 'white', borderRadius: '12px', padding: '24px', boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.1)' }}>
-        <h3 style={{ fontSize: '18px', fontWeight: 'bold', marginBottom: '16px', color: '#334155' }}>Google Sheets Integration</h3>
-        
-        <p style={{ color: '#64748b', fontSize: '14px', marginBottom: '24px', lineHeight: '1.6' }}>
-          Connect this dashboard to your Google Sheet using Google Apps Script. 
-          The URL you provide here is saved securely in your browser's local storage and 
-          overrides the default <code>.env</code> file configuration.
+      {/* Security Warning */}
+      <div className="settings-warning">
+        <ShieldAlert size={20} />
+        <div>
+          <strong>Development-only authentication</strong>
+          <p>
+            Login credentials are currently stored in <code>.env</code> variables and validated
+            client-side. This is suitable for trusted internal use only. Do not expose this
+            dashboard publicly without adding proper server-side authentication.
+          </p>
+        </div>
+      </div>
+
+      <div className="settings-card">
+        <h3>Google Sheets Integration</h3>
+        <p className="settings-card__desc">
+          Connect this dashboard to your Google Sheet via Google Apps Script.
+          The URL is saved to your browser's local storage and overrides the <code>.env</code> default.
         </p>
 
-        <form onSubmit={handleSave}>
-          <div style={{ marginBottom: '20px' }}>
-            <label htmlFor="scriptUrl" style={{ display: 'block', fontSize: '14px', fontWeight: '500', color: '#475569', marginBottom: '8px' }}>
-              Apps Script Web App URL
-            </label>
+        <div className="settings-card__steps">
+          <h4>Setup Steps</h4>
+          <ol>
+            <li>Open <strong>Google Apps Script</strong> (script.google.com) and create a new project.</li>
+            <li>Paste the contents of <code>google-apps-script/DashSheet_Setup.gs</code> from your project.</li>
+            <li>Run <code>createDashSheetForm()</code> once — this creates the Form and Spreadsheet.</li>
+            <li>Run <code>installTrigger()</code> once — this routes form submissions to the correct sheets.</li>
+            <li>Deploy <code>doGet()</code> as a Web App: <em>Execute as: Me</em>, <em>Access: Anyone</em>.</li>
+            <li>Copy the Web App URL and paste it below.</li>
+          </ol>
+          <a
+            href="https://script.google.com"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="settings-card__link"
+          >
+            Open Google Apps Script <ExternalLink size={13} />
+          </a>
+        </div>
+
+        <form onSubmit={handleSave} className="settings-form">
+          <div className="settings-form__field">
+            <label htmlFor="scriptUrl">Apps Script Web App URL</label>
             <input
               id="scriptUrl"
               type="url"
               value={url}
-              onChange={(e) => setUrl(e.target.value)}
+              onChange={e => setUrl(e.target.value)}
               placeholder="https://script.google.com/macros/s/.../exec"
-              style={{
-                width: '100%',
-                padding: '12px 16px',
-                borderRadius: '8px',
-                border: '1px solid #cbd5e1',
-                fontSize: '14px',
-                outline: 'none',
-                transition: 'border-color 0.2s',
-              }}
-              onFocus={(e) => e.target.style.borderColor = '#3b82f6'}
-              onBlur={(e) => e.target.style.borderColor = '#cbd5e1'}
+              className="settings-form__input"
             />
           </div>
 
-          <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
-            <button 
-              type="submit" 
-              disabled={status === 'saving'}
-              style={{
-                display: 'flex',
-                alignItems: 'center',
-                gap: '8px',
-                background: '#3b82f6',
-                color: 'white',
-                padding: '10px 20px',
-                borderRadius: '8px',
-                border: 'none',
-                fontWeight: '500',
-                cursor: status === 'saving' ? 'not-allowed' : 'pointer',
-                opacity: status === 'saving' ? 0.7 : 1,
-              }}
-            >
+          <div className="settings-form__actions">
+            <button type="submit" disabled={status === 'saving'} className="btn btn--primary">
               <Save size={18} />
               {status === 'saving' ? 'Saving...' : 'Save Configuration'}
             </button>
 
             {status === 'success' && (
-              <span style={{ display: 'flex', alignItems: 'center', gap: '6px', color: '#10b981', fontSize: '14px', fontWeight: '500' }}>
-                <CheckCircle2 size={18} />
-                Saved successfully! Reloading data...
+              <span className="settings-form__status settings-form__status--success">
+                <CheckCircle2 size={18} /> Saved! Reloading data...
               </span>
             )}
-
             {status === 'error' && (
-              <span style={{ display: 'flex', alignItems: 'center', gap: '6px', color: '#ef4444', fontSize: '14px', fontWeight: '500' }}>
-                <AlertCircle size={18} />
-                Failed to save URL
+              <span className="settings-form__status settings-form__status--error">
+                <AlertCircle size={18} /> Failed to save URL
               </span>
             )}
           </div>

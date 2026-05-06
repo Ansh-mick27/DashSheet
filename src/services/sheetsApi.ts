@@ -1,11 +1,11 @@
 // ==========================================
 // DashSheet — Data Service
 // ==========================================
-import { Member, TrainingReport, WorkReport } from '../types';
-import { generateMembers, generateTrainingReports, generateWorkReports } from '../data/mockData';
-
-// For development, use mock data
-// For production, replace with Google Apps Script API calls
+import { Member, TrainingReport, WorkReport, OfficeAdminReport, PlacementReport, Notification } from '../types';
+import {
+  generateMembers, generateTrainingReports, generateWorkReports,
+  generateOfficeAdminReports, generatePlacementReports
+} from '../data/mockData';
 
 export function getAppsScriptUrl(): string {
   return localStorage.getItem('APPS_SCRIPT_URL') || import.meta.env.VITE_APPS_SCRIPT_URL || '';
@@ -20,6 +20,8 @@ interface SheetData {
   members: Member[];
   trainingReports: TrainingReport[];
   workReports: WorkReport[];
+  officeAdminReports: OfficeAdminReport[];
+  placementReports: PlacementReport[];
 }
 
 let cachedData: SheetData | null = null;
@@ -40,11 +42,12 @@ export async function fetchSheetData(): Promise<SheetData> {
     }
   }
 
-  // Fallback to mock data
   cachedData = {
     members: generateMembers(),
     trainingReports: generateTrainingReports(),
-    workReports: generateWorkReports()
+    workReports: generateWorkReports(),
+    officeAdminReports: generateOfficeAdminReports(),
+    placementReports: generatePlacementReports()
   };
 
   return cachedData;
@@ -55,7 +58,6 @@ export function refreshData(): void {
 }
 
 export function parseDate(dateStr: string): Date {
-  // Parse DD/MM/YYYY format
   const parts = dateStr.split('/');
   if (parts.length === 3) {
     return new Date(parseInt(parts[2]), parseInt(parts[1]) - 1, parseInt(parts[0]));
@@ -84,4 +86,61 @@ export function getAttendanceRate(reports: TrainingReport[]): number {
     return acc + (r.totalEnrolled > 0 ? (r.studentsPresent / r.totalEnrolled) * 100 : 0);
   }, 0);
   return Math.round(totalRate / reports.length);
+}
+
+export function generateNotifications(
+  workReports: WorkReport[],
+  trainingReports: TrainingReport[]
+): Notification[] {
+  const notifications: Notification[] = [];
+
+  // Check completion rates per trainer
+  const trainerWorkMap: Record<string, WorkReport[]> = {};
+  workReports.forEach(r => {
+    if (!trainerWorkMap[r.trainerName]) trainerWorkMap[r.trainerName] = [];
+    trainerWorkMap[r.trainerName].push(r);
+  });
+
+  Object.entries(trainerWorkMap).forEach(([name, reports]) => {
+    const rate = getCompletionRate(reports);
+    if (rate < 60) {
+      notifications.push({
+        id: `low-completion-${name}`,
+        type: 'error',
+        message: `${name} has a low task completion rate of ${rate}%`,
+        trainerName: name,
+        timestamp: new Date()
+      });
+    } else if (rate < 75) {
+      notifications.push({
+        id: `warn-completion-${name}`,
+        type: 'warning',
+        message: `${name}'s completion rate is ${rate}% — below target`,
+        trainerName: name,
+        timestamp: new Date()
+      });
+    }
+  });
+
+  // Check attendance rates per trainer
+  const trainerTrainingMap: Record<string, TrainingReport[]> = {};
+  trainingReports.forEach(r => {
+    if (!trainerTrainingMap[r.trainerName]) trainerTrainingMap[r.trainerName] = [];
+    trainerTrainingMap[r.trainerName].push(r);
+  });
+
+  Object.entries(trainerTrainingMap).forEach(([name, reports]) => {
+    const rate = getAttendanceRate(reports);
+    if (rate < 70) {
+      notifications.push({
+        id: `low-attendance-${name}`,
+        type: 'warning',
+        message: `${name}'s average attendance is ${rate}% — below 70%`,
+        trainerName: name,
+        timestamp: new Date()
+      });
+    }
+  });
+
+  return notifications.slice(0, 10);
 }

@@ -1,28 +1,49 @@
 // ==========================================
 // DashSheet — Members Page
 // ==========================================
-import { useMemo, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useMemo, useState, useEffect } from 'react';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 import {
   User, Mail, BookOpen, ClipboardList,
-  CheckCircle2, AlertTriangle, Search
+  CheckCircle2, AlertTriangle, Search, Package, Briefcase
 } from 'lucide-react';
-import { Member, TrainingReport, WorkReport } from '../types';
+import { Member, TrainingReport, WorkReport, OfficeAdminReport, PlacementReport } from '../types';
+import EmptyState from '../components/EmptyState';
 
 interface MembersPageProps {
   members: Member[];
   trainingReports: TrainingReport[];
   workReports: WorkReport[];
+  officeAdminReports: OfficeAdminReport[];
+  placementReports: PlacementReport[];
 }
 
-export default function MembersPage({ members, trainingReports, workReports }: MembersPageProps) {
+const ROLE_COLORS: Record<string, string> = {
+  trainer: 'blue',
+  admin: 'purple',
+  officeadmin: 'orange',
+  placement: 'green'
+};
+
+export default function MembersPage({
+  members, trainingReports, workReports, officeAdminReports, placementReports
+}: MembersPageProps) {
   const [search, setSearch] = useState('');
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
+
+  // Pick up global search from sidebar
+  useEffect(() => {
+    const q = searchParams.get('q');
+    if (q) setSearch(q);
+  }, [searchParams]);
 
   const memberStats = useMemo(() => {
     return members.map(m => {
       const tReports = trainingReports.filter(r => r.trainerName === m.name);
       const wReports = workReports.filter(r => r.trainerName === m.name);
+      const invReports = officeAdminReports.filter(r => r.staffName === m.name);
+      const plReports = placementReports.filter(r => r.staffName === m.name);
 
       let totalTasks = 0, completedTasks = 0;
       wReports.forEach(r => r.timeSlots.forEach(ts => {
@@ -38,12 +59,14 @@ export default function MembersPage({ members, trainingReports, workReports }: M
         ...m,
         trainingCount: tReports.length,
         workCount: wReports.length,
+        invCount: invReports.length,
+        plCount: plReports.length,
         completionRate,
         pendingCount,
         completedTasks
       };
     });
-  }, [members, trainingReports, workReports]);
+  }, [members, trainingReports, workReports, officeAdminReports, placementReports]);
 
   const filtered = useMemo(() => {
     if (!search) return memberStats;
@@ -51,7 +74,8 @@ export default function MembersPage({ members, trainingReports, workReports }: M
     return memberStats.filter(m =>
       m.name.toLowerCase().includes(q) ||
       m.department.toLowerCase().includes(q) ||
-      m.batch.toLowerCase().includes(q)
+      m.batch.toLowerCase().includes(q) ||
+      m.role.toLowerCase().includes(q)
     );
   }, [memberStats, search]);
 
@@ -60,17 +84,16 @@ export default function MembersPage({ members, trainingReports, workReports }: M
       <div className="page-header">
         <div>
           <h2 className="page-title">Members</h2>
-          <p className="page-subtitle">{members.length} trainers enrolled</p>
+          <p className="page-subtitle">{members.length} staff enrolled</p>
         </div>
         <div className="members-search">
           <Search size={16} />
           <input
             type="text"
-            placeholder="Search by name, department, or batch..."
+            placeholder="Search by name, department, batch, or role..."
             value={search}
             onChange={e => setSearch(e.target.value)}
             className="members-search__input"
-            id="member-search"
           />
         </div>
       </div>
@@ -84,52 +107,72 @@ export default function MembersPage({ members, trainingReports, workReports }: M
             role="button"
             tabIndex={0}
             aria-label={`View ${member.name}'s details`}
+            onKeyDown={e => e.key === 'Enter' && navigate(`/member/${encodeURIComponent(member.name)}`)}
           >
             <div className="member-card__header">
-              <div className="member-card__avatar">
+              <div className={`member-card__avatar member-card__avatar--${ROLE_COLORS[member.role.toLowerCase()] || 'blue'}`}>
                 {member.name.split(' ').map(n => n[0]).join('')}
               </div>
               <div className="member-card__info">
                 <h3 className="member-card__name">{member.name}</h3>
                 <p className="member-card__dept">{member.department}</p>
-                <p className="member-card__batch">{member.batch}</p>
+                {member.batch !== '-' && <p className="member-card__batch">{member.batch}</p>}
               </div>
               <span className={`member-card__role member-card__role--${member.role.toLowerCase()}`}>
-                {member.role}
+                {member.role === 'OfficeAdmin' ? 'Office Admin' : member.role}
               </span>
             </div>
 
             <div className="member-card__stats">
-              <div className="member-card__stat">
-                <BookOpen size={14} />
-                <span>{member.trainingCount} training</span>
-              </div>
-              <div className="member-card__stat">
-                <ClipboardList size={14} />
-                <span>{member.workCount} work</span>
-              </div>
-              <div className="member-card__stat member-card__stat--green">
-                <CheckCircle2 size={14} />
-                <span>{member.completionRate}%</span>
-              </div>
-              <div className="member-card__stat member-card__stat--orange">
-                <AlertTriangle size={14} />
-                <span>{member.pendingCount} pending</span>
-              </div>
+              {(member.role === 'Trainer' || member.role === 'Admin') && (
+                <>
+                  <div className="member-card__stat">
+                    <BookOpen size={14} />
+                    <span>{member.trainingCount} training</span>
+                  </div>
+                  <div className="member-card__stat">
+                    <ClipboardList size={14} />
+                    <span>{member.workCount} work</span>
+                  </div>
+                  <div className="member-card__stat member-card__stat--green">
+                    <CheckCircle2 size={14} />
+                    <span>{member.completionRate}%</span>
+                  </div>
+                  <div className="member-card__stat member-card__stat--orange">
+                    <AlertTriangle size={14} />
+                    <span>{member.pendingCount} pending</span>
+                  </div>
+                </>
+              )}
+              {member.role === 'OfficeAdmin' && (
+                <div className="member-card__stat">
+                  <Package size={14} />
+                  <span>{member.invCount} inventory logs</span>
+                </div>
+              )}
+              {member.role === 'Placement' && (
+                <div className="member-card__stat member-card__stat--green">
+                  <Briefcase size={14} />
+                  <span>{member.plCount} interactions</span>
+                </div>
+              )}
             </div>
 
-            <div className="member-card__progress">
-              <div className="member-card__progress-bar" style={{ width: `${member.completionRate}%` }} />
-            </div>
+            {(member.role === 'Trainer' || member.role === 'Admin') && (
+              <div className="member-card__progress">
+                <div className="member-card__progress-bar" style={{ width: `${member.completionRate}%` }} />
+              </div>
+            )}
           </div>
         ))}
       </div>
 
       {filtered.length === 0 && (
-        <div className="members-empty">
-          <User size={48} />
-          <p>No members found matching "{search}"</p>
-        </div>
+        <EmptyState
+          icon={User}
+          title={search ? `No members found for "${search}"` : 'No members found'}
+          description="Try adjusting your search or filters."
+        />
       )}
     </div>
   );

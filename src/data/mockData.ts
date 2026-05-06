@@ -1,15 +1,17 @@
 // ==========================================
 // DashSheet — Mock Data for Development
 // ==========================================
-import { Member, TrainingReport, WorkReport } from '../types';
+import { Member, TrainingReport, WorkReport, OfficeAdminReport, PlacementReport } from '../types';
 
 const TRAINER_NAMES = [
   'Aarav Sharma', 'Priya Patel', 'Rohan Gupta', 'Neha Singh', 'Vikram Reddy',
   'Ananya Iyer', 'Karan Mehta', 'Divya Joshi', 'Arjun Nair', 'Sneha Das',
   'Rahul Verma', 'Pooja Mishra', 'Aditya Kumar', 'Riya Banerjee', 'Siddharth Rao',
-  'Meera Choudhary', 'Nikhil Saxena', 'Kavya Menon', 'Dhruv Tiwari', 'Ishita Kapoor',
-  'Manish Yadav', 'Shreya Agarwal', 'Varun Bhatt', 'Tanvi Deshmukh', 'Gaurav Pandey'
+  'Meera Choudhary', 'Nikhil Saxena', 'Kavya Menon', 'Dhruv Tiwari', 'Ishita Kapoor'
 ];
+
+const OFFICE_ADMIN_NAMES = ['Suresh Pillai', 'Rekha Nambiar'];
+const PLACEMENT_NAMES = ['Manish Yadav', 'Shreya Agarwal', 'Varun Bhatt'];
 
 const DEPARTMENTS = ['Computer Science', 'Data Science', 'Web Development', 'Mobile Development', 'Cloud Computing'];
 const BATCHES = ['Batch A', 'Batch B', 'Batch C', 'Batch D', 'Batch E'];
@@ -26,6 +28,7 @@ const TOPICS = [
   'Neural Networks', 'Docker Containers', 'Authentication & JWT',
   'Color Theory', 'Kubernetes Basics', 'Encryption Methods', 'NoSQL Databases'
 ];
+const DURATIONS = ['1 Hour', '2 Hours', '3 Hours', 'Full Day'];
 
 const TIME_SLOTS = [
   '08:30 - 09:30', '09:30 - 10:30', '10:30 - 11:30', '11:30 - 12:30',
@@ -39,6 +42,20 @@ const TASKS = [
   'Create quiz questions', 'Grade assignments', 'Student feedback analysis',
   'Curriculum planning', 'Industry interaction session', 'Internal training',
   'Documentation update', 'Research new topics', 'Webinar preparation'
+];
+
+const INVENTORY_ITEMS = [
+  'Laptop', 'Desktop PC', 'Projector', 'Whiteboard', 'Printer',
+  'UPS Battery', 'Extension Board', 'HDMI Cable', 'Webcam', 'Headset',
+  'Office Chair', 'Study Table', 'Marker Set', 'Pen Stand', 'Notebook Stack',
+  'Eraser Board', 'Speaker System', 'Router', 'Switch', 'External HDD'
+];
+
+const COMPANIES = [
+  'Infosys', 'TCS', 'Wipro', 'HCL Technologies', 'Tech Mahindra',
+  'Cognizant', 'Accenture', 'Capgemini', 'IBM India', 'Oracle India',
+  'Zoho Corporation', 'Freshworks', 'Byju\'s', 'Swiggy', 'Ola',
+  'Tata Elxsi', 'L&T Infotech', 'Mindtree', 'Hexaware', 'Mphasis'
 ];
 
 function randomItem<T>(arr: T[]): T {
@@ -70,13 +87,39 @@ function generateDates(count: number): string[] {
 }
 
 export function generateMembers(): Member[] {
-  return TRAINER_NAMES.map((name, i) => ({
-    name,
-    department: DEPARTMENTS[i % DEPARTMENTS.length],
-    batch: BATCHES[i % BATCHES.length],
-    email: `${name.toLowerCase().replace(' ', '.')}@org.com`,
-    role: i < 3 ? 'Admin' : 'Trainer' as 'Trainer' | 'Admin'
-  }));
+  const members: Member[] = [];
+
+  TRAINER_NAMES.forEach((name, i) => {
+    members.push({
+      name,
+      department: DEPARTMENTS[i % DEPARTMENTS.length],
+      batch: BATCHES[i % BATCHES.length],
+      email: `${name.toLowerCase().replace(' ', '.')}@org.com`,
+      role: i < 3 ? 'Admin' : 'Trainer'
+    });
+  });
+
+  OFFICE_ADMIN_NAMES.forEach((name, i) => {
+    members.push({
+      name,
+      department: 'Administration',
+      batch: '-',
+      email: `${name.toLowerCase().replace(' ', '.')}@org.com`,
+      role: 'OfficeAdmin'
+    });
+  });
+
+  PLACEMENT_NAMES.forEach((name, i) => {
+    members.push({
+      name,
+      department: 'Placement Cell',
+      batch: '-',
+      email: `${name.toLowerCase().replace(' ', '.')}@org.com`,
+      role: 'Placement'
+    });
+  });
+
+  return members;
 }
 
 export function generateTrainingReports(): TrainingReport[] {
@@ -94,6 +137,7 @@ export function generateTrainingReports(): TrainingReport[] {
         batch: randomItem(BATCHES),
         course: randomItem(COURSES),
         topicCovered: randomItem(TOPICS),
+        duration: randomItem(DURATIONS),
         learningObjectives: `Understand ${randomItem(TOPICS).toLowerCase()} concepts and apply them practically`,
         methods: {
           lecture: Math.random() > 0.3,
@@ -150,6 +194,72 @@ export function generateWorkReports(): WorkReport[] {
         additionalNotes: '',
         reviewedBy: Math.random() > 0.4 ? randomItem(TRAINER_NAMES.slice(0, 3)) : ''
       });
+    }
+  }
+
+  return reports;
+}
+
+export function generateOfficeAdminReports(): OfficeAdminReport[] {
+  const reports: OfficeAdminReport[] = [];
+  const dates = generateDates(30);
+  const categories: OfficeAdminReport['itemCategory'][] = ['Electronics', 'Furniture', 'Stationery', 'Equipment', 'Other'];
+  const conditions: OfficeAdminReport['condition'][] = ['New', 'Good', 'Fair', 'Poor', 'Damaged'];
+  const actions: OfficeAdminReport['actionTaken'][] = ['Added', 'Removed', 'Repaired', 'Maintenance', 'Audited'];
+  const locations = ['Lab 1', 'Lab 2', 'Lab 3', 'Staff Room', 'Principal Office', 'Store Room', 'Conference Room'];
+
+  for (const staffName of OFFICE_ADMIN_NAMES) {
+    const reportDates = dates.slice(0, randomInt(12, 25));
+    for (const date of reportDates) {
+      const itemsCount = randomInt(1, 4);
+      for (let i = 0; i < itemsCount; i++) {
+        reports.push({
+          timestamp: new Date().toISOString(),
+          staffName,
+          date,
+          itemName: randomItem(INVENTORY_ITEMS),
+          itemCategory: randomItem(categories),
+          quantity: randomInt(1, 10),
+          condition: randomItem(conditions),
+          actionTaken: randomItem(actions),
+          location: randomItem(locations),
+          notes: Math.random() > 0.6 ? 'Needs follow-up in next audit' : ''
+        });
+      }
+    }
+  }
+
+  return reports;
+}
+
+export function generatePlacementReports(): PlacementReport[] {
+  const reports: PlacementReport[] = [];
+  const dates = generateDates(30);
+  const companyTypes: PlacementReport['companyType'][] = ['IT', 'Non-IT', 'Manufacturing', 'Healthcare', 'Finance', 'Education', 'Other'];
+  const interactionTypes: PlacementReport['interactionType'][] = ['Cold Call', 'Follow-up Call', 'Email', 'Campus Visit', 'Company Visit', 'LinkedIn'];
+  const outcomes: PlacementReport['outcome'][] = ['Interested', 'Not Interested', 'Scheduled Visit', 'Sent JD', 'No Response', 'Placed Students', 'Follow-up Needed'];
+
+  for (const staffName of PLACEMENT_NAMES) {
+    const reportDates = dates.slice(0, randomInt(15, 28));
+    for (const date of reportDates) {
+      const interactionsPerDay = randomInt(1, 5);
+      for (let i = 0; i < interactionsPerDay; i++) {
+        const outcome = randomItem(outcomes);
+        const placed = outcome === 'Placed Students';
+        reports.push({
+          timestamp: new Date().toISOString(),
+          staffName,
+          date,
+          companyName: randomItem(COMPANIES),
+          companyType: randomItem(companyTypes),
+          interactionType: randomItem(interactionTypes),
+          contactPerson: `HR Manager`,
+          outcome,
+          jobsOffered: placed ? randomInt(2, 15) : 0,
+          studentsPlaced: placed ? randomInt(1, 10) : 0,
+          notes: Math.random() > 0.5 ? 'Follow up scheduled for next week' : ''
+        });
+      }
     }
   }
 
