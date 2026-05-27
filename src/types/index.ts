@@ -97,6 +97,10 @@ export interface PlacementReport {
   studentsSelected: number;
   remarks: string;
   priority: 'High' | 'Medium' | 'Low';
+  nextFollowUpDate: string;
+  actionRequired: string;
+  assignedTo: 'Placement Officer' | 'HOD / Coordinator' | 'Campus Relations Manager' | 'Business Development Associate' | 'Other' | '';
+  followUpDone: boolean;
 }
 
 export interface DashboardFilters {

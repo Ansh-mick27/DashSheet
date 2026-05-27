@@ -146,6 +146,10 @@ function createSeparateForms() {
   f4.addTextItem().setTitle('Students Selected').setRequired(false);
   f4.addParagraphTextItem().setTitle('Remarks / Next Steps').setRequired(false);
   f4.addListItem().setTitle('Priority').setChoiceValues(['High','Medium','Low']).setRequired(true);
+  f4.addDateItem().setTitle('Next Follow-Up Date').setRequired(false);
+  f4.addTextItem().setTitle('Action Required').setRequired(false);
+  f4.addListItem().setTitle('Assigned To').setChoiceValues(['Placement Officer','HOD / Coordinator','Campus Relations Manager','Business Development Associate','Other']).setRequired(false);
+  f4.addListItem().setTitle('Follow-Up Done?').setChoiceValues(['Yes','No']).setRequired(false);
   f4.setDestination(FormApp.DestinationType.SPREADSHEET, ssId);
 
   // Save form URLs
@@ -321,7 +325,11 @@ function _parsePlacement(h, row) {
     driveDate:          String(_c(h, row, 'Drive Date (DD/MM/YYYY or TBD)')) || 'TBD',
     studentsSelected:   parseInt(_c(h, row, 'Students Selected'))    || 0,
     remarks:            String(_c(h, row, 'Remarks / Next Steps')),
-    priority:           String(_c(h, row, 'Priority'))           || 'Medium'
+    priority:           String(_c(h, row, 'Priority'))           || 'Medium',
+    nextFollowUpDate:   _fmt(row[0], _c(h, row, 'Next Follow-Up Date')),
+    actionRequired:     String(_c(h, row, 'Action Required')),
+    assignedTo:         String(_c(h, row, 'Assigned To')),
+    followUpDone:       String(_c(h, row, 'Follow-Up Done?')) === 'Yes'
   };
 }
 

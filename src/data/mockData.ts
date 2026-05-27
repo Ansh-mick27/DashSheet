@@ -246,6 +246,14 @@ const STATUSES: PlacementReport['currentStatus'][] = [
   'MoU Signed', 'Drive Scheduled', 'Drive Completed', 'No Response', 'Blacklisted'
 ];
 const PRIORITIES: PlacementReport['priority'][] = ['High', 'Medium', 'Low'];
+const ASSIGNED_TO: PlacementReport['assignedTo'][] = [
+  'Placement Officer', 'HOD / Coordinator', 'Campus Relations Manager', 'Business Development Associate'
+];
+const ACTIONS_REQUIRED = [
+  'Resend JD + follow-up mail', 'Confirm PPT schedule', 'Negotiate CTC & finalize date',
+  'Send student shortlist (resume)', 'Schedule campus visit', 'Follow up on MoU signing',
+  'Confirm drive date', 'Send offer letter details', 'Share batch profiles'
+];
 const ROLES_OFFERED = [
   'Software Engineer Trainee', 'Business Analyst', 'Graduate Engineer Trainee',
   'Data Analyst', 'HR Executive', 'Probationary Officer', 'Marketing Associate',
@@ -288,7 +296,15 @@ export function generatePlacementReports(): PlacementReport[] {
         driveDate: (isDriveCompleted || status === 'Drive Scheduled') ? formatDate(futureDate) : 'TBD',
         studentsSelected: isDriveCompleted ? randomInt(1, 10) : 0,
         remarks: Math.random() > 0.5 ? 'Follow up scheduled' : '',
-        priority: randomItem(PRIORITIES)
+        priority: randomItem(PRIORITIES),
+        nextFollowUpDate: status !== 'Drive Completed' && status !== 'Blacklisted'
+          ? formatDate(new Date(Date.now() + randomInt(2, 20) * 24 * 60 * 60 * 1000))
+          : '',
+        actionRequired: status !== 'Drive Completed' && status !== 'Blacklisted'
+          ? randomItem(ACTIONS_REQUIRED) : '',
+        assignedTo: status !== 'Drive Completed' && status !== 'Blacklisted'
+          ? randomItem(ASSIGNED_TO) : '',
+        followUpDone: Math.random() > 0.7
       });
     }
   }
