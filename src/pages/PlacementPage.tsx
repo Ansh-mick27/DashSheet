@@ -238,38 +238,61 @@ export default function PlacementPage({ reports }: PlacementPageProps) {
         />
       ) : (
         <>
-          {/* ── Dashboard Summary Tables (matching PDF page 2) ── */}
-          <div className="charts-grid charts-grid--2" style={{ marginTop: 24 }}>
-            {/* Status Breakdown Table */}
-            <ChartCard title="Status Breakdown" subtitle="Pipeline stage count, share & distribution">
-              <div style={{ overflowX: 'auto' }}>
-                <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: 13 }}>
+          {/* ── PLACEMENT SOURCING DASHBOARD PANEL (PDF page 2) ── */}
+          <div className="sourcing-dashboard">
+            {/* Header banner */}
+            <div className="sourcing-dashboard__header">
+              <p className="sourcing-dashboard__title">Placement Sourcing Dashboard</p>
+              <p className="sourcing-dashboard__subtitle">
+                Auto-Summary from Sourcing Tracker &nbsp;|&nbsp; {new Date().toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' })}
+              </p>
+            </div>
+
+            {/* Compact KPI row */}
+            <div className="sourcing-dashboard__kpis">
+              {[
+                { label: 'Total Companies Tracked', value: totalCompanies },
+                { label: 'MoU Signed',              value: mouSigned      },
+                { label: 'Drive Scheduled / Completed', value: driveCount },
+                { label: 'Total Openings',           value: totalOpenings  },
+                { label: 'Total Students Selected',  value: totalSelected  },
+                { label: 'High Priority Companies',  value: highPriority   },
+              ].map(({ label, value }) => (
+                <div key={label} className="sourcing-dashboard__kpi">
+                  <div className="sourcing-dashboard__kpi-value">{value}</div>
+                  <div className="sourcing-dashboard__kpi-label">{label}</div>
+                </div>
+              ))}
+            </div>
+
+            {/* Status Breakdown + Top Sectors tables */}
+            <div className="sourcing-dashboard__tables">
+              {/* Status Breakdown */}
+              <div className="sourcing-dashboard__table-section">
+                <p className="sourcing-dashboard__table-heading">Status Breakdown</p>
+                <table className="sourcing-dashboard__tbl">
                   <thead>
-                    <tr style={{ borderBottom: '1px solid rgba(255,255,255,0.08)' }}>
-                      <th style={{ textAlign: 'left',  padding: '6px 8px', color: 'var(--text-secondary)', fontWeight: 600 }}>Status</th>
-                      <th style={{ textAlign: 'center', padding: '6px 8px', color: 'var(--text-secondary)', fontWeight: 600, width: 52 }}>Count</th>
-                      <th style={{ textAlign: 'center', padding: '6px 8px', color: 'var(--text-secondary)', fontWeight: 600, width: 68 }}>% Share</th>
-                      <th style={{ padding: '6px 8px', color: 'var(--text-secondary)', fontWeight: 600 }}>Bar</th>
+                    <tr>
+                      <th>Status</th>
+                      <th>Count</th>
+                      <th>% Share</th>
+                      <th className="sourcing-dashboard__bar-cell">Bar</th>
                     </tr>
                   </thead>
                   <tbody>
                     {statusBreakdown.map(row => (
-                      <tr key={row.name} style={{ borderBottom: '1px solid rgba(255,255,255,0.04)' }}>
-                        <td style={{ padding: '5px 8px', color: row.count > 0 ? 'var(--text-primary)' : 'var(--text-secondary)' }}>
-                          {row.name}
-                        </td>
-                        <td style={{ textAlign: 'center', padding: '5px 8px', fontWeight: row.count > 0 ? 700 : 400,
-                          color: row.count > 0 ? STATUS_COLOR[row.name] || 'var(--text-primary)' : 'var(--text-secondary)' }}>
+                      <tr key={row.name} className={row.count === 0 ? 'dim' : ''}>
+                        <td>{row.name}</td>
+                        <td style={{ fontWeight: row.count > 0 ? 700 : 400,
+                          color: row.count > 0 ? STATUS_COLOR[row.name] : undefined }}>
                           {row.count}
                         </td>
-                        <td style={{ textAlign: 'center', padding: '5px 8px', color: 'var(--text-secondary)' }}>
-                          {row.pct}%
-                        </td>
-                        <td style={{ padding: '5px 8px' }}>
+                        <td style={{ color: 'var(--text-secondary)' }}>{row.pct}%</td>
+                        <td className="sourcing-dashboard__bar-cell">
                           {row.count > 0 && (
-                            <div style={{ background: 'rgba(255,255,255,0.06)', borderRadius: 4, height: 8, overflow: 'hidden' }}>
-                              <div style={{ width: `${row.barW}%`, height: '100%', borderRadius: 4,
-                                background: STATUS_COLOR[row.name] || '#6366f1', transition: 'width 0.4s' }} />
+                            <div className="sourcing-dashboard__bar-track">
+                              <div className="sourcing-dashboard__bar-fill"
+                                style={{ width: `${row.barW}%`, background: STATUS_COLOR[row.name] || '#6366f1' }} />
                             </div>
                           )}
                         </td>
@@ -278,34 +301,31 @@ export default function PlacementPage({ reports }: PlacementPageProps) {
                   </tbody>
                 </table>
               </div>
-            </ChartCard>
 
-            {/* Top Sectors Table */}
-            <ChartCard title="Top Sectors" subtitle="Companies by industry sector">
-              <div style={{ overflowX: 'auto' }}>
-                <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: 13 }}>
+              {/* Top Sectors */}
+              <div className="sourcing-dashboard__table-section">
+                <p className="sourcing-dashboard__table-heading">Top Sectors</p>
+                <table className="sourcing-dashboard__tbl">
                   <thead>
-                    <tr style={{ borderBottom: '1px solid rgba(255,255,255,0.08)' }}>
-                      <th style={{ textAlign: 'left',  padding: '6px 8px', color: 'var(--text-secondary)', fontWeight: 600 }}>Sector</th>
-                      <th style={{ textAlign: 'center', padding: '6px 8px', color: 'var(--text-secondary)', fontWeight: 600, width: 60 }}>Count</th>
+                    <tr>
+                      <th>Sector</th>
+                      <th>Count</th>
                     </tr>
                   </thead>
                   <tbody>
                     {sectorBreakdown.map((row, i) => (
-                      <tr key={row.name} style={{ borderBottom: '1px solid rgba(255,255,255,0.04)' }}>
-                        <td style={{ padding: '5px 8px', color: row.count > 0 ? 'var(--text-primary)' : 'var(--text-secondary)' }}>
-                          {row.name}
-                        </td>
-                        <td style={{ textAlign: 'center', padding: '5px 8px', fontWeight: row.count > 0 ? 700 : 400,
-                          color: row.count > 0 ? PIE_COLORS[i % PIE_COLORS.length] : 'var(--text-secondary)' }}>
-                          {row.count > 0 ? row.count : 0}
+                      <tr key={row.name} className={row.count === 0 ? 'dim' : ''}>
+                        <td>{row.name}</td>
+                        <td style={{ fontWeight: row.count > 0 ? 700 : 400,
+                          color: row.count > 0 ? PIE_COLORS[i % PIE_COLORS.length] : undefined }}>
+                          {row.count}
                         </td>
                       </tr>
                     ))}
                   </tbody>
                 </table>
               </div>
-            </ChartCard>
+            </div>
           </div>
 
           {/* ── Charts ─────────────────────────────────────── */}

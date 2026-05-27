@@ -1903,6 +1903,164 @@ input, select { font: inherit; color: inherit; }
 
 
 /* ============================================
+   PLACEMENT SOURCING DASHBOARD PANEL
+   ============================================ */
+.sourcing-dashboard {
+  margin-top: 24px;
+  border-radius: 16px;
+  overflow: hidden;
+  border: 1px solid rgba(99,102,241,0.25);
+  background: var(--bg-card);
+  backdrop-filter: blur(12px);
+}
+
+.sourcing-dashboard__header {
+  background: linear-gradient(135deg, #1e1b4b 0%, #0f1e45 50%, #0c2340 100%);
+  padding: 18px 28px;
+  text-align: center;
+  border-bottom: 1px solid rgba(99,102,241,0.3);
+}
+
+.sourcing-dashboard__title {
+  font-size: 1.05rem;
+  font-weight: 800;
+  color: #f1f5f9;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  margin: 0;
+}
+
+.sourcing-dashboard__subtitle {
+  font-size: 0.78rem;
+  color: #94a3b8;
+  margin: 5px 0 0;
+  font-style: italic;
+}
+
+.sourcing-dashboard__kpis {
+  display: grid;
+  grid-template-columns: repeat(6, 1fr);
+  border-bottom: 1px solid var(--border-color);
+}
+
+.sourcing-dashboard__kpi {
+  padding: 18px 10px;
+  text-align: center;
+  border-right: 1px solid var(--border-color);
+  transition: background 0.2s;
+}
+
+.sourcing-dashboard__kpi:last-child { border-right: none; }
+
+.sourcing-dashboard__kpi:hover { background: var(--bg-card-hover); }
+
+.sourcing-dashboard__kpi-value {
+  font-size: 2rem;
+  font-weight: 800;
+  color: var(--text-primary);
+  line-height: 1;
+  margin-bottom: 5px;
+}
+
+.sourcing-dashboard__kpi-label {
+  font-size: 0.68rem;
+  color: var(--text-secondary);
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  line-height: 1.3;
+}
+
+.sourcing-dashboard__tables {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+}
+
+.sourcing-dashboard__table-section {
+  padding: 20px 24px;
+}
+
+.sourcing-dashboard__table-section:first-child {
+  border-right: 1px solid var(--border-color);
+}
+
+.sourcing-dashboard__table-heading {
+  font-size: 0.72rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.07em;
+  color: var(--text-secondary);
+  margin: 0 0 10px;
+}
+
+.sourcing-dashboard__tbl {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 12.5px;
+}
+
+.sourcing-dashboard__tbl th {
+  text-align: left;
+  padding: 5px 6px;
+  color: var(--text-muted);
+  font-weight: 700;
+  border-bottom: 1px solid var(--border-light);
+  white-space: nowrap;
+}
+
+.sourcing-dashboard__tbl th:not(:first-child) { text-align: center; }
+
+.sourcing-dashboard__tbl td {
+  padding: 5px 6px;
+  border-bottom: 1px solid var(--border-color);
+  color: var(--text-primary);
+}
+
+.sourcing-dashboard__tbl td:not(:first-child) { text-align: center; }
+
+.sourcing-dashboard__tbl tr:last-child td { border-bottom: none; }
+
+.sourcing-dashboard__tbl tr.dim td { color: var(--text-muted); }
+
+.sourcing-dashboard__bar-cell { padding: 5px 6px; min-width: 80px; }
+
+.sourcing-dashboard__bar-track {
+  background: rgba(255,255,255,0.06);
+  border-radius: 4px;
+  height: 8px;
+  overflow: hidden;
+}
+
+.sourcing-dashboard__bar-fill {
+  height: 100%;
+  border-radius: 4px;
+  transition: width 0.5s ease;
+}
+
+[data-theme="light"] .sourcing-dashboard__bar-track {
+  background: rgba(0,0,0,0.06);
+}
+
+[data-theme="light"] .sourcing-dashboard__header {
+  background: linear-gradient(135deg, #312e81 0%, #1e3a8a 100%);
+}
+
+@media (max-width: 1100px) {
+  .sourcing-dashboard__kpis { grid-template-columns: repeat(3, 1fr); }
+}
+@media (max-width: 860px) {
+  .sourcing-dashboard__tables { grid-template-columns: 1fr; }
+  .sourcing-dashboard__table-section:first-child {
+    border-right: none;
+    border-bottom: 1px solid var(--border-color);
+  }
+}
+@media (max-width: 600px) {
+  .sourcing-dashboard__kpis { grid-template-columns: repeat(2, 1fr); }
+}
+
+
+/* ============================================
    RESPONSIVE EXTRAS
    ============================================ */
 @media (max-width: 900px) {
