@@ -78,15 +78,25 @@ export interface OfficeAdminReport {
 export interface PlacementReport {
   timestamp: string;
   staffName: string;
-  date: string;
   companyName: string;
-  companyType: 'IT' | 'Non-IT' | 'Manufacturing' | 'Healthcare' | 'Finance' | 'Education' | 'Other';
-  interactionType: 'Cold Call' | 'Follow-up Call' | 'Email' | 'Campus Visit' | 'Company Visit' | 'LinkedIn';
+  industrySector: 'IT / Software' | 'Consulting' | 'Manufacturing' | 'BFSI' | 'EdTech' | 'Healthcare' | 'E-Commerce' | 'FMCG' | 'Automobile' | 'Other';
+  companyType: 'MNC' | 'Startup' | 'PSU / Large Corp' | 'Private Sector' | 'Other';
+  hqLocation: string;
   contactPerson: string;
-  outcome: 'Interested' | 'Not Interested' | 'Scheduled Visit' | 'Sent JD' | 'No Response' | 'Placed Students' | 'Follow-up Needed';
-  jobsOffered: number;
-  studentsPlaced: number;
-  notes: string;
+  designation: string;
+  emailId: string;
+  phoneNumber: string;
+  sourceChannel: 'Alumni Reference' | 'LinkedIn Outreach' | 'Company Portal' | 'Job Fair' | 'College Website' | 'Direct Approach' | 'Other';
+  dateOfFirstContact: string;
+  modeOfContact: 'Email' | 'Phone Call' | 'Video Call' | 'In-Person Meeting' | 'LinkedIn';
+  currentStatus: 'Identified' | 'Email Sent' | 'JD Sent' | 'Under Discussion' | 'In Negotiation' | 'MoU Signed' | 'Drive Scheduled' | 'Drive Completed' | 'No Response' | 'Blacklisted';
+  rolesOffered: string;
+  numberOfOpenings: number;
+  ctcLPA: number;
+  driveDate: string;
+  studentsSelected: number;
+  remarks: string;
+  priority: 'High' | 'Medium' | 'Low';
 }
 
 export interface DashboardFilters {

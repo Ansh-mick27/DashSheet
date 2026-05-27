@@ -96,13 +96,13 @@ export default function MemberDetailPage({
   // Placement-specific charts
   const placementOutcomeData = useMemo(() => {
     const map: Record<string, number> = {};
-    memberPlacement.forEach(r => { map[r.outcome] = (map[r.outcome] || 0) + 1; });
+    memberPlacement.forEach(r => { map[r.currentStatus] = (map[r.currentStatus] || 0) + 1; });
     return Object.entries(map).map(([name, value]) => ({ name, value }));
   }, [memberPlacement]);
 
   const placementTimeline = useMemo(() => {
     const dateMap: Record<string, number> = {};
-    memberPlacement.forEach(r => { dateMap[r.date] = (dateMap[r.date] || 0) + 1; });
+    memberPlacement.forEach(r => { dateMap[r.dateOfFirstContact] = (dateMap[r.dateOfFirstContact] || 0) + 1; });
     return Object.entries(dateMap)
       .sort(([a], [b]) => {
         const [da, ma, ya] = a.split('/').map(Number);
@@ -179,18 +179,19 @@ export default function MemberDetailPage({
   ];
 
   const placCols = [
-    { key: 'date', header: 'Date', sortable: true, width: '90px' },
+    { key: 'dateOfFirstContact', header: 'Date', sortable: true, width: '90px' },
     { key: 'companyName', header: 'Company', sortable: true },
-    { key: 'companyType', header: 'Sector', width: '90px' },
-    { key: 'interactionType', header: 'Mode', width: '120px' },
-    { key: 'outcome', header: 'Outcome',
+    { key: 'industrySector', header: 'Sector', width: '110px' },
+    { key: 'modeOfContact', header: 'Mode', width: '120px' },
+    { key: 'currentStatus', header: 'Status',
       render: (r: PlacementReport) => {
-        const c = r.outcome === 'Placed Students' ? 'high'
-          : r.outcome === 'Interested' ? 'moderate' : 'low';
-        return <span className={`badge badge--${c}`}>{r.outcome}</span>;
+        const c = r.currentStatus === 'Drive Completed' || r.currentStatus === 'MoU Signed' ? 'high'
+          : r.currentStatus === 'Under Discussion' || r.currentStatus === 'In Negotiation' || r.currentStatus === 'JD Sent' ? 'moderate'
+          : r.currentStatus === 'No Response' || r.currentStatus === 'Blacklisted' ? 'low' : 'neutral';
+        return <span className={`badge badge--${c}`}>{r.currentStatus}</span>;
       }
     },
-    { key: 'studentsPlaced', header: 'Placed', width: '70px' }
+    { key: 'studentsSelected', header: 'Selected', width: '80px' }
   ];
 
   return (
@@ -304,10 +305,10 @@ export default function MemberDetailPage({
       {isPlacement && (
         <>
           <div className="stats-grid stats-grid--4">
-            <StatCard title="Total Interactions" value={memberPlacement.length} icon={Briefcase} color="blue" />
-            <StatCard title="Companies Reached" value={new Set(memberPlacement.map(r => r.companyName)).size} icon={Briefcase} color="cyan" />
-            <StatCard title="Students Placed" value={memberPlacement.reduce((s, r) => s + r.studentsPlaced, 0)} icon={Users} color="green" />
-            <StatCard title="Jobs Offered" value={memberPlacement.reduce((s, r) => s + r.jobsOffered, 0)} icon={CheckCircle2} color="purple" />
+            <StatCard title="Companies Tracked" value={memberPlacement.length} icon={Briefcase} color="blue" />
+            <StatCard title="Unique Companies" value={new Set(memberPlacement.map(r => r.companyName)).size} icon={Briefcase} color="cyan" />
+            <StatCard title="Students Selected" value={memberPlacement.reduce((s, r) => s + r.studentsSelected, 0)} icon={Users} color="green" />
+            <StatCard title="Total Openings" value={memberPlacement.reduce((s, r) => s + r.numberOfOpenings, 0)} icon={CheckCircle2} color="purple" />
           </div>
           <div className="charts-grid charts-grid--2">
             <ChartCard title="Outcome Breakdown">
@@ -337,7 +338,7 @@ export default function MemberDetailPage({
           </div>
           <ChartCard title="Placement Activity Log" className="mt-24">
             <DataTable columns={placCols} data={memberPlacement}
-              rowKey={(r, i) => `pl-${r.date}-${i}`} pageSize={10}
+              rowKey={(r, i) => `pl-${r.dateOfFirstContact}-${i}`} pageSize={10}
               exportFilename={`placement_${member.name.replace(' ', '_')}`}
               emptyMessage="No placement logs found" />
           </ChartCard>

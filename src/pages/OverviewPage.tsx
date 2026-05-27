@@ -45,7 +45,7 @@ export default function OverviewPage({
     return trainingReports.filter(r => r.date === todayStr).length
       + workReports.filter(r => r.date === todayStr).length
       + officeAdminReports.filter(r => r.date === todayStr).length
-      + placementReports.filter(r => r.date === todayStr).length;
+      + placementReports.filter(r => r.dateOfFirstContact === todayStr).length;
   }, [trainingReports, workReports, officeAdminReports, placementReports, todayStr]);
 
   const pendingTasks = useMemo(() => {
@@ -61,7 +61,7 @@ export default function OverviewPage({
   }, [workReports]);
 
   const totalStudentsPlaced = useMemo(
-    () => placementReports.reduce((s, r) => s + r.studentsPlaced, 0), [placementReports]
+    () => placementReports.reduce((s, r) => s + r.studentsSelected, 0), [placementReports]
   );
 
   // Participation level distribution
@@ -98,7 +98,7 @@ export default function OverviewPage({
     }
     trainingReports.forEach(r => { if (dayMap[r.date] !== undefined) dayMap[r.date].training++; });
     workReports.forEach(r => { if (dayMap[r.date] !== undefined) dayMap[r.date].work++; });
-    placementReports.forEach(r => { if (dayMap[r.date] !== undefined) dayMap[r.date].placement++; });
+    placementReports.forEach(r => { if (dayMap[r.dateOfFirstContact] !== undefined) dayMap[r.dateOfFirstContact].placement++; });
     return Object.entries(dayMap).map(([date, c]) => ({
       date: date.substring(0, 5),
       Training: c.training,

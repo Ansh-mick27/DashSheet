@@ -125,7 +125,7 @@ function DashboardLayout() {
   const filteredPlacement = useMemo(() => {
     return placementReports.filter(r => {
       if (filters.trainer && r.staffName !== filters.trainer) return false;
-      if (!inDateRange(r.date)) return false;
+      if (!inDateRange(r.dateOfFirstContact)) return false;
       return true;
     });
   }, [placementReports, filters, inDateRange]);

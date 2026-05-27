@@ -122,20 +122,30 @@ function createSeparateForms() {
   f3.addParagraphTextItem().setTitle('Additional Notes').setRequired(false);
   f3.setDestination(FormApp.DestinationType.SPREADSHEET, ssId);
 
-  // --- Form 4: Placement Activity Report ---
-  var f4 = FormApp.create('CDC — Placement Activity Report');
-  f4.setDescription('Log every company interaction — calls, visits, emails.');
+  // --- Form 4: Placement Company Sourcing Tracker ---
+  var f4 = FormApp.create('CDC — Company Sourcing Tracker');
+  f4.setDescription('Log every company you source or follow up with for placement. One entry per company per update.');
   f4.setCollectEmail(false);
   f4.addListItem().setTitle('Staff Name').setChoiceValues(PLACEMENT_NAMES).setRequired(true);
-  f4.addDateItem().setTitle('Date of Interaction').setRequired(true);
   f4.addTextItem().setTitle('Company Name').setRequired(true);
-  f4.addListItem().setTitle('Company Type / Sector').setChoiceValues(['IT','Non-IT','Manufacturing','Healthcare','Finance','Education','Other']).setRequired(true);
-  f4.addListItem().setTitle('Mode of Interaction').setChoiceValues(['Cold Call','Follow-up Call','Email','Campus Visit','Company Visit','LinkedIn']).setRequired(true);
-  f4.addTextItem().setTitle('Contact Person Name & Designation').setRequired(false);
-  f4.addListItem().setTitle('Outcome of Interaction').setChoiceValues(['Interested','Not Interested','Scheduled Visit','Sent JD','No Response','Placed Students','Follow-up Needed']).setRequired(true);
-  f4.addTextItem().setTitle('Number of Job Openings Offered (0 if none)').setRequired(false);
-  f4.addTextItem().setTitle('Number of Students Placed (0 if none)').setRequired(false);
-  f4.addParagraphTextItem().setTitle('Notes / Next Steps').setRequired(false);
+  f4.addListItem().setTitle('Industry Sector').setChoiceValues(['IT / Software','Consulting','Manufacturing','BFSI','EdTech','Healthcare','E-Commerce','FMCG','Automobile','Other']).setRequired(true);
+  f4.addListItem().setTitle('Company Type').setChoiceValues(['MNC','Startup','PSU / Large Corp','Private Sector','Other']).setRequired(true);
+  f4.addTextItem().setTitle('HQ Location').setRequired(false);
+  f4.addTextItem().setTitle('Contact Person').setRequired(false);
+  f4.addTextItem().setTitle('Designation').setRequired(false);
+  f4.addTextItem().setTitle('Email ID').setRequired(false);
+  f4.addTextItem().setTitle('Phone Number').setRequired(false);
+  f4.addListItem().setTitle('Source Channel').setChoiceValues(['Alumni Reference','LinkedIn Outreach','Company Portal','Job Fair','College Website','Direct Approach','Other']).setRequired(true);
+  f4.addDateItem().setTitle('Date of First Contact').setRequired(true);
+  f4.addListItem().setTitle('Mode of Contact').setChoiceValues(['Email','Phone Call','Video Call','In-Person Meeting','LinkedIn']).setRequired(true);
+  f4.addListItem().setTitle('Current Status').setChoiceValues(['Identified','Email Sent','JD Sent','Under Discussion','In Negotiation','MoU Signed','Drive Scheduled','Drive Completed','No Response','Blacklisted']).setRequired(true);
+  f4.addTextItem().setTitle('Roles Offered').setRequired(false);
+  f4.addTextItem().setTitle('Number of Openings').setRequired(false);
+  f4.addTextItem().setTitle('CTC (LPA)').setRequired(false);
+  f4.addTextItem().setTitle('Drive Date (DD/MM/YYYY or TBD)').setRequired(false);
+  f4.addTextItem().setTitle('Students Selected').setRequired(false);
+  f4.addParagraphTextItem().setTitle('Remarks / Next Steps').setRequired(false);
+  f4.addListItem().setTitle('Priority').setChoiceValues(['High','Medium','Low']).setRequired(true);
   f4.setDestination(FormApp.DestinationType.SPREADSHEET, ssId);
 
   // Save form URLs
@@ -191,8 +201,8 @@ function doGet() {
       // Inventory form responses
       rows.forEach(function(row) { officeAdminReports.push(_parseInventory(headers, row)); });
 
-    } else if (_hasCol(headers, 'Date of Interaction')) {
-      // Placement form responses
+    } else if (_hasCol(headers, 'Date of First Contact')) {
+      // Placement sourcing form responses
       rows.forEach(function(row) { placementReports.push(_parsePlacement(headers, row)); });
     }
   });
@@ -291,17 +301,27 @@ function _parseInventory(h, row) {
 
 function _parsePlacement(h, row) {
   return {
-    timestamp:       String(row[0]),
-    staffName:       String(_c(h, row, 'Staff Name')),
-    date:            _fmt(row[0], _c(h, row, 'Date of Interaction')),
-    companyName:     String(_c(h, row, 'Company Name')),
-    companyType:     String(_c(h, row, 'Company Type / Sector'))  || 'IT',
-    interactionType: String(_c(h, row, 'Mode of Interaction'))    || 'Cold Call',
-    contactPerson:   String(_c(h, row, 'Contact Person Name & Designation')),
-    outcome:         String(_c(h, row, 'Outcome of Interaction')) || 'No Response',
-    jobsOffered:     parseInt(_c(h, row, 'Number of Job Openings Offered (0 if none)'))  || 0,
-    studentsPlaced:  parseInt(_c(h, row, 'Number of Students Placed (0 if none)'))       || 0,
-    notes:           String(_c(h, row, 'Notes / Next Steps'))
+    timestamp:          String(row[0]),
+    staffName:          String(_c(h, row, 'Staff Name')),
+    companyName:        String(_c(h, row, 'Company Name')),
+    industrySector:     String(_c(h, row, 'Industry Sector'))    || 'Other',
+    companyType:        String(_c(h, row, 'Company Type'))        || 'Other',
+    hqLocation:         String(_c(h, row, 'HQ Location')),
+    contactPerson:      String(_c(h, row, 'Contact Person')),
+    designation:        String(_c(h, row, 'Designation')),
+    emailId:            String(_c(h, row, 'Email ID')),
+    phoneNumber:        String(_c(h, row, 'Phone Number')),
+    sourceChannel:      String(_c(h, row, 'Source Channel'))     || 'Other',
+    dateOfFirstContact: _fmt(row[0], _c(h, row, 'Date of First Contact')),
+    modeOfContact:      String(_c(h, row, 'Mode of Contact'))    || 'Email',
+    currentStatus:      String(_c(h, row, 'Current Status'))     || 'Identified',
+    rolesOffered:       String(_c(h, row, 'Roles Offered')),
+    numberOfOpenings:   parseInt(_c(h, row, 'Number of Openings'))   || 0,
+    ctcLPA:             parseFloat(_c(h, row, 'CTC (LPA)'))          || 0,
+    driveDate:          String(_c(h, row, 'Drive Date (DD/MM/YYYY or TBD)')) || 'TBD',
+    studentsSelected:   parseInt(_c(h, row, 'Students Selected'))    || 0,
+    remarks:            String(_c(h, row, 'Remarks / Next Steps')),
+    priority:           String(_c(h, row, 'Priority'))           || 'Medium'
   };
 }
 

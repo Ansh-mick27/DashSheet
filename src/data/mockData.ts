@@ -232,34 +232,64 @@ export function generateOfficeAdminReports(): OfficeAdminReport[] {
   return reports;
 }
 
+const INDUSTRY_SECTORS: PlacementReport['industrySector'][] = [
+  'IT / Software', 'Consulting', 'Manufacturing', 'BFSI', 'EdTech',
+  'Healthcare', 'E-Commerce', 'FMCG', 'Automobile', 'Other'
+];
+const COMPANY_TYPES_PL: PlacementReport['companyType'][] = ['MNC', 'Startup', 'PSU / Large Corp', 'Private Sector', 'Other'];
+const SOURCE_CHANNELS: PlacementReport['sourceChannel'][] = [
+  'Alumni Reference', 'LinkedIn Outreach', 'Company Portal', 'Job Fair', 'College Website', 'Direct Approach', 'Other'
+];
+const MODES_OF_CONTACT: PlacementReport['modeOfContact'][] = ['Email', 'Phone Call', 'Video Call', 'In-Person Meeting', 'LinkedIn'];
+const STATUSES: PlacementReport['currentStatus'][] = [
+  'Identified', 'Email Sent', 'JD Sent', 'Under Discussion', 'In Negotiation',
+  'MoU Signed', 'Drive Scheduled', 'Drive Completed', 'No Response', 'Blacklisted'
+];
+const PRIORITIES: PlacementReport['priority'][] = ['High', 'Medium', 'Low'];
+const ROLES_OFFERED = [
+  'Software Engineer Trainee', 'Business Analyst', 'Graduate Engineer Trainee',
+  'Data Analyst', 'HR Executive', 'Probationary Officer', 'Marketing Associate',
+  'Campus Relations Manager', 'Business Development Associate', 'Operations Trainee'
+];
+const CITIES = ['Bengaluru', 'Mumbai', 'Delhi', 'Hyderabad', 'Chennai', 'Pune', 'Kolkata', 'Jamshedpur'];
+const DESIGNATIONS = ['HR Manager', 'Talent Acquisition', 'GM – HR', 'HR Business Partner', 'Deputy Manager HR', 'Campus Coordinator'];
+const FIRST_NAMES = ['Priya', 'Rahul', 'Anita', 'Sunita', 'Karan', 'Deepa', 'Arjun', 'Meena'];
+const LAST_NAMES = ['Sharma', 'Mehta', 'Rao', 'Joshi', 'Singh', 'Kumar', 'Nair', 'Pillai'];
+
 export function generatePlacementReports(): PlacementReport[] {
   const reports: PlacementReport[] = [];
   const dates = generateDates(30);
-  const companyTypes: PlacementReport['companyType'][] = ['IT', 'Non-IT', 'Manufacturing', 'Healthcare', 'Finance', 'Education', 'Other'];
-  const interactionTypes: PlacementReport['interactionType'][] = ['Cold Call', 'Follow-up Call', 'Email', 'Campus Visit', 'Company Visit', 'LinkedIn'];
-  const outcomes: PlacementReport['outcome'][] = ['Interested', 'Not Interested', 'Scheduled Visit', 'Sent JD', 'No Response', 'Placed Students', 'Follow-up Needed'];
 
   for (const staffName of PLACEMENT_NAMES) {
-    const reportDates = dates.slice(0, randomInt(15, 28));
+    const reportDates = dates.slice(0, randomInt(8, 18));
     for (const date of reportDates) {
-      const interactionsPerDay = randomInt(1, 5);
-      for (let i = 0; i < interactionsPerDay; i++) {
-        const outcome = randomItem(outcomes);
-        const placed = outcome === 'Placed Students';
-        reports.push({
-          timestamp: new Date().toISOString(),
-          staffName,
-          date,
-          companyName: randomItem(COMPANIES),
-          companyType: randomItem(companyTypes),
-          interactionType: randomItem(interactionTypes),
-          contactPerson: `HR Manager`,
-          outcome,
-          jobsOffered: placed ? randomInt(2, 15) : 0,
-          studentsPlaced: placed ? randomInt(1, 10) : 0,
-          notes: Math.random() > 0.5 ? 'Follow up scheduled for next week' : ''
-        });
-      }
+      const status = randomItem(STATUSES);
+      const isDriveCompleted = status === 'Drive Completed';
+      const hasOpenings = ['MoU Signed', 'Drive Scheduled', 'Drive Completed', 'In Negotiation'].includes(status);
+      const futureDate = new Date(Date.now() + randomInt(7, 90) * 24 * 60 * 60 * 1000);
+      reports.push({
+        timestamp: new Date().toISOString(),
+        staffName,
+        companyName: randomItem(COMPANIES),
+        industrySector: randomItem(INDUSTRY_SECTORS),
+        companyType: randomItem(COMPANY_TYPES_PL),
+        hqLocation: randomItem(CITIES),
+        contactPerson: `${randomItem(FIRST_NAMES)} ${randomItem(LAST_NAMES)}`,
+        designation: randomItem(DESIGNATIONS),
+        emailId: `hr@company${randomInt(1, 20)}.com`,
+        phoneNumber: `98${randomInt(10000000, 99999999)}`,
+        sourceChannel: randomItem(SOURCE_CHANNELS),
+        dateOfFirstContact: date,
+        modeOfContact: randomItem(MODES_OF_CONTACT),
+        currentStatus: status,
+        rolesOffered: hasOpenings ? randomItem(ROLES_OFFERED) : '',
+        numberOfOpenings: hasOpenings ? randomInt(3, 20) : 0,
+        ctcLPA: hasOpenings ? parseFloat((randomInt(30, 120) / 10).toFixed(1)) : 0,
+        driveDate: (isDriveCompleted || status === 'Drive Scheduled') ? formatDate(futureDate) : 'TBD',
+        studentsSelected: isDriveCompleted ? randomInt(1, 10) : 0,
+        remarks: Math.random() > 0.5 ? 'Follow up scheduled' : '',
+        priority: randomItem(PRIORITIES)
+      });
     }
   }
 
