@@ -38,9 +38,43 @@
 [data-theme="light"] .data-table td { border-bottom-color: rgba(0,0,0,0.05); }
 [data-theme="light"] .data-table tbody tr:hover { background: rgba(99,102,241,0.04); }
 [data-theme="light"] .filter-bar__select option { background: #ffffff; color: #1e293b; }
+
+/* ── Recharts light-mode overrides ───────────────────── */
 [data-theme="light"] .recharts-text { fill: #475569 !important; }
 [data-theme="light"] .recharts-cartesian-grid-horizontal line,
-[data-theme="light"] .recharts-cartesian-grid-vertical line { stroke: rgba(0,0,0,0.06); }
+[data-theme="light"] .recharts-cartesian-grid-vertical line { stroke: rgba(0,0,0,0.08) !important; }
+[data-theme="light"] .recharts-cartesian-axis-line { stroke: rgba(0,0,0,0.15) !important; }
+[data-theme="light"] .recharts-cartesian-axis-tick-line { stroke: rgba(0,0,0,0.15) !important; }
+[data-theme="light"] .recharts-polar-grid-concentric-polygon { stroke: rgba(0,0,0,0.08) !important; }
+
+/* ── Ghost buttons / icon buttons in light mode ─────── */
+[data-theme="light"] .btn--ghost { background: rgba(0,0,0,0.04); }
+[data-theme="light"] .sidebar__search { background: rgba(0,0,0,0.05); }
+[data-theme="light"] .notif-bell { background: rgba(0,0,0,0.04); }
+[data-theme="light"] .notif-item__dismiss:hover { background: rgba(0,0,0,0.06); }
+
+/* ── Code blocks in settings ─────────────────────────── */
+[data-theme="light"] .settings-warning code,
+[data-theme="light"] .settings-card__steps code,
+[data-theme="light"] .settings-card__desc code { background: rgba(0,0,0,0.07); color: #1e293b; }
+
+/* ── Mini progress bar track ─────────────────────────── */
+[data-theme="light"] .mini-progress__bar::before { background: rgba(0,0,0,0.06); }
+
+/* ── Notification panel ──────────────────────────────── */
+[data-theme="light"] .notif-dropdown { background: #ffffff; border-color: rgba(0,0,0,0.1); }
+[data-theme="light"] .notif-item { border-bottom-color: rgba(0,0,0,0.06); }
+
+/* ── Data table head ─────────────────────────────────── */
+[data-theme="light"] .data-table th { background: rgba(0,0,0,0.03); color: #475569; }
+
+/* ── Page pagination buttons ─────────────────────────── */
+[data-theme="light"] .data-table__page-btn { background: rgba(0,0,0,0.04); border-color: rgba(0,0,0,0.1); color: #475569; }
+[data-theme="light"] .data-table__page-btn:hover:not(:disabled) { background: rgba(99,102,241,0.1); }
+
+/* ── Member cards ────────────────────────────────────── */
+[data-theme="light"] .member-card { border-color: rgba(0,0,0,0.08); }
+[data-theme="light"] .member-card__progress { background: rgba(0,0,0,0.08); }
 
 /* restore dark theme defaults after light override */
 :root {

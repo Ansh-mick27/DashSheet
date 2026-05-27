@@ -175,7 +175,7 @@ export default function PlacementPage({ reports }: PlacementPageProps) {
       key: 'nextFollowUpDate', header: 'Next Follow-Up Date', sortable: true, width: '140px',
       render: (r: PlacementReport & { diffDays?: number | null }) => {
         const diff = r.diffDays ?? null;
-        const color = diff === null ? '' : diff < 0 ? '#ef4444' : diff === 0 ? '#f59e0b' : '#e2e8f0';
+        const color = diff === null ? '' : diff < 0 ? '#ef4444' : diff === 0 ? '#f59e0b' : '';
         const label = diff === null ? r.nextFollowUpDate
           : diff < 0 ? `${r.nextFollowUpDate} (${Math.abs(diff)}d overdue)`
           : diff === 0 ? `${r.nextFollowUpDate} (Today)`
