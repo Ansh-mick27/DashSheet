@@ -11,24 +11,46 @@
 
 // ---- Customise these lists before running ----
 var TRAINER_NAMES      = [
-  'Aarav Sharma','Priya Patel','Rohan Gupta','Neha Singh','Vikram Reddy',
-  'Ananya Iyer','Karan Mehta','Divya Joshi','Arjun Nair','Sneha Das',
-  'Rahul Verma','Pooja Mishra','Aditya Kumar','Riya Banerjee','Siddharth Rao',
-  'Meera Choudhary','Nikhil Saxena','Kavya Menon','Dhruv Tiwari','Ishita Kapoor'
+  'Amit Mishra',
+  'Anshul Oza',
+  'Khyati Koranne',
+  'Ritu Shrivastava',
+  'Lajwanti Kishnani',
+  'Aarti Rao',
+  'Vineeta Shirdhonkar',
+  'Anuj Sengar',
+  'Sapna Choubey',
+  'Prathamesh Tikhe',
+  'Anuja Sharma',
+  'Deepal Chhatwani',
+  'Sarthak Jain'
 ];
-var OFFICE_ADMIN_NAMES = ['Suresh Pillai', 'Rekha Nambiar'];
-var PLACEMENT_NAMES    = ['Manish Yadav', 'Shreya Agarwal', 'Varun Bhatt'];
+var OFFICE_ADMIN_NAMES = ['Honey Meena', 'Khushi Verma'];
+var PLACEMENT_NAMES    = ['Rajesh Tyagi', 'Sarvesh Dubey', 'Ankit Shrivastava'];
 
-var DEPARTMENTS = ['Computer Science','Data Science','Web Development','Mobile Development','Cloud Computing'];
-var BATCHES     = ['Batch A','Batch B','Batch C','Batch D','Batch E'];
+var DEPARTMENTS = [
+  'Technical Skills',
+  'Communication Skills',
+  'Soft Skills',
+  'Cognitive Skills',
+  'Innovation & Outreach Skills'
+];
 var COURSES     = [
   'Python Fundamentals','React Development','Data Structures & Algorithms',
   'Machine Learning Basics','Cloud Architecture','Full Stack Development',
   'UI/UX Design','DevOps Practices','Cybersecurity Essentials','Database Management','Other'
 ];
 var TIME_SLOTS  = [
-  '08:30 - 09:30','09:30 - 10:30','10:30 - 11:30','11:30 - 12:30',
-  '01:30 - 02:30','02:30 - 03:30','03:30 - 04:30','04:30 - 05:30'
+  'Slot 1 (8:50-9:05)',
+  'Slot 2 (9:05-9:50)',
+  'Slot 3 (9:50-10:30)',
+  'Slot 4 (10:30-11:20)',
+  'Slot 5 (11:20-12:10)',
+  'Slot 6 (12:10-13:00)',
+  'Slot 7 (13:50-14:40)',
+  'Slot 8 (14:40-15:30)',
+  'Slot 9 (15:30-16:15)',
+  'Slot 10 (16:15-17:00)'
 ];
 var TASKS = [
   'Prepare lecture materials','Conduct training session','Student assessment',
@@ -76,13 +98,14 @@ function createSeparateForms() {
   f1.addListItem().setTitle('Trainer Name').setChoiceValues(TRAINER_NAMES).setRequired(true);
   f1.addDateItem().setTitle('Date of Session').setRequired(true);
   f1.addListItem().setTitle('Department').setChoiceValues(DEPARTMENTS).setRequired(true);
-  f1.addListItem().setTitle('Batch').setChoiceValues(BATCHES).setRequired(true);
+  f1.addTextItem().setTitle('Branch').setRequired(true);
   f1.addListItem().setTitle('Course Name').setChoiceValues(COURSES).setRequired(true);
   f1.addTextItem().setTitle('Topic Covered').setRequired(true);
   f1.addListItem().setTitle('Session Duration').setChoiceValues(['1 Hour','2 Hours','3 Hours','Full Day']).setRequired(true);
   f1.addCheckboxItem().setTitle('Teaching Methods Used').setChoiceValues(['Lecture','Group Discussion','Case Study','Role Play','Presentation','Practical','Online Demo']).setRequired(true);
   f1.addTextItem().setTitle('Total Students Enrolled').setRequired(true);
   f1.addTextItem().setTitle('Students Present').setRequired(true);
+  f1.addTextItem().setTitle('Total Present Students').setRequired(true);
   f1.addListItem().setTitle('Participation Level').setChoiceValues(['High','Moderate','Low']).setRequired(true);
   f1.addParagraphTextItem().setTitle('Learning Objectives').setRequired(false);
   f1.addParagraphTextItem().setTitle('Engagement Observations').setRequired(false);
@@ -97,7 +120,8 @@ function createSeparateForms() {
   f2.addListItem().setTitle('Trainer Name').setChoiceValues(TRAINER_NAMES).setRequired(true);
   f2.addDateItem().setTitle('Date').setRequired(true);
   f2.addListItem().setTitle('Department').setChoiceValues(DEPARTMENTS).setRequired(true);
-  f2.addListItem().setTitle('Batch').setChoiceValues(BATCHES).setRequired(true);
+  f2.addTextItem().setTitle('Branch').setRequired(false);
+  f2.addTextItem().setTitle('Total Present Students').setRequired(false);
   TIME_SLOTS.forEach(function(slot) {
     f2.addListItem().setTitle('Task — ' + slot).setChoiceValues(TASKS).setRequired(false);
     f2.addListItem().setTitle('Status — ' + slot).setChoiceValues(['Completed','Pending','Not Applicable']).setRequired(false);
@@ -197,7 +221,7 @@ function doGet() {
       // Training form responses
       rows.forEach(function(row) { trainingReports.push(_parseTraining(headers, row)); });
 
-    } else if (_hasCol(headers, 'Task — 08:30 - 09:30')) {
+    } else if (_hasCol(headers, 'Task — Slot 1 (8:50-9:05)')) {
       // Work form responses
       rows.forEach(function(row) { workReports.push(_parseWork(headers, row)); });
 
@@ -233,7 +257,7 @@ function _parseTraining(h, row) {
     timestamp:              String(row[0]),
     trainerName:            String(_c(h, row, 'Trainer Name')),
     date:                   _fmt(row[0], _c(h, row, 'Date of Session')),
-    batch:                  String(_c(h, row, 'Batch')),
+    batch:                  String(_c(h, row, 'Branch')),
     course:                 String(_c(h, row, 'Course Name')),
     topicCovered:           String(_c(h, row, 'Topic Covered')),
     duration:               String(_c(h, row, 'Session Duration')),
@@ -248,6 +272,7 @@ function _parseTraining(h, row) {
       other: ''
     },
     studentsPresent:        parseInt(_c(h, row, 'Students Present'))        || 0,
+    totalPresentStudents:   parseInt(_c(h, row, 'Total Present Students'))  || 0,
     totalEnrolled:          parseInt(_c(h, row, 'Total Students Enrolled')) || 0,
     participationLevel:     String(_c(h, row, 'Participation Level'))       || 'Moderate',
     engagementObservations: String(_c(h, row, 'Engagement Observations')),
@@ -261,8 +286,16 @@ function _parseTraining(h, row) {
 
 function _parseWork(h, row) {
   var slots = [
-    '08:30 - 09:30','09:30 - 10:30','10:30 - 11:30','11:30 - 12:30',
-    '01:30 - 02:30','02:30 - 03:30','03:30 - 04:30','04:30 - 05:30'
+    'Slot 1 (8:50-9:05)',
+    'Slot 2 (9:05-9:50)',
+    'Slot 3 (9:50-10:30)',
+    'Slot 4 (10:30-11:20)',
+    'Slot 5 (11:20-12:10)',
+    'Slot 6 (12:10-13:00)',
+    'Slot 7 (13:50-14:40)',
+    'Slot 8 (14:40-15:30)',
+    'Slot 9 (15:30-16:15)',
+    'Slot 10 (16:15-17:00)'
   ];
   var timeSlots = slots.map(function(slot) {
     var sv = String(_c(h, row, 'Status — ' + slot));
@@ -274,17 +307,18 @@ function _parseWork(h, row) {
     };
   });
   return {
-    timestamp:           String(row[0]),
-    trainerName:         String(_c(h, row, 'Trainer Name')),
-    date:                _fmt(row[0], _c(h, row, 'Date')),
-    department:          String(_c(h, row, 'Department')),
-    batch:               String(_c(h, row, 'Batch')),
-    timeSlots:           timeSlots,
-    keyAccomplishments:  String(_c(h, row, 'Key Accomplishments Today')),
-    challengesSolutions: String(_c(h, row, 'Challenges & Solutions')),
-    pendingWork:         String(_c(h, row, 'Pending Work')),
-    additionalNotes:     '',
-    reviewedBy:          ''
+    timestamp:            String(row[0]),
+    trainerName:          String(_c(h, row, 'Trainer Name')),
+    date:                 _fmt(row[0], _c(h, row, 'Date')),
+    department:           String(_c(h, row, 'Department')),
+    batch:                String(_c(h, row, 'Branch')),
+    totalPresentStudents: parseInt(_c(h, row, 'Total Present Students')) || 0,
+    timeSlots:            timeSlots,
+    keyAccomplishments:   String(_c(h, row, 'Key Accomplishments Today')),
+    challengesSolutions:  String(_c(h, row, 'Challenges & Solutions')),
+    pendingWork:          String(_c(h, row, 'Pending Work')),
+    additionalNotes:      '',
+    reviewedBy:           ''
   };
 }
 
@@ -386,7 +420,7 @@ function _ensureSheet(ss, name) {
 
 function _populateMembersSheet(ss) {
   var sheet   = ss.getSheetByName('Members');
-  var depts   = ['Computer Science','Data Science','Web Development','Mobile Development','Cloud Computing'];
+  var depts   = ['Technical Skills','Communication Skills','Soft Skills','Cognitive Skills','Innovation & Outreach Skills'];
   var batches = ['Batch A','Batch B','Batch C','Batch D','Batch E'];
   sheet.clearContents();
   sheet.appendRow(['name','department','batch','email','role']);
