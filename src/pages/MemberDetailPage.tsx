@@ -137,7 +137,9 @@ export default function MemberDetailPage({
 
   const trainingCols = [
     { key: 'date', header: 'Date', sortable: true, width: '90px' },
-    { key: 'course', header: 'Course', sortable: true },
+    { key: 'college', header: 'College', sortable: true },
+    { key: 'course', header: 'Course', sortable: true, width: '100px' },
+    { key: 'specialization', header: 'Specialization', sortable: true, width: '110px' },
     { key: 'topicCovered', header: 'Topic' },
     { key: 'attendance', header: 'Attendance', width: '90px',
       render: (r: TrainingReport) => `${r.studentsPresent}/${r.totalEnrolled}` },

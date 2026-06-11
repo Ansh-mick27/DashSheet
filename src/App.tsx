@@ -89,7 +89,6 @@ function DashboardLayout() {
   const filteredTraining = useMemo(() => {
     return trainingReports.filter(r => {
       if (filters.trainer && r.trainerName !== filters.trainer) return false;
-      if (filters.batch && r.batch !== filters.batch) return false;
       if (!inDateRange(r.date)) return false;
       return true;
     });

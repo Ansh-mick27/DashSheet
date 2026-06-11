@@ -91,8 +91,9 @@ export default function TrainingReportsPage({ reports }: TrainingReportsPageProp
   const columns = [
     { key: 'date', header: 'Date', sortable: true, width: '90px' },
     { key: 'trainerName', header: 'Trainer', sortable: true, width: '140px' },
-    { key: 'batch', header: 'Batch', sortable: true, width: '80px' },
-    { key: 'course', header: 'Course', sortable: true },
+    { key: 'college', header: 'College', sortable: true },
+    { key: 'course', header: 'Course', sortable: true, width: '110px' },
+    { key: 'specialization', header: 'Specialization', sortable: true, width: '120px' },
     { key: 'topicCovered', header: 'Topic' },
     {
       key: 'attendance', header: 'Attendance', width: '100px',

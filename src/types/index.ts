@@ -16,8 +16,9 @@ export interface TrainingReport {
   timestamp: string;
   trainerName: string;
   date: string;
-  batch: string;
+  college: string;
   course: string;
+  specialization: string;
   topicCovered: string;
   learningObjectives: string;
   duration: string;

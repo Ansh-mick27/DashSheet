@@ -15,10 +15,16 @@ const PLACEMENT_NAMES = ['Manish Yadav', 'Shreya Agarwal', 'Varun Bhatt'];
 
 const DEPARTMENTS = ['Computer Science', 'Data Science', 'Web Development', 'Mobile Development', 'Cloud Computing'];
 const BATCHES = ['Batch A', 'Batch B', 'Batch C', 'Batch D', 'Batch E'];
-const COURSES = [
-  'Python Fundamentals', 'React Development', 'Data Structures & Algorithms',
-  'Machine Learning Basics', 'Cloud Architecture', 'Full Stack Development',
-  'UI/UX Design', 'DevOps Practices', 'Cybersecurity Essentials', 'Database Management'
+const COLLEGES_COURSES_SPECIALIZATIONS: { college: string; course: string; specialization: string }[] = [
+  { college: 'Acropolis Institute of Technology & Research', course: 'B. Tech.', specialization: 'CSE' },
+  { college: 'Acropolis Institute of Technology & Research', course: 'B. Tech.', specialization: 'IT' },
+  { college: 'Acropolis Institute of Technology & Research', course: 'B. Tech.', specialization: 'CSE-AIML' },
+  { college: 'Acropolis Institute of Technology & Research', course: 'MCA', specialization: '' },
+  { college: 'Acropolis Institute of Management Studies and Research', course: 'BBA', specialization: 'Marketing' },
+  { college: 'Acropolis Institute of Management Studies and Research', course: 'BCA', specialization: 'Computer Applications' },
+  { college: 'Acropolis Faculty of Management & Research', course: 'MBA', specialization: 'Finance' },
+  { college: 'Acropolis Institute of Pharmaceutical Education and Research', course: 'B. Pharma', specialization: '' },
+  { college: 'Acropolis Institute of Law', course: 'BA LLB', specialization: '' }
 ];
 const TOPICS = [
   'Variables and Data Types', 'Component Lifecycle', 'Linked Lists',
@@ -130,12 +136,14 @@ export function generateTrainingReports(): TrainingReport[] {
     const reportDates = dates.slice(0, randomInt(10, 25));
     for (const date of reportDates) {
       const totalEnrolled = randomInt(20, 45);
+      const ccs = randomItem(COLLEGES_COURSES_SPECIALIZATIONS);
       reports.push({
         timestamp: new Date().toISOString(),
         trainerName,
         date,
-        batch: randomItem(BATCHES),
-        course: randomItem(COURSES),
+        college: ccs.college,
+        course: ccs.course,
+        specialization: ccs.specialization,
         topicCovered: randomItem(TOPICS),
         duration: randomItem(DURATIONS),
         learningObjectives: `Understand ${randomItem(TOPICS).toLowerCase()} concepts and apply them practically`,

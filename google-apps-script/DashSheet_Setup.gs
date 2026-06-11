@@ -35,10 +35,12 @@ var DEPARTMENTS = [
   'Cognitive Skills',
   'Innovation & Outreach Skills'
 ];
-var COURSES     = [
-  'Python Fundamentals','React Development','Data Structures & Algorithms',
-  'Machine Learning Basics','Cloud Architecture','Full Stack Development',
-  'UI/UX Design','DevOps Practices','Cybersecurity Essentials','Database Management','Other'
+var COLLEGES    = [
+  'Acropolis Institute of Technology & Research',
+  'Acropolis Institute of Management Studies and Research',
+  'Acropolis Faculty of Management & Research',
+  'Acropolis Institute of Pharmaceutical Education and Research',
+  'Acropolis Institute of Law'
 ];
 var TIME_SLOTS  = [
   'Slot 1 (8:50-9:05)',
@@ -98,14 +100,20 @@ function createSeparateForms() {
   f1.addListItem().setTitle('Trainer Name').setChoiceValues(TRAINER_NAMES).setRequired(true);
   f1.addDateItem().setTitle('Date of Session').setRequired(true);
   f1.addListItem().setTitle('Department').setChoiceValues(DEPARTMENTS).setRequired(true);
-  f1.addTextItem().setTitle('Branch').setRequired(true);
-  f1.addListItem().setTitle('Course Name').setChoiceValues(COURSES).setRequired(true);
+  f1.addListItem().setTitle('College').setChoiceValues(COLLEGES).setRequired(true);
+  // NOTE: The live form branches by College into per-college sections with
+  // their own 'Courses'/'Course'/'Specialization'/'Department' questions
+  // (e.g. AITR -> B.Tech/MCA/IMCA -> Department: CSE, IT, ...). These
+  // branching pages were configured manually in the Google Forms UI using
+  // page breaks + "Go to section based on answer" and are not recreated by
+  // this script. If you re-run createSeparateForms(), re-add those sections
+  // manually and redo the branching. doGet()/_parseTraining() already know
+  // how to read the resulting columns (see _cNth()).
   f1.addTextItem().setTitle('Topic Covered').setRequired(true);
   f1.addListItem().setTitle('Session Duration').setChoiceValues(['1 Hour','2 Hours','3 Hours','Full Day']).setRequired(true);
   f1.addCheckboxItem().setTitle('Teaching Methods Used').setChoiceValues(['Lecture','Group Discussion','Case Study','Role Play','Presentation','Practical','Online Demo']).setRequired(true);
   f1.addTextItem().setTitle('Total Students Enrolled').setRequired(true);
   f1.addTextItem().setTitle('Students Present').setRequired(true);
-  f1.addTextItem().setTitle('Total Present Students').setRequired(true);
   f1.addListItem().setTitle('Participation Level').setChoiceValues(['High','Moderate','Low']).setRequired(true);
   f1.addParagraphTextItem().setTitle('Learning Objectives').setRequired(false);
   f1.addParagraphTextItem().setTitle('Engagement Observations').setRequired(false);
@@ -251,14 +259,41 @@ function doGet() {
 // PARSERS — one per form type
 // ============================================================
 
+// The Training Report form branches by College, with each college showing
+// its own Course/Specialization/Department questions. Several questions
+// share the same title (e.g. 'Courses', 'Specialization', 'Department'), so
+// we use _cNth() to pick the Nth column with that title (0-indexed, in the
+// order they appear in the form). Only the branch matching the selected
+// College will have a non-empty value for any given response.
 function _parseTraining(h, row) {
   var methods = String(_c(h, row, 'Teaching Methods Used'));
+  var college = String(_c(h, row, 'College'));
+
+  var course = '';
+  var specialization = '';
+
+  if (college.indexOf('Technology & Research') !== -1) {
+    course         = String(_c(h, row, 'Acropolis Institute of Technology & Research'));
+    specialization = String(_cNth(h, row, 'Department', 1));
+  } else if (college.indexOf('Management Studies') !== -1) {
+    course         = String(_cNth(h, row, 'Courses', 0));
+    specialization = String(_cNth(h, row, 'Specialization', 0));
+  } else if (college.indexOf('Faculty of Management') !== -1) {
+    course         = String(_c(h, row, 'Course'));
+    specialization = String(_cNth(h, row, 'Specialization', 1));
+  } else if (college.indexOf('Pharmaceutical') !== -1) {
+    course         = String(_cNth(h, row, 'Courses', 1));
+  } else if (college.indexOf('Law') !== -1) {
+    course         = String(_cNth(h, row, 'Courses', 2));
+  }
+
   return {
     timestamp:              String(row[0]),
     trainerName:            String(_c(h, row, 'Trainer Name')),
     date:                   _fmt(row[0], _c(h, row, 'Date of Session')),
-    batch:                  String(_c(h, row, 'Branch')),
-    course:                 String(_c(h, row, 'Course Name')),
+    college:                college,
+    course:                 course,
+    specialization:         specialization,
     topicCovered:           String(_c(h, row, 'Topic Covered')),
     duration:               String(_c(h, row, 'Session Duration')),
     learningObjectives:     String(_c(h, row, 'Learning Objectives')),
@@ -272,7 +307,6 @@ function _parseTraining(h, row) {
       other: ''
     },
     studentsPresent:        parseInt(_c(h, row, 'Students Present'))        || 0,
-    totalPresentStudents:   parseInt(_c(h, row, 'Total Present Students'))  || 0,
     totalEnrolled:          parseInt(_c(h, row, 'Total Students Enrolled')) || 0,
     participationLevel:     String(_c(h, row, 'Participation Level'))       || 'Moderate',
     engagementObservations: String(_c(h, row, 'Engagement Observations')),
@@ -376,6 +410,19 @@ function _parsePlacement(h, row) {
 function _c(headers, row, name) {
   var idx = headers.indexOf(name);
   return idx !== -1 ? row[idx] : '';
+}
+
+// Get value of the Nth column (0-indexed) that has the given header name.
+// Used for forms where multiple branched questions share the same title.
+function _cNth(headers, row, name, n) {
+  var count = 0;
+  for (var i = 0; i < headers.length; i++) {
+    if (headers[i] === name) {
+      if (count === n) return row[i];
+      count++;
+    }
+  }
+  return '';
 }
 
 // Check if a header exists in the sheet
