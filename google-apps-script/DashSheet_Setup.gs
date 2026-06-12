@@ -11,6 +11,7 @@
 
 // ---- Customise these lists before running ----
 var TRAINER_NAMES      = [
+  'Deepti Verma',
   'Amit Mishra',
   'Anshul Oza',
   'Khyati Koranne',
@@ -27,6 +28,27 @@ var TRAINER_NAMES      = [
 ];
 var OFFICE_ADMIN_NAMES = ['Honey Meena', 'Khushi Verma'];
 var PLACEMENT_NAMES    = ['Rajesh Tyagi', 'Sarvesh Dubey', 'Ankit Shrivastava'];
+
+// Each trainer's real specialization area, used to populate the Members sheet.
+var TRAINER_DEPARTMENTS = {
+  'Deepti Verma':        'Soft Skills',
+  'Amit Mishra':         'Technical Skills',
+  'Anshul Oza':          'Technical Skills',
+  'Khyati Koranne':      'Technical Skills',
+  'Ritu Shrivastava':    'Communication Skills',
+  'Lajwanti Kishnani':   'Communication Skills',
+  'Aarti Rao':           'Communication Skills',
+  'Vineeta Shirdhonkar': 'Communication Skills',
+  'Anuj Sengar':         'Communication Skills',
+  'Sapna Choubey':       'Communication Skills',
+  'Prathamesh Tikhe':    'Soft Skills',
+  'Anuja Sharma':        'Soft Skills',
+  'Deepal Chhatwani':    'Cognitive Skills',
+  'Sarthak Jain':        'Innovation & Outreach Skills'
+};
+
+// Trainers who should get Admin (dashboard access) role.
+var TRAINER_ADMINS = ['Deepti Verma', 'Amit Mishra'];
 
 var DEPARTMENTS = [
   'Technical Skills',
@@ -467,13 +489,14 @@ function _ensureSheet(ss, name) {
 
 function _populateMembersSheet(ss) {
   var sheet   = ss.getSheetByName('Members');
-  var depts   = ['Technical Skills','Communication Skills','Soft Skills','Cognitive Skills','Innovation & Outreach Skills'];
   var batches = ['Batch A','Batch B','Batch C','Batch D','Batch E'];
   sheet.clearContents();
   sheet.appendRow(['name','department','batch','email','role']);
   TRAINER_NAMES.forEach(function(name, i) {
-    sheet.appendRow([name, depts[i%depts.length], batches[i%batches.length],
-      name.toLowerCase().replace(' ','.') + '@org.com', i < 3 ? 'Admin' : 'Trainer']);
+    var dept = TRAINER_DEPARTMENTS[name] || DEPARTMENTS[i % DEPARTMENTS.length];
+    var role = TRAINER_ADMINS.indexOf(name) !== -1 ? 'Admin' : 'Trainer';
+    sheet.appendRow([name, dept, batches[i%batches.length],
+      name.toLowerCase().replace(' ','.') + '@org.com', role]);
   });
   OFFICE_ADMIN_NAMES.forEach(function(name) {
     sheet.appendRow([name,'Administration','-',name.toLowerCase().replace(' ','.') + '@org.com','OfficeAdmin']);
