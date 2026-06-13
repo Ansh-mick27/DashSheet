@@ -1,7 +1,7 @@
 // ==========================================
 // DashSheet — Placement Sourcing Report Form Page
 // ==========================================
-import { useState, FormEvent } from 'react';
+import { useState, useMemo, FormEvent } from 'react';
 import { CheckCircle2, AlertCircle, Send } from 'lucide-react';
 import { useAuth } from '../../contexts/AuthContext';
 import { submitPlacementReport } from '../../services/dataApi';
@@ -10,10 +10,13 @@ import {
   INDUSTRY_SECTORS, COMPANY_TYPES, SOURCE_CHANNELS, MODES_OF_CONTACT,
   PLACEMENT_STATUSES, PRIORITIES, ASSIGNED_TO_OPTIONS
 } from '../../data/constants';
-import { PlacementReport } from '../../types';
+import { PlacementReport, ExtraFields } from '../../types';
+import { useFormConfig } from '../../lib/useFormConfig';
+import { mergeOptions } from '../../lib/options';
 import FormField from '../../components/form/FormField';
 import FormSelect from '../../components/form/FormSelect';
 import FormTextarea from '../../components/form/FormTextarea';
+import CustomFieldsSection from '../../components/form/CustomFieldsSection';
 
 export default function PlacementReportFormPage() {
   const { member } = useAuth();
@@ -40,7 +43,21 @@ export default function PlacementReportFormPage() {
   const [actionRequired, setActionRequired] = useState('');
   const [assignedTo, setAssignedTo] = useState('');
   const [followUpDone, setFollowUpDone] = useState(false);
+  const [extraFields, setExtraFields] = useState<ExtraFields>({});
   const [status, setStatus] = useState<'idle' | 'saving' | 'success' | 'error'>('idle');
+
+  const { fieldOptions, customFields } = useFormConfig('placement');
+  const industrySectors = useMemo(() => mergeOptions(INDUSTRY_SECTORS, fieldOptions, 'industrySectors'), [fieldOptions]);
+  const companyTypes = useMemo(() => mergeOptions(COMPANY_TYPES, fieldOptions, 'companyTypes'), [fieldOptions]);
+  const sourceChannels = useMemo(() => mergeOptions(SOURCE_CHANNELS, fieldOptions, 'sourceChannels'), [fieldOptions]);
+  const modesOfContact = useMemo(() => mergeOptions(MODES_OF_CONTACT, fieldOptions, 'modesOfContact'), [fieldOptions]);
+  const placementStatuses = useMemo(() => mergeOptions(PLACEMENT_STATUSES, fieldOptions, 'placementStatuses'), [fieldOptions]);
+  const priorities = useMemo(() => mergeOptions(PRIORITIES, fieldOptions, 'priorities'), [fieldOptions]);
+  const assignedToOptions = useMemo(() => mergeOptions(ASSIGNED_TO_OPTIONS, fieldOptions, 'assignedTo'), [fieldOptions]);
+
+  const handleExtraChange = (key: string, value: string | number | boolean) => {
+    setExtraFields(prev => ({ ...prev, [key]: value }));
+  };
 
   const resetForm = () => {
     setCompanyName(''); setIndustrySector(''); setCompanyType(''); setHqLocation('');
@@ -49,6 +66,7 @@ export default function PlacementReportFormPage() {
     setCurrentStatus(''); setRolesOffered(''); setNumberOfOpenings(''); setCtcLPA('');
     setDriveDate(''); setStudentsSelected(''); setRemarks(''); setPriority('');
     setNextFollowUpDate(''); setActionRequired(''); setAssignedTo(''); setFollowUpDone(false);
+    setExtraFields({});
   };
 
   const handleSubmit = async (e: FormEvent) => {
@@ -81,7 +99,8 @@ export default function PlacementReportFormPage() {
         nextFollowUpDate,
         actionRequired,
         assignedTo: assignedTo as PlacementReport['assignedTo'],
-        followUpDone
+        followUpDone,
+        extraFields
       };
       await submitPlacementReport(report);
       setStatus('success');
@@ -109,8 +128,8 @@ export default function PlacementReportFormPage() {
           <div className="form-section-title">Company Details</div>
           <div className="form-grid form-grid--3">
             <FormField label="Company Name" name="companyName" value={companyName} onChange={setCompanyName} required />
-            <FormSelect label="Industry Sector" name="industrySector" value={industrySector} onChange={setIndustrySector} options={INDUSTRY_SECTORS} required />
-            <FormSelect label="Company Type" name="companyType" value={companyType} onChange={setCompanyType} options={COMPANY_TYPES} required />
+            <FormSelect label="Industry Sector" name="industrySector" value={industrySector} onChange={setIndustrySector} options={industrySectors} required />
+            <FormSelect label="Company Type" name="companyType" value={companyType} onChange={setCompanyType} options={companyTypes} required />
           </div>
           <FormField label="HQ Location" name="hqLocation" value={hqLocation} onChange={setHqLocation} />
 
@@ -122,16 +141,16 @@ export default function PlacementReportFormPage() {
           </div>
           <div className="form-grid">
             <FormField label="Phone Number" name="phoneNumber" value={phoneNumber} onChange={setPhoneNumber} />
-            <FormSelect label="Source Channel" name="sourceChannel" value={sourceChannel} onChange={setSourceChannel} options={SOURCE_CHANNELS} required />
+            <FormSelect label="Source Channel" name="sourceChannel" value={sourceChannel} onChange={setSourceChannel} options={sourceChannels} required />
           </div>
           <div className="form-grid">
             <FormField label="Date of First Contact" name="dateOfFirstContact" type="date" value={dateOfFirstContact} onChange={setDateOfFirstContact} required />
-            <FormSelect label="Mode of Contact" name="modeOfContact" value={modeOfContact} onChange={setModeOfContact} options={MODES_OF_CONTACT} required />
+            <FormSelect label="Mode of Contact" name="modeOfContact" value={modeOfContact} onChange={setModeOfContact} options={modesOfContact} required />
           </div>
 
           <div className="form-section-title">Drive Progress</div>
           <div className="form-grid">
-            <FormSelect label="Current Status" name="currentStatus" value={currentStatus} onChange={setCurrentStatus} options={PLACEMENT_STATUSES} required />
+            <FormSelect label="Current Status" name="currentStatus" value={currentStatus} onChange={setCurrentStatus} options={placementStatuses} required />
             <FormField label="Roles Offered" name="rolesOffered" value={rolesOffered} onChange={setRolesOffered} />
           </div>
           <div className="form-grid form-grid--3">
@@ -144,15 +163,17 @@ export default function PlacementReportFormPage() {
           <div className="form-section-title">Follow-up</div>
           <FormTextarea label="Remarks" name="remarks" value={remarks} onChange={setRemarks} rows={2} />
           <div className="form-grid form-grid--3">
-            <FormSelect label="Priority" name="priority" value={priority} onChange={setPriority} options={PRIORITIES} required />
+            <FormSelect label="Priority" name="priority" value={priority} onChange={setPriority} options={priorities} required />
             <FormField label="Next Follow-up Date" name="nextFollowUpDate" type="date" value={nextFollowUpDate} onChange={setNextFollowUpDate} />
-            <FormSelect label="Assigned To" name="assignedTo" value={assignedTo} onChange={setAssignedTo} options={ASSIGNED_TO_OPTIONS} />
+            <FormSelect label="Assigned To" name="assignedTo" value={assignedTo} onChange={setAssignedTo} options={assignedToOptions} />
           </div>
           <FormTextarea label="Action Required" name="actionRequired" value={actionRequired} onChange={setActionRequired} rows={2} />
           <label className="form-checkbox form-checkbox-inline">
             <input type="checkbox" checked={followUpDone} onChange={e => setFollowUpDone(e.target.checked)} />
             <span>Follow-up done</span>
           </label>
+
+          <CustomFieldsSection fields={customFields} values={extraFields} onChange={handleExtraChange} />
 
           <div className="settings-form__actions">
             <button type="submit" disabled={status === 'saving'} className="btn btn--primary">

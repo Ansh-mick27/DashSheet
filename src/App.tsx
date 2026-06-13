@@ -15,6 +15,7 @@ import WorkReportsPage from './pages/WorkReportsPage';
 import MembersPage from './pages/MembersPage';
 import MemberDetailPage from './pages/MemberDetailPage';
 import SettingsPage from './pages/SettingsPage';
+import SuperAdminPage from './pages/SuperAdminPage';
 import OfficeAdminPage from './pages/OfficeAdminPage';
 import PlacementPage from './pages/PlacementPage';
 import PortalHomePage from './pages/portal/PortalHomePage';
@@ -164,7 +165,7 @@ function DashboardLayout() {
         <div className="dashboard-content">
           <Routes>
             <Route path="/" element={
-              member?.role !== 'Admin' ? (
+              member?.role !== 'Admin' && member?.role !== 'SuperAdmin' ? (
                 <Navigate to="/portal" replace />
               ) : (
                 <ErrorBoundary>
@@ -229,6 +230,13 @@ function DashboardLayout() {
             } />
             <Route path="/settings" element={
               <ErrorBoundary><SettingsPage /></ErrorBoundary>
+            } />
+            <Route path="/admin" element={
+              member?.role !== 'SuperAdmin' ? (
+                <Navigate to="/" replace />
+              ) : (
+                <ErrorBoundary><SuperAdminPage /></ErrorBoundary>
+              )
             } />
           </Routes>
         </div>

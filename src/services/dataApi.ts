@@ -2,7 +2,10 @@
 // DashSheet — Data Service (Supabase)
 // ==========================================
 import { supabase, isSupabaseConfigured } from '../lib/supabaseClient';
-import { Member, TrainingReport, WorkReport, OfficeAdminReport, PlacementReport, Notification } from '../types';
+import {
+  Member, MemberRole, TrainingReport, WorkReport, OfficeAdminReport, PlacementReport, Notification,
+  FieldOption, CustomField, CustomFieldFormType, CustomFieldType
+} from '../types';
 import {
   generateMembers, generateTrainingReports, generateWorkReports,
   generateOfficeAdminReports, generatePlacementReports
@@ -14,6 +17,8 @@ interface SheetData {
   workReports: WorkReport[];
   officeAdminReports: OfficeAdminReport[];
   placementReports: PlacementReport[];
+  fieldOptions: FieldOption[];
+  customFields: CustomField[];
 }
 
 let cachedData: SheetData | null = null;
@@ -50,7 +55,8 @@ function mapTrainingReport(row: any): TrainingReport {
     challengesStudent: row.challenges_student,
     actionPlan: row.action_plan,
     feedback: row.feedback,
-    reviewedBy: row.reviewed_by
+    reviewedBy: row.reviewed_by,
+    extraFields: row.extra_fields ?? {}
   };
 }
 
@@ -66,7 +72,8 @@ function mapWorkReport(row: any): WorkReport {
     challengesSolutions: row.challenges_solutions,
     pendingWork: row.pending_work,
     additionalNotes: row.additional_notes,
-    reviewedBy: row.reviewed_by
+    reviewedBy: row.reviewed_by,
+    extraFields: row.extra_fields ?? {}
   };
 }
 
@@ -81,7 +88,8 @@ function mapOfficeAdminReport(row: any): OfficeAdminReport {
     condition: row.condition,
     actionTaken: row.action_taken,
     location: row.location,
-    notes: row.notes
+    notes: row.notes,
+    extraFields: row.extra_fields ?? {}
   };
 }
 
@@ -111,7 +119,31 @@ function mapPlacementReport(row: any): PlacementReport {
     nextFollowUpDate: row.next_follow_up_date,
     actionRequired: row.action_required,
     assignedTo: row.assigned_to,
-    followUpDone: row.follow_up_done
+    followUpDone: row.follow_up_done,
+    extraFields: row.extra_fields ?? {}
+  };
+}
+
+function mapFieldOption(row: any): FieldOption {
+  return {
+    id: row.id,
+    category: row.category,
+    value: row.value,
+    label: row.label,
+    sortOrder: row.sort_order
+  };
+}
+
+function mapCustomField(row: any): CustomField {
+  return {
+    id: row.id,
+    formType: row.form_type,
+    fieldKey: row.field_key,
+    label: row.label,
+    fieldType: row.field_type,
+    options: row.options ?? [],
+    required: row.required,
+    sortOrder: row.sort_order
   };
 }
 
@@ -120,15 +152,17 @@ export async function fetchSheetData(): Promise<SheetData> {
 
   if (isSupabaseConfigured) {
     try {
-      const [membersRes, trainingRes, workRes, officeRes, placementRes] = await Promise.all([
+      const [membersRes, trainingRes, workRes, officeRes, placementRes, fieldOptionsRes, customFieldsRes] = await Promise.all([
         supabase.from('members_public').select('*'),
         supabase.from('training_reports').select('*').order('timestamp', { ascending: false }),
         supabase.from('work_reports').select('*').order('timestamp', { ascending: false }),
         supabase.from('office_admin_reports').select('*').order('timestamp', { ascending: false }),
-        supabase.from('placement_reports').select('*').order('timestamp', { ascending: false })
+        supabase.from('placement_reports').select('*').order('timestamp', { ascending: false }),
+        supabase.from('field_options').select('*').order('sort_order', { ascending: true }),
+        supabase.from('custom_fields').select('*').order('sort_order', { ascending: true })
       ]);
 
-      const errors = [membersRes.error, trainingRes.error, workRes.error, officeRes.error, placementRes.error].filter(Boolean);
+      const errors = [membersRes.error, trainingRes.error, workRes.error, officeRes.error, placementRes.error, fieldOptionsRes.error, customFieldsRes.error].filter(Boolean);
       if (errors.length) throw errors[0];
 
       const hasAnyData = [membersRes, trainingRes, workRes, officeRes, placementRes]
@@ -140,7 +174,9 @@ export async function fetchSheetData(): Promise<SheetData> {
           trainingReports: (trainingRes.data ?? []).map(mapTrainingReport),
           workReports: (workRes.data ?? []).map(mapWorkReport),
           officeAdminReports: (officeRes.data ?? []).map(mapOfficeAdminReport),
-          placementReports: (placementRes.data ?? []).map(mapPlacementReport)
+          placementReports: (placementRes.data ?? []).map(mapPlacementReport),
+          fieldOptions: (fieldOptionsRes.data ?? []).map(mapFieldOption),
+          customFields: (customFieldsRes.data ?? []).map(mapCustomField)
         };
         return cachedData;
       }
@@ -154,10 +190,22 @@ export async function fetchSheetData(): Promise<SheetData> {
     trainingReports: generateTrainingReports(),
     workReports: generateWorkReports(),
     officeAdminReports: generateOfficeAdminReports(),
-    placementReports: generatePlacementReports()
+    placementReports: generatePlacementReports(),
+    fieldOptions: [],
+    customFields: []
   };
 
   return cachedData;
+}
+
+export async function fetchFieldOptions(): Promise<FieldOption[]> {
+  const data = await fetchSheetData();
+  return data.fieldOptions;
+}
+
+export async function fetchCustomFields(): Promise<CustomField[]> {
+  const data = await fetchSheetData();
+  return data.customFields;
 }
 
 export function refreshData(): void {
@@ -275,7 +323,8 @@ export async function submitTrainingReport(report: TrainingReport): Promise<void
     challenges_student: report.challengesStudent,
     action_plan: report.actionPlan,
     feedback: report.feedback,
-    reviewed_by: report.reviewedBy
+    reviewed_by: report.reviewedBy,
+    extra_fields: report.extraFields ?? {}
   });
   if (error) throw error;
   refreshData();
@@ -292,7 +341,8 @@ export async function submitWorkReport(report: WorkReport): Promise<void> {
     challenges_solutions: report.challengesSolutions,
     pending_work: report.pendingWork,
     additional_notes: report.additionalNotes,
-    reviewed_by: report.reviewedBy
+    reviewed_by: report.reviewedBy,
+    extra_fields: report.extraFields ?? {}
   });
   if (error) throw error;
   refreshData();
@@ -308,7 +358,8 @@ export async function submitOfficeAdminReport(report: OfficeAdminReport): Promis
     condition: report.condition,
     action_taken: report.actionTaken,
     location: report.location,
-    notes: report.notes
+    notes: report.notes,
+    extra_fields: report.extraFields ?? {}
   });
   if (error) throw error;
   refreshData();
@@ -339,8 +390,97 @@ export async function submitPlacementReport(report: PlacementReport): Promise<vo
     next_follow_up_date: report.nextFollowUpDate,
     action_required: report.actionRequired,
     assigned_to: report.assignedTo,
-    follow_up_done: report.followUpDone
+    follow_up_done: report.followUpDone,
+    extra_fields: report.extraFields ?? {}
   });
+  if (error) throw error;
+  refreshData();
+}
+
+// ==========================================
+// SuperAdmin: dynamic dropdown options
+// ==========================================
+
+export async function addFieldOption(category: string, value: string, label: string, sortOrder = 0): Promise<void> {
+  const { error } = await supabase.from('field_options').insert({
+    category, value, label, sort_order: sortOrder
+  });
+  if (error) throw error;
+  refreshData();
+}
+
+export async function deleteFieldOption(id: string): Promise<void> {
+  const { error } = await supabase.from('field_options').delete().eq('id', id);
+  if (error) throw error;
+  refreshData();
+}
+
+// ==========================================
+// SuperAdmin: custom form fields
+// ==========================================
+
+export async function upsertCustomField(field: {
+  id?: string;
+  formType: CustomFieldFormType;
+  fieldKey: string;
+  label: string;
+  fieldType: CustomFieldType;
+  options: string[];
+  required: boolean;
+  sortOrder?: number;
+}): Promise<void> {
+  const row = {
+    form_type: field.formType,
+    field_key: field.fieldKey,
+    label: field.label,
+    field_type: field.fieldType,
+    options: field.options,
+    required: field.required,
+    sort_order: field.sortOrder ?? 0
+  };
+  const { error } = field.id
+    ? await supabase.from('custom_fields').update(row).eq('id', field.id)
+    : await supabase.from('custom_fields').insert(row);
+  if (error) throw error;
+  refreshData();
+}
+
+export async function deleteCustomField(id: string): Promise<void> {
+  const { error } = await supabase.from('custom_fields').delete().eq('id', id);
+  if (error) throw error;
+  refreshData();
+}
+
+// ==========================================
+// SuperAdmin: staff member management
+// ==========================================
+
+export async function upsertMember(member: {
+  id?: string;
+  name: string;
+  department: string;
+  batch: string;
+  email: string;
+  role: MemberRole;
+  username: string;
+  password?: string;
+}): Promise<void> {
+  const { error } = await supabase.rpc('admin_upsert_member', {
+    p_id: member.id ?? null,
+    p_name: member.name,
+    p_department: member.department,
+    p_batch: member.batch,
+    p_email: member.email,
+    p_role: member.role,
+    p_username: member.username,
+    p_password: member.password ?? null
+  });
+  if (error) throw error;
+  refreshData();
+}
+
+export async function deleteMember(id: string): Promise<void> {
+  const { error } = await supabase.rpc('admin_delete_member', { p_id: id });
   if (error) throw error;
   refreshData();
 }

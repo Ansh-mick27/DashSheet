@@ -2,7 +2,7 @@
 // DashSheet — TypeScript Type Definitions
 // ==========================================
 
-export type MemberRole = 'Trainer' | 'Admin' | 'OfficeAdmin' | 'Placement';
+export type MemberRole = 'Trainer' | 'Admin' | 'OfficeAdmin' | 'Placement' | 'SuperAdmin';
 
 export interface Member {
   id: string;
@@ -13,6 +13,31 @@ export interface Member {
   role: MemberRole;
   username: string;
 }
+
+export type CustomFieldType = 'text' | 'number' | 'textarea' | 'select' | 'checkbox' | 'date';
+
+export type CustomFieldFormType = 'training' | 'work' | 'inventory' | 'placement';
+
+export interface FieldOption {
+  id: string;
+  category: string;
+  value: string;
+  label: string;
+  sortOrder: number;
+}
+
+export interface CustomField {
+  id: string;
+  formType: CustomFieldFormType;
+  fieldKey: string;
+  label: string;
+  fieldType: CustomFieldType;
+  options: string[];
+  required: boolean;
+  sortOrder: number;
+}
+
+export type ExtraFields = Record<string, string | number | boolean>;
 
 export interface TrainingReport {
   timestamp: string;
@@ -42,6 +67,7 @@ export interface TrainingReport {
   actionPlan: string;
   feedback: string;
   reviewedBy: string;
+  extraFields?: ExtraFields;
 }
 
 export interface TimeSlotEntry {
@@ -63,6 +89,7 @@ export interface WorkReport {
   pendingWork: string;
   additionalNotes: string;
   reviewedBy: string;
+  extraFields?: ExtraFields;
 }
 
 export interface OfficeAdminReport {
@@ -76,6 +103,7 @@ export interface OfficeAdminReport {
   actionTaken: 'Added' | 'Removed' | 'Repaired' | 'Maintenance' | 'Audited';
   location: string;
   notes: string;
+  extraFields?: ExtraFields;
 }
 
 export interface PlacementReport {
@@ -104,6 +132,7 @@ export interface PlacementReport {
   actionRequired: string;
   assignedTo: 'Placement Officer' | 'HOD / Coordinator' | 'Campus Relations Manager' | 'Business Development Associate' | 'Other' | '';
   followUpDone: boolean;
+  extraFields?: ExtraFields;
 }
 
 export interface DashboardFilters {

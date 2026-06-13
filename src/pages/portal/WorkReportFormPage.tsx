@@ -1,16 +1,19 @@
 // ==========================================
 // DashSheet — Work Report Form Page
 // ==========================================
-import { useState, FormEvent } from 'react';
+import { useState, useMemo, FormEvent } from 'react';
 import { CheckCircle2, AlertCircle, Send } from 'lucide-react';
 import { useAuth } from '../../contexts/AuthContext';
 import { submitWorkReport } from '../../services/dataApi';
 import { todayISO, isoToDDMMYYYY } from '../../lib/dateUtils';
-import { TIME_SLOTS } from '../../data/constants';
-import { WorkReport, TimeSlotEntry } from '../../types';
+import { TIME_SLOTS, TASKS } from '../../data/constants';
+import { WorkReport, TimeSlotEntry, ExtraFields } from '../../types';
+import { useFormConfig } from '../../lib/useFormConfig';
+import { mergeOptions } from '../../lib/options';
 import FormField from '../../components/form/FormField';
 import FormTextarea from '../../components/form/FormTextarea';
 import TimeSlotGrid from '../../components/form/TimeSlotGrid';
+import CustomFieldsSection from '../../components/form/CustomFieldsSection';
 
 function emptyTimeSlots(): TimeSlotEntry[] {
   return TIME_SLOTS.map(slot => ({ timeSlot: slot, task: '', status: '', remarks: '' }));
@@ -25,13 +28,22 @@ export default function WorkReportFormPage() {
   const [pendingWork, setPendingWork] = useState('');
   const [additionalNotes, setAdditionalNotes] = useState('');
   const [reviewedBy, setReviewedBy] = useState('');
+  const [extraFields, setExtraFields] = useState<ExtraFields>({});
   const [status, setStatus] = useState<'idle' | 'saving' | 'success' | 'error'>('idle');
+
+  const { fieldOptions, customFields } = useFormConfig('work');
+  const tasks = useMemo(() => mergeOptions(TASKS, fieldOptions, 'tasks'), [fieldOptions]);
+
+  const handleExtraChange = (key: string, value: string | number | boolean) => {
+    setExtraFields(prev => ({ ...prev, [key]: value }));
+  };
 
   const resetForm = () => {
     setDate(todayISO());
     setTimeSlots(emptyTimeSlots());
     setKeyAccomplishments(''); setChallengesSolutions(''); setPendingWork('');
     setAdditionalNotes(''); setReviewedBy('');
+    setExtraFields({});
   };
 
   const handleSubmit = async (e: FormEvent) => {
@@ -50,7 +62,8 @@ export default function WorkReportFormPage() {
         challengesSolutions,
         pendingWork,
         additionalNotes,
-        reviewedBy
+        reviewedBy,
+        extraFields
       };
       await submitWorkReport(report);
       setStatus('success');
@@ -80,7 +93,7 @@ export default function WorkReportFormPage() {
           </div>
 
           <div className="form-section-title">Daily Schedule</div>
-          <TimeSlotGrid value={timeSlots} onChange={setTimeSlots} />
+          <TimeSlotGrid value={timeSlots} onChange={setTimeSlots} tasks={tasks} />
 
           <div className="form-section-title">Summary</div>
           <FormTextarea label="Key Accomplishments" name="keyAccomplishments" value={keyAccomplishments} onChange={setKeyAccomplishments} rows={2} required />
@@ -88,6 +101,8 @@ export default function WorkReportFormPage() {
           <FormTextarea label="Pending Work" name="pendingWork" value={pendingWork} onChange={setPendingWork} rows={2} />
           <FormTextarea label="Additional Notes" name="additionalNotes" value={additionalNotes} onChange={setAdditionalNotes} rows={2} />
           <FormField label="Reviewed By (optional)" name="reviewedBy" value={reviewedBy} onChange={setReviewedBy} />
+
+          <CustomFieldsSection fields={customFields} values={extraFields} onChange={handleExtraChange} />
 
           <div className="settings-form__actions">
             <button type="submit" disabled={status === 'saving'} className="btn btn--primary">

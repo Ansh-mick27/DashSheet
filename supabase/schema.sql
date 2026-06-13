@@ -17,7 +17,7 @@ create table if not exists members (
   department text not null,
   batch text not null,
   email text not null,
-  role text not null check (role in ('Trainer', 'Admin', 'OfficeAdmin', 'Placement')),
+  role text not null check (role in ('Trainer', 'Admin', 'OfficeAdmin', 'Placement', 'SuperAdmin')),
   username text not null unique,
   password text not null,
   created_at timestamptz not null default now()
@@ -171,8 +171,8 @@ grant execute on function login_member(text, text) to anon;
 -- ==========================================
 
 insert into members (name, department, batch, email, role, username, password) values
-  ('Deepti Verma',        'Soft Skills',                  'Batch A', 'deepti.verma@org.com',        'Admin',       'deepti.verma',        extensions.crypt('Cdc@2026', extensions.gen_salt('bf'))),
-  ('Amit Mishra',         'Technical Skills',             'Batch B', 'amit.mishra@org.com',         'Admin',       'amit.mishra',         extensions.crypt('Cdc@2026', extensions.gen_salt('bf'))),
+  ('Deepti Verma',        'Soft Skills',                  'Batch A', 'deepti.verma@org.com',        'Trainer',     'deepti.verma',        extensions.crypt('Cdc@2026', extensions.gen_salt('bf'))),
+  ('Amit Mishra',         'Technical Skills',             'Batch B', 'amit.mishra@org.com',         'Trainer',     'amit.mishra',         extensions.crypt('Cdc@2026', extensions.gen_salt('bf'))),
   ('Anshul Oza',          'Technical Skills',             'Batch C', 'anshul.oza@org.com',          'Trainer',     'anshul.oza',          extensions.crypt('Cdc@2026', extensions.gen_salt('bf'))),
   ('Khyati Koranne',      'Technical Skills',             'Batch D', 'khyati.koranne@org.com',      'Trainer',     'khyati.koranne',      extensions.crypt('Cdc@2026', extensions.gen_salt('bf'))),
   ('Ritu Shrivastava',    'Communication Skills',         'Batch E', 'ritu.shrivastava@org.com',    'Trainer',     'ritu.shrivastava',    extensions.crypt('Cdc@2026', extensions.gen_salt('bf'))),
@@ -189,5 +189,109 @@ insert into members (name, department, batch, email, role, username, password) v
   ('Khushi Verma',        'Administration',               '-',       'khushi.verma@org.com',        'OfficeAdmin', 'khushi.verma',        extensions.crypt('Cdc@2026', extensions.gen_salt('bf'))),
   ('Rajesh Tyagi',        'Placement Cell',                '-',       'rajesh.tyagi@org.com',        'Placement',   'rajesh.tyagi',        extensions.crypt('Cdc@2026', extensions.gen_salt('bf'))),
   ('Sarvesh Dubey',       'Placement Cell',                '-',       'sarvesh.dubey@org.com',       'Placement',   'sarvesh.dubey',       extensions.crypt('Cdc@2026', extensions.gen_salt('bf'))),
-  ('Ankit Shrivastava',   'Placement Cell',                '-',       'ankit.shrivastava@org.com',   'Placement',   'ankit.shrivastava',   extensions.crypt('Cdc@2026', extensions.gen_salt('bf')))
+  ('Ankit Shrivastava',   'Placement Cell',                '-',       'ankit.shrivastava@org.com',   'Placement',   'ankit.shrivastava',   extensions.crypt('Cdc@2026', extensions.gen_salt('bf'))),
+  ('Atul Bharat',         'Administration',                '-',       'atul.bharat@org.com',         'Admin',       'atul.bharat',         extensions.crypt('Cdc@2026', extensions.gen_salt('bf'))),
+  ('Super Admin',         'Administration',                '-',       'super.admin@org.com',         'SuperAdmin',  'super.admin',         extensions.crypt('Cdc@2026', extensions.gen_salt('bf')))
 on conflict (username) do nothing;
+
+-- ==========================================
+-- SuperAdmin customization: dynamic dropdown options
+-- ==========================================
+
+create table if not exists field_options (
+  id uuid primary key default gen_random_uuid(),
+  category text not null,
+  value text not null,
+  label text not null,
+  sort_order integer not null default 0,
+  created_at timestamptz not null default now(),
+  unique (category, value)
+);
+
+alter table field_options enable row level security;
+create policy "anon all field_options" on field_options for all to anon using (true) with check (true);
+
+-- ==========================================
+-- SuperAdmin customization: custom form fields
+-- ==========================================
+
+create table if not exists custom_fields (
+  id uuid primary key default gen_random_uuid(),
+  form_type text not null check (form_type in ('training', 'work', 'inventory', 'placement')),
+  field_key text not null,
+  label text not null,
+  field_type text not null check (field_type in ('text', 'number', 'textarea', 'select', 'checkbox', 'date')),
+  options jsonb not null default '[]'::jsonb,
+  required boolean not null default false,
+  sort_order integer not null default 0,
+  created_at timestamptz not null default now(),
+  unique (form_type, field_key)
+);
+
+alter table custom_fields enable row level security;
+create policy "anon all custom_fields" on custom_fields for all to anon using (true) with check (true);
+
+alter table training_reports add column if not exists extra_fields jsonb not null default '{}'::jsonb;
+alter table work_reports add column if not exists extra_fields jsonb not null default '{}'::jsonb;
+alter table office_admin_reports add column if not exists extra_fields jsonb not null default '{}'::jsonb;
+alter table placement_reports add column if not exists extra_fields jsonb not null default '{}'::jsonb;
+
+-- ==========================================
+-- SuperAdmin customization: staff member management
+-- members table has no anon policies, so use SECURITY DEFINER RPCs
+-- ==========================================
+
+create or replace function admin_upsert_member(
+  p_id uuid,
+  p_name text,
+  p_department text,
+  p_batch text,
+  p_email text,
+  p_role text,
+  p_username text,
+  p_password text default null
+)
+returns table (id uuid, name text, department text, batch text, email text, role text, username text)
+language plpgsql
+security definer
+set search_path = public, extensions
+as $$
+begin
+  if p_id is null then
+    return query
+      insert into members (name, department, batch, email, role, username, password)
+      values (p_name, p_department, p_batch, p_email, p_role, lower(trim(p_username)),
+              crypt(coalesce(p_password, 'Cdc@2026'), gen_salt('bf')))
+      returning members.id, members.name, members.department, members.batch, members.email, members.role, members.username;
+  else
+    update members set
+      name = p_name,
+      department = p_department,
+      batch = p_batch,
+      email = p_email,
+      role = p_role,
+      username = lower(trim(p_username)),
+      password = case when p_password is not null and p_password <> ''
+                       then crypt(p_password, gen_salt('bf'))
+                       else members.password end
+    where members.id = p_id;
+
+    return query
+      select members.id, members.name, members.department, members.batch, members.email, members.role, members.username
+      from members where members.id = p_id;
+  end if;
+end;
+$$;
+
+grant execute on function admin_upsert_member(uuid, text, text, text, text, text, text, text) to anon;
+
+create or replace function admin_delete_member(p_id uuid)
+returns void
+language sql
+security definer
+set search_path = public, extensions
+as $$
+  delete from members where members.id = p_id;
+$$;
+
+grant execute on function admin_delete_member(uuid) to anon;

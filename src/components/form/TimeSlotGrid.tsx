@@ -7,9 +7,10 @@ import { TimeSlotEntry } from '../../types';
 interface TimeSlotGridProps {
   value: TimeSlotEntry[];
   onChange: (value: TimeSlotEntry[]) => void;
+  tasks?: string[];
 }
 
-export default function TimeSlotGrid({ value, onChange }: TimeSlotGridProps) {
+export default function TimeSlotGrid({ value, onChange, tasks = TASKS }: TimeSlotGridProps) {
   const updateRow = (index: number, patch: Partial<TimeSlotEntry>) => {
     const updated = value.map((row, i) => i === index ? { ...row, ...patch } : row);
     onChange(updated);
@@ -34,7 +35,7 @@ export default function TimeSlotGrid({ value, onChange }: TimeSlotGridProps) {
               onChange={e => updateRow(i, { task: e.target.value })}
             >
               <option value="">Select task...</option>
-              {TASKS.map(task => <option key={task} value={task}>{task}</option>)}
+              {tasks.map(task => <option key={task} value={task}>{task}</option>)}
             </select>
             <select
               className="settings-form__input"

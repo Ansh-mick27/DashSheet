@@ -1,16 +1,19 @@
 // ==========================================
 // DashSheet — Inventory Report Form Page
 // ==========================================
-import { useState, FormEvent } from 'react';
+import { useState, useMemo, FormEvent } from 'react';
 import { CheckCircle2, AlertCircle, Send } from 'lucide-react';
 import { useAuth } from '../../contexts/AuthContext';
 import { submitOfficeAdminReport } from '../../services/dataApi';
 import { todayISO, isoToDDMMYYYY } from '../../lib/dateUtils';
 import { INVENTORY_ITEMS, ITEM_CATEGORIES, ITEM_CONDITIONS, ACTIONS_TAKEN } from '../../data/constants';
-import { OfficeAdminReport } from '../../types';
+import { OfficeAdminReport, ExtraFields } from '../../types';
+import { useFormConfig } from '../../lib/useFormConfig';
+import { mergeOptions } from '../../lib/options';
 import FormField from '../../components/form/FormField';
 import FormSelect from '../../components/form/FormSelect';
 import FormTextarea from '../../components/form/FormTextarea';
+import CustomFieldsSection from '../../components/form/CustomFieldsSection';
 
 export default function InventoryReportFormPage() {
   const { member } = useAuth();
@@ -22,12 +25,24 @@ export default function InventoryReportFormPage() {
   const [actionTaken, setActionTaken] = useState('');
   const [location, setLocation] = useState('');
   const [notes, setNotes] = useState('');
+  const [extraFields, setExtraFields] = useState<ExtraFields>({});
   const [status, setStatus] = useState<'idle' | 'saving' | 'success' | 'error'>('idle');
+
+  const { fieldOptions, customFields } = useFormConfig('inventory');
+  const inventoryItems = useMemo(() => mergeOptions(INVENTORY_ITEMS, fieldOptions, 'inventoryItems'), [fieldOptions]);
+  const itemCategories = useMemo(() => mergeOptions(ITEM_CATEGORIES, fieldOptions, 'itemCategories'), [fieldOptions]);
+  const itemConditions = useMemo(() => mergeOptions(ITEM_CONDITIONS, fieldOptions, 'itemConditions'), [fieldOptions]);
+  const actionsTaken = useMemo(() => mergeOptions(ACTIONS_TAKEN, fieldOptions, 'actionsTaken'), [fieldOptions]);
+
+  const handleExtraChange = (key: string, value: string | number | boolean) => {
+    setExtraFields(prev => ({ ...prev, [key]: value }));
+  };
 
   const resetForm = () => {
     setDate(todayISO());
     setItemName(''); setItemCategory(''); setQuantity('');
     setCondition(''); setActionTaken(''); setLocation(''); setNotes('');
+    setExtraFields({});
   };
 
   const handleSubmit = async (e: FormEvent) => {
@@ -45,7 +60,8 @@ export default function InventoryReportFormPage() {
         condition: condition as OfficeAdminReport['condition'],
         actionTaken: actionTaken as OfficeAdminReport['actionTaken'],
         location,
-        notes
+        notes,
+        extraFields
       };
       await submitOfficeAdminReport(report);
       setStatus('success');
@@ -74,18 +90,20 @@ export default function InventoryReportFormPage() {
           </div>
 
           <div className="form-grid">
-            <FormSelect label="Item Name" name="itemName" value={itemName} onChange={setItemName} options={INVENTORY_ITEMS} required />
-            <FormSelect label="Item Category" name="itemCategory" value={itemCategory} onChange={setItemCategory} options={ITEM_CATEGORIES} required />
+            <FormSelect label="Item Name" name="itemName" value={itemName} onChange={setItemName} options={inventoryItems} required />
+            <FormSelect label="Item Category" name="itemCategory" value={itemCategory} onChange={setItemCategory} options={itemCategories} required />
           </div>
 
           <div className="form-grid form-grid--3">
             <FormField label="Quantity" name="quantity" type="number" value={quantity} onChange={setQuantity} required min={0} />
-            <FormSelect label="Condition" name="condition" value={condition} onChange={setCondition} options={ITEM_CONDITIONS} required />
-            <FormSelect label="Action Taken" name="actionTaken" value={actionTaken} onChange={setActionTaken} options={ACTIONS_TAKEN} required />
+            <FormSelect label="Condition" name="condition" value={condition} onChange={setCondition} options={itemConditions} required />
+            <FormSelect label="Action Taken" name="actionTaken" value={actionTaken} onChange={setActionTaken} options={actionsTaken} required />
           </div>
 
           <FormField label="Location" name="location" value={location} onChange={setLocation} required />
           <FormTextarea label="Notes" name="notes" value={notes} onChange={setNotes} rows={3} />
+
+          <CustomFieldsSection fields={customFields} values={extraFields} onChange={handleExtraChange} />
 
           <div className="settings-form__actions">
             <button type="submit" disabled={status === 'saving'} className="btn btn--primary">

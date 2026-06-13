@@ -5,7 +5,7 @@ import { NavLink, useNavigate } from 'react-router-dom';
 import {
   LayoutDashboard, BookOpen, ClipboardList, Users,
   LogOut, ChevronLeft, ChevronRight, Settings,
-  Package, Briefcase, Sun, Moon, Search, ClipboardPlus
+  Package, Briefcase, Sun, Moon, Search, ClipboardPlus, ShieldCheck
 } from 'lucide-react';
 import { useAuth } from '../contexts/AuthContext';
 import { useTheme } from '../contexts/ThemeContext';
@@ -22,6 +22,11 @@ const ADMIN_NAV_ITEMS = [
   { path: '/settings', icon: Settings, label: 'Settings' },
 ];
 
+const SUPERADMIN_NAV_ITEMS = [
+  ...ADMIN_NAV_ITEMS,
+  { path: '/admin', icon: ShieldCheck, label: 'SuperAdmin' },
+];
+
 const PORTAL_NAV_ITEMS = [
   { path: '/portal', icon: ClipboardPlus, label: 'Portal' },
 ];
@@ -36,7 +41,11 @@ export default function Sidebar({ onSearch }: SidebarProps) {
   const [collapsed, setCollapsed] = useState(false);
   const [searchVal, setSearchVal] = useState('');
   const navigate = useNavigate();
-  const navItems = member?.role === 'Admin' ? ADMIN_NAV_ITEMS : PORTAL_NAV_ITEMS;
+  const navItems = member?.role === 'SuperAdmin'
+    ? SUPERADMIN_NAV_ITEMS
+    : member?.role === 'Admin'
+      ? ADMIN_NAV_ITEMS
+      : PORTAL_NAV_ITEMS;
 
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();
@@ -69,7 +78,7 @@ export default function Sidebar({ onSearch }: SidebarProps) {
         </button>
       </div>
 
-      {!collapsed && member?.role === 'Admin' && (
+      {!collapsed && (member?.role === 'Admin' || member?.role === 'SuperAdmin') && (
         <form className="sidebar__search" onSubmit={handleSearch}>
           <Search size={14} className="sidebar__search-icon" />
           <input

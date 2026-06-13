@@ -7,11 +7,14 @@ import { useAuth } from '../../contexts/AuthContext';
 import { submitTrainingReport } from '../../services/dataApi';
 import { todayISO, isoToDDMMYYYY } from '../../lib/dateUtils';
 import { COLLEGES_COURSES_SPECIALIZATIONS, DURATIONS, PARTICIPATION_LEVELS } from '../../data/constants';
-import { TrainingReport } from '../../types';
+import { TrainingReport, ExtraFields } from '../../types';
+import { useFormConfig } from '../../lib/useFormConfig';
+import { mergeOptions, mergeCollegeCourseSpecs } from '../../lib/options';
 import FormField from '../../components/form/FormField';
 import FormSelect from '../../components/form/FormSelect';
 import FormTextarea from '../../components/form/FormTextarea';
 import FormCheckboxGroup from '../../components/form/FormCheckboxGroup';
+import CustomFieldsSection from '../../components/form/CustomFieldsSection';
 
 const EMPTY_METHODS: TrainingReport['methods'] = {
   lecture: false,
@@ -42,22 +45,36 @@ export default function TrainingReportFormPage() {
   const [actionPlan, setActionPlan] = useState('');
   const [feedback, setFeedback] = useState('');
   const [reviewedBy, setReviewedBy] = useState('');
+  const [extraFields, setExtraFields] = useState<ExtraFields>({});
   const [status, setStatus] = useState<'idle' | 'saving' | 'success' | 'error'>('idle');
 
+  const { fieldOptions, customFields } = useFormConfig('training');
+
+  const collegeCourseSpecs = useMemo(
+    () => mergeCollegeCourseSpecs(COLLEGES_COURSES_SPECIALIZATIONS, fieldOptions),
+    [fieldOptions]
+  );
+  const durations = useMemo(() => mergeOptions(DURATIONS, fieldOptions, 'durations'), [fieldOptions]);
+  const participationLevels = useMemo(() => mergeOptions(PARTICIPATION_LEVELS, fieldOptions, 'participationLevels'), [fieldOptions]);
+
   const colleges = useMemo(
-    () => Array.from(new Set(COLLEGES_COURSES_SPECIALIZATIONS.map(c => c.college))),
-    []
+    () => Array.from(new Set(collegeCourseSpecs.map(c => c.college))),
+    [collegeCourseSpecs]
   );
   const courses = useMemo(
-    () => Array.from(new Set(COLLEGES_COURSES_SPECIALIZATIONS.filter(c => c.college === college).map(c => c.course))),
-    [college]
+    () => Array.from(new Set(collegeCourseSpecs.filter(c => c.college === college).map(c => c.course))),
+    [collegeCourseSpecs, college]
   );
   const specializations = useMemo(
-    () => COLLEGES_COURSES_SPECIALIZATIONS
+    () => collegeCourseSpecs
       .filter(c => c.college === college && c.course === course && c.specialization)
       .map(c => c.specialization),
-    [college, course]
+    [collegeCourseSpecs, college, course]
   );
+
+  const handleExtraChange = (key: string, value: string | number | boolean) => {
+    setExtraFields(prev => ({ ...prev, [key]: value }));
+  };
 
   const handleCollegeChange = (value: string) => {
     setCollege(value);
@@ -78,6 +95,7 @@ export default function TrainingReportFormPage() {
     setStudentsPresent(''); setTotalEnrolled(''); setParticipationLevel('');
     setEngagementObservations(''); setChallengesTrainer(''); setChallengesStudent('');
     setActionPlan(''); setFeedback(''); setReviewedBy('');
+    setExtraFields({});
   };
 
   const handleSubmit = async (e: FormEvent) => {
@@ -104,7 +122,8 @@ export default function TrainingReportFormPage() {
         challengesStudent,
         actionPlan,
         feedback,
-        reviewedBy
+        reviewedBy,
+        extraFields
       };
       await submitTrainingReport(report);
       setStatus('success');
@@ -142,7 +161,7 @@ export default function TrainingReportFormPage() {
 
           <div className="form-grid">
             <FormField label="Topic Covered" name="topicCovered" value={topicCovered} onChange={setTopicCovered} required />
-            <FormSelect label="Session Duration" name="duration" value={duration} onChange={setDuration} options={DURATIONS} required />
+            <FormSelect label="Session Duration" name="duration" value={duration} onChange={setDuration} options={durations} required />
           </div>
 
           <FormTextarea label="Learning Objectives" name="learningObjectives" value={learningObjectives} onChange={setLearningObjectives} rows={2} />
@@ -152,7 +171,7 @@ export default function TrainingReportFormPage() {
           <div className="form-grid form-grid--3">
             <FormField label="Total Students Enrolled" name="totalEnrolled" type="number" value={totalEnrolled} onChange={setTotalEnrolled} required min={0} />
             <FormField label="Students Present" name="studentsPresent" type="number" value={studentsPresent} onChange={setStudentsPresent} required min={0} />
-            <FormSelect label="Participation Level" name="participationLevel" value={participationLevel} onChange={setParticipationLevel} options={PARTICIPATION_LEVELS} required />
+            <FormSelect label="Participation Level" name="participationLevel" value={participationLevel} onChange={setParticipationLevel} options={participationLevels} required />
           </div>
 
           <FormTextarea label="Engagement Observations" name="engagementObservations" value={engagementObservations} onChange={setEngagementObservations} rows={2} />
@@ -165,6 +184,8 @@ export default function TrainingReportFormPage() {
           <FormTextarea label="Action Plan for Next Session" name="actionPlan" value={actionPlan} onChange={setActionPlan} rows={2} />
           <FormTextarea label="Feedback" name="feedback" value={feedback} onChange={setFeedback} rows={2} />
           <FormField label="Reviewed By (optional)" name="reviewedBy" value={reviewedBy} onChange={setReviewedBy} />
+
+          <CustomFieldsSection fields={customFields} values={extraFields} onChange={handleExtraChange} />
 
           <div className="settings-form__actions">
             <button type="submit" disabled={status === 'saving'} className="btn btn--primary">
