@@ -3,7 +3,7 @@
 // Manage dropdown options, custom form fields,
 // and staff members
 // ==========================================
-import { useEffect, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { Plus, Trash2, Pencil, Check, X } from 'lucide-react';
 import {
   fetchFieldOptions, fetchCustomFields, fetchSheetData,
@@ -40,6 +40,8 @@ const ALL_OPTION_CATEGORIES = [
   ...OPTION_CATEGORIES,
   { key: COLLEGE_OPTION_CATEGORY, label: 'College / Course / Specialization' }
 ];
+
+const ADD_NEW_COLLEGE = '+ Add New College';
 
 const EMPTY_MEMBER_FORM = {
   id: undefined as string | undefined,
@@ -111,6 +113,7 @@ function OptionsTab({ fieldOptions, onChange }: { fieldOptions: FieldOption[]; o
   const [course, setCourse] = useState('');
   const [specialization, setSpecialization] = useState('');
   const [saving, setSaving] = useState(false);
+  const [collegeMode, setCollegeMode] = useState<'select' | 'new'>('select');
 
   // Inline editing state — simple categories (single label)
   const [editingKey, setEditingKey] = useState<string | null>(null);
@@ -120,12 +123,21 @@ function OptionsTab({ fieldOptions, onChange }: { fieldOptions: FieldOption[]; o
   const [editCollege, setEditCollege] = useState('');
   const [editCourse, setEditCourse] = useState('');
   const [editSpecialization, setEditSpecialization] = useState('');
+  const [editCollegeMode, setEditCollegeMode] = useState<'select' | 'new'>('select');
 
   const isCollege = category === COLLEGE_OPTION_CATEGORY;
   const categoryLabel = ALL_OPTION_CATEGORIES.find(c => c.key === category)?.label ?? '';
 
   const items = isCollege ? [] : mergeOptionsDetailed(category, fieldOptions);
   const collegeItems = isCollege ? mergeCollegeCourseSpecsDetailed(COLLEGES_COURSES_SPECIALIZATIONS, fieldOptions) : [];
+  const existingColleges = useMemo(
+    () => Array.from(new Set(collegeItems.map(i => i.spec.college))).sort(),
+    [collegeItems]
+  );
+
+  useEffect(() => {
+    if (existingColleges.length === 0) setCollegeMode('new');
+  }, [existingColleges.length]);
 
   const changeCategory = (v: string) => {
     const match = ALL_OPTION_CATEGORIES.find(c => c.label === v);
@@ -142,6 +154,7 @@ function OptionsTab({ fieldOptions, onChange }: { fieldOptions: FieldOption[]; o
         const display = `${college} — ${course}${specialization ? ` (${specialization})` : ''}`;
         await addFieldOption(category, JSON.stringify(spec), display, nextSortOrder(collegeItems));
         setCollege(''); setCourse(''); setSpecialization('');
+        setCollegeMode(existingColleges.length > 0 ? 'select' : 'new');
       } else {
         if (!label.trim()) return;
         await addFieldOption(category, label.trim(), label.trim(), nextSortOrder(items));
@@ -203,6 +216,7 @@ function OptionsTab({ fieldOptions, onChange }: { fieldOptions: FieldOption[]; o
     setEditCollege(item.spec.college);
     setEditCourse(item.spec.course);
     setEditSpecialization(item.spec.specialization);
+    setEditCollegeMode('select');
   };
 
   const saveEditCollege = async (item: CollegeCourseSpecItem) => {
@@ -260,7 +274,23 @@ function OptionsTab({ fieldOptions, onChange }: { fieldOptions: FieldOption[]; o
 
       {isCollege ? (
         <div className="form-grid form-grid--3" style={{ marginBottom: 16 }}>
-          <FormField label="College" name="college" value={college} onChange={setCollege} placeholder="College name" />
+          {existingColleges.length > 0 ? (
+            <FormSelect
+              label="College"
+              name="college"
+              value={collegeMode === 'new' ? ADD_NEW_COLLEGE : college}
+              onChange={v => {
+                if (v === ADD_NEW_COLLEGE) { setCollegeMode('new'); setCollege(''); }
+                else { setCollegeMode('select'); setCollege(v); }
+              }}
+              options={[...existingColleges, ADD_NEW_COLLEGE]}
+            />
+          ) : (
+            <FormField label="College" name="college" value={college} onChange={setCollege} placeholder="College name" />
+          )}
+          {existingColleges.length > 0 && collegeMode === 'new' && (
+            <FormField label="New College Name" name="newCollege" value={college} onChange={setCollege} placeholder="College name" />
+          )}
           <FormField label="Course" name="course" value={course} onChange={setCourse} placeholder="e.g. B. Tech." />
           <FormField label="Specialization (optional)" name="specialization" value={specialization} onChange={setSpecialization} placeholder="e.g. CSE" />
         </div>
@@ -283,7 +313,23 @@ function OptionsTab({ fieldOptions, onChange }: { fieldOptions: FieldOption[]; o
                 {editingKey === item.key ? (
                   <>
                     <div className="form-grid form-grid--3" style={{ flex: 1 }}>
-                      <FormField label="College" name="editCollege" value={editCollege} onChange={setEditCollege} />
+                      {existingColleges.length > 0 ? (
+                        <FormSelect
+                          label="College"
+                          name="editCollege"
+                          value={editCollegeMode === 'new' ? ADD_NEW_COLLEGE : editCollege}
+                          onChange={v => {
+                            if (v === ADD_NEW_COLLEGE) { setEditCollegeMode('new'); setEditCollege(''); }
+                            else { setEditCollegeMode('select'); setEditCollege(v); }
+                          }}
+                          options={[...existingColleges, ADD_NEW_COLLEGE]}
+                        />
+                      ) : (
+                        <FormField label="College" name="editCollege" value={editCollege} onChange={setEditCollege} />
+                      )}
+                      {existingColleges.length > 0 && editCollegeMode === 'new' && (
+                        <FormField label="New College Name" name="editNewCollege" value={editCollege} onChange={setEditCollege} />
+                      )}
                       <FormField label="Course" name="editCourse" value={editCourse} onChange={setEditCourse} />
                       <FormField label="Specialization" name="editSpecialization" value={editSpecialization} onChange={setEditSpecialization} />
                     </div>
