@@ -1,16 +1,17 @@
 // ==========================================
 // DashSheet — Time Slot Grid (Work Report)
 // ==========================================
-import { TIME_SLOTS, TASKS, TASK_STATUSES } from '../../data/constants';
+import { TASKS, TASK_STATUSES } from '../../data/constants';
 import { TimeSlotEntry } from '../../types';
 
 interface TimeSlotGridProps {
   value: TimeSlotEntry[];
   onChange: (value: TimeSlotEntry[]) => void;
   tasks?: string[];
+  statuses?: string[];
 }
 
-export default function TimeSlotGrid({ value, onChange, tasks = TASKS }: TimeSlotGridProps) {
+export default function TimeSlotGrid({ value, onChange, tasks = TASKS, statuses = TASK_STATUSES }: TimeSlotGridProps) {
   const updateRow = (index: number, patch: Partial<TimeSlotEntry>) => {
     const updated = value.map((row, i) => i === index ? { ...row, ...patch } : row);
     onChange(updated);
@@ -24,11 +25,10 @@ export default function TimeSlotGrid({ value, onChange, tasks = TASKS }: TimeSlo
         <span>Status</span>
         <span>Remarks</span>
       </div>
-      {TIME_SLOTS.map((slot, i) => {
-        const row = value[i] ?? { timeSlot: slot, task: '', status: '', remarks: '' };
+      {value.map((row, i) => {
         return (
-          <div className="time-slot-grid__row" key={slot}>
-            <span className="time-slot-grid__label">{slot}</span>
+          <div className="time-slot-grid__row" key={row.timeSlot}>
+            <span className="time-slot-grid__label">{row.timeSlot}</span>
             <select
               className="settings-form__input"
               value={row.task}
@@ -43,7 +43,7 @@ export default function TimeSlotGrid({ value, onChange, tasks = TASKS }: TimeSlo
               onChange={e => updateRow(i, { status: e.target.value as TimeSlotEntry['status'] })}
             >
               <option value="">Select status...</option>
-              {TASK_STATUSES.map(status => <option key={status} value={status}>{status}</option>)}
+              {statuses.map(status => <option key={status} value={status}>{status}</option>)}
             </select>
             <input
               type="text"

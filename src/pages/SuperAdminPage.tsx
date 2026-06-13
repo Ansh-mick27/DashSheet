@@ -15,7 +15,8 @@ import {
   FieldOption, CustomField, CustomFieldType, CustomFieldFormType,
   Member, MemberRole
 } from '../types';
-import { OPTION_CATEGORIES, COLLEGE_OPTION_CATEGORY, CollegeCourseSpec } from '../lib/options';
+import { OPTION_CATEGORIES, COLLEGE_OPTION_CATEGORY, CollegeCourseSpec, mergeOptions } from '../lib/options';
+import { DEPARTMENTS, BATCHES } from '../data/constants';
 import FormField from '../components/form/FormField';
 import FormSelect from '../components/form/FormSelect';
 
@@ -89,7 +90,7 @@ export default function SuperAdminPage() {
         <>
           {tab === 'options' && <OptionsTab fieldOptions={fieldOptions} onChange={reload} />}
           {tab === 'fields' && <FieldsTab customFields={customFields} onChange={reload} />}
-          {tab === 'members' && <MembersTab members={members} onChange={reload} />}
+          {tab === 'members' && <MembersTab members={members} fieldOptions={fieldOptions} onChange={reload} />}
         </>
       )}
     </div>
@@ -333,10 +334,13 @@ function FieldsTab({ customFields, onChange }: { customFields: CustomField[]; on
 // ==========================================
 // Staff Members Tab
 // ==========================================
-function MembersTab({ members, onChange }: { members: Member[]; onChange: () => void }) {
+function MembersTab({ members, fieldOptions, onChange }: { members: Member[]; fieldOptions: FieldOption[]; onChange: () => void }) {
   const [form, setForm] = useState(EMPTY_MEMBER_FORM);
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState('');
+
+  const departments = [...mergeOptions(DEPARTMENTS, fieldOptions, 'departments'), '-'];
+  const batches = [...mergeOptions(BATCHES, fieldOptions, 'batches'), '-'];
 
   const startEdit = (m: Member) => {
     setForm({ id: m.id, name: m.name, department: m.department, batch: m.batch, email: m.email, role: m.role, username: m.username, password: '' });
@@ -396,8 +400,8 @@ function MembersTab({ members, onChange }: { members: Member[]; onChange: () => 
         <FormSelect label="Role" name="role" value={form.role} onChange={v => setForm(f => ({ ...f, role: v as MemberRole }))} options={ROLES} />
       </div>
       <div className="form-grid form-grid--3" style={{ marginBottom: 12 }}>
-        <FormField label="Department" name="department" value={form.department} onChange={v => setForm(f => ({ ...f, department: v }))} placeholder="e.g. Technical Skills, or -" />
-        <FormField label="Batch" name="batch" value={form.batch} onChange={v => setForm(f => ({ ...f, batch: v }))} placeholder="e.g. Batch A, or -" />
+        <FormSelect label="Department" name="department" value={form.department} onChange={v => setForm(f => ({ ...f, department: v }))} options={departments} />
+        <FormSelect label="Batch" name="batch" value={form.batch} onChange={v => setForm(f => ({ ...f, batch: v }))} options={batches} />
         <FormField label="Username" name="username" value={form.username} onChange={v => setForm(f => ({ ...f, username: v }))} required />
       </div>
       <div className="form-grid" style={{ marginBottom: 16 }}>

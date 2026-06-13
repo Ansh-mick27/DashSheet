@@ -1,12 +1,12 @@
 // ==========================================
 // DashSheet — Work Report Form Page
 // ==========================================
-import { useState, useMemo, FormEvent } from 'react';
+import { useState, useMemo, useEffect, FormEvent } from 'react';
 import { CheckCircle2, AlertCircle, Send } from 'lucide-react';
 import { useAuth } from '../../contexts/AuthContext';
 import { submitWorkReport } from '../../services/dataApi';
 import { todayISO, isoToDDMMYYYY } from '../../lib/dateUtils';
-import { TIME_SLOTS, TASKS } from '../../data/constants';
+import { TIME_SLOTS, TASKS, TASK_STATUSES } from '../../data/constants';
 import { WorkReport, TimeSlotEntry, ExtraFields } from '../../types';
 import { useFormConfig } from '../../lib/useFormConfig';
 import { mergeOptions } from '../../lib/options';
@@ -15,14 +15,14 @@ import FormTextarea from '../../components/form/FormTextarea';
 import TimeSlotGrid from '../../components/form/TimeSlotGrid';
 import CustomFieldsSection from '../../components/form/CustomFieldsSection';
 
-function emptyTimeSlots(): TimeSlotEntry[] {
-  return TIME_SLOTS.map(slot => ({ timeSlot: slot, task: '', status: '', remarks: '' }));
+function emptyTimeSlots(slots: string[]): TimeSlotEntry[] {
+  return slots.map(slot => ({ timeSlot: slot, task: '', status: '', remarks: '' }));
 }
 
 export default function WorkReportFormPage() {
   const { member } = useAuth();
   const [date, setDate] = useState(todayISO());
-  const [timeSlots, setTimeSlots] = useState<TimeSlotEntry[]>(emptyTimeSlots());
+  const [timeSlots, setTimeSlots] = useState<TimeSlotEntry[]>(emptyTimeSlots(TIME_SLOTS));
   const [keyAccomplishments, setKeyAccomplishments] = useState('');
   const [challengesSolutions, setChallengesSolutions] = useState('');
   const [pendingWork, setPendingWork] = useState('');
@@ -33,6 +33,17 @@ export default function WorkReportFormPage() {
 
   const { fieldOptions, customFields } = useFormConfig('work');
   const tasks = useMemo(() => mergeOptions(TASKS, fieldOptions, 'tasks'), [fieldOptions]);
+  const taskStatuses = useMemo(() => mergeOptions(TASK_STATUSES, fieldOptions, 'taskStatuses'), [fieldOptions]);
+  const timeSlotLabels = useMemo(() => mergeOptions(TIME_SLOTS, fieldOptions, 'timeSlots'), [fieldOptions]);
+
+  // Keep the time slot grid in sync with SuperAdmin-managed slots, preserving any entered data.
+  useEffect(() => {
+    setTimeSlots(prev => {
+      const sameSlots = prev.length === timeSlotLabels.length && prev.every((row, i) => row.timeSlot === timeSlotLabels[i]);
+      if (sameSlots) return prev;
+      return timeSlotLabels.map(slot => prev.find(row => row.timeSlot === slot) ?? { timeSlot: slot, task: '', status: '', remarks: '' });
+    });
+  }, [timeSlotLabels]);
 
   const handleExtraChange = (key: string, value: string | number | boolean) => {
     setExtraFields(prev => ({ ...prev, [key]: value }));
@@ -40,7 +51,7 @@ export default function WorkReportFormPage() {
 
   const resetForm = () => {
     setDate(todayISO());
-    setTimeSlots(emptyTimeSlots());
+    setTimeSlots(emptyTimeSlots(timeSlotLabels));
     setKeyAccomplishments(''); setChallengesSolutions(''); setPendingWork('');
     setAdditionalNotes(''); setReviewedBy('');
     setExtraFields({});
@@ -93,7 +104,7 @@ export default function WorkReportFormPage() {
           </div>
 
           <div className="form-section-title">Daily Schedule</div>
-          <TimeSlotGrid value={timeSlots} onChange={setTimeSlots} tasks={tasks} />
+          <TimeSlotGrid value={timeSlots} onChange={setTimeSlots} tasks={tasks} statuses={taskStatuses} />
 
           <div className="form-section-title">Summary</div>
           <FormTextarea label="Key Accomplishments" name="keyAccomplishments" value={keyAccomplishments} onChange={setKeyAccomplishments} rows={2} required />
