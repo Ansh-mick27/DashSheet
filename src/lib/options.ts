@@ -75,15 +75,6 @@ function getHiddenValues(fieldOptions: FieldOption[], category: string): Set<str
   return new Set(fieldOptions.filter(f => f.category === hidden).map(f => f.value));
 }
 
-export function mergeOptions(staticOptions: string[], fieldOptions: FieldOption[], category: string): string[] {
-  const hidden = getHiddenValues(fieldOptions, category);
-  const combined = staticOptions.filter(o => !hidden.has(o));
-  fieldOptions
-    .filter(f => f.category === category)
-    .forEach(f => { if (f.label && !combined.includes(f.label)) combined.push(f.label); });
-  return combined;
-}
-
 export interface OptionItem {
   // Stable key for React lists.
   key: string;
@@ -92,36 +83,35 @@ export interface OptionItem {
   // Present for SuperAdmin-added options; undefined for built-in defaults.
   id?: string;
   isStatic: boolean;
+  // Position in the merged list. Built-in defaults keep their original index
+  // so a renamed default stays in its original slot rather than moving to the end.
+  sortOrder: number;
 }
 
 // Like mergeOptions, but returns metadata needed to edit/delete each entry
-// (including built-in defaults, which can be hidden/renamed via field_options).
+// (including built-in defaults, which can be hidden/renamed via field_options),
+// sorted into a stable display/usage order.
 export function mergeOptionsDetailed(category: string, fieldOptions: FieldOption[]): OptionItem[] {
   const staticOptions = STATIC_OPTIONS_MAP[category] ?? [];
   const hidden = getHiddenValues(fieldOptions, category);
-  const items: OptionItem[] = staticOptions
-    .filter(o => !hidden.has(o))
-    .map(o => ({ key: `static:${o}`, value: o, label: o, isStatic: true }));
+  const items: OptionItem[] = [];
+  staticOptions.forEach((o, i) => {
+    if (!hidden.has(o)) items.push({ key: `static:${o}`, value: o, label: o, isStatic: true, sortOrder: i });
+  });
   fieldOptions
     .filter(f => f.category === category)
-    .forEach(f => items.push({ key: `field:${f.id}`, value: f.value, label: f.label, id: f.id, isStatic: false }));
+    .forEach(f => items.push({ key: `field:${f.id}`, value: f.value, label: f.label, id: f.id, isStatic: false, sortOrder: f.sortOrder }));
+  items.sort((a, b) => a.sortOrder - b.sortOrder);
   return items;
 }
 
-export function mergeCollegeCourseSpecs(staticList: CollegeCourseSpec[], fieldOptions: FieldOption[]): CollegeCourseSpec[] {
-  const hidden = getHiddenValues(fieldOptions, COLLEGE_OPTION_CATEGORY);
-  const visible = staticList.filter(s => !hidden.has(JSON.stringify(s)));
-  const extras = fieldOptions
-    .filter(f => f.category === COLLEGE_OPTION_CATEGORY)
-    .map(f => {
-      try {
-        return JSON.parse(f.value) as CollegeCourseSpec;
-      } catch {
-        return null;
-      }
-    })
-    .filter((x): x is CollegeCourseSpec => !!x);
-  return [...visible, ...extras];
+export function mergeOptions(staticOptions: string[], fieldOptions: FieldOption[], category: string): string[] {
+  return mergeOptionsDetailed(category, fieldOptions).map(item => item.label);
+}
+
+// Sort order to use for a brand-new option appended to the end of a category's list.
+export function nextSortOrder(items: { sortOrder: number }[]): number {
+  return items.reduce((max, item) => Math.max(max, item.sortOrder), -1) + 1;
 }
 
 export interface CollegeCourseSpecItem {
@@ -129,20 +119,27 @@ export interface CollegeCourseSpecItem {
   spec: CollegeCourseSpec;
   id?: string;
   isStatic: boolean;
+  sortOrder: number;
 }
 
 export function mergeCollegeCourseSpecsDetailed(staticList: CollegeCourseSpec[], fieldOptions: FieldOption[]): CollegeCourseSpecItem[] {
   const hidden = getHiddenValues(fieldOptions, COLLEGE_OPTION_CATEGORY);
-  const items: CollegeCourseSpecItem[] = staticList
-    .filter(s => !hidden.has(JSON.stringify(s)))
-    .map(s => ({ key: `static:${JSON.stringify(s)}`, spec: s, isStatic: true }));
+  const items: CollegeCourseSpecItem[] = [];
+  staticList.forEach((s, i) => {
+    if (!hidden.has(JSON.stringify(s))) items.push({ key: `static:${JSON.stringify(s)}`, spec: s, isStatic: true, sortOrder: i });
+  });
   fieldOptions
     .filter(f => f.category === COLLEGE_OPTION_CATEGORY)
     .forEach(f => {
       try {
         const spec = JSON.parse(f.value) as CollegeCourseSpec;
-        items.push({ key: `field:${f.id}`, spec, id: f.id, isStatic: false });
+        items.push({ key: `field:${f.id}`, spec, id: f.id, isStatic: false, sortOrder: f.sortOrder });
       } catch { /* ignore malformed entries */ }
     });
+  items.sort((a, b) => a.sortOrder - b.sortOrder);
   return items;
+}
+
+export function mergeCollegeCourseSpecs(staticList: CollegeCourseSpec[], fieldOptions: FieldOption[]): CollegeCourseSpec[] {
+  return mergeCollegeCourseSpecsDetailed(staticList, fieldOptions).map(item => item.spec);
 }

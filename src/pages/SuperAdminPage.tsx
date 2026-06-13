@@ -17,7 +17,7 @@ import {
 } from '../types';
 import {
   OPTION_CATEGORIES, COLLEGE_OPTION_CATEGORY, CollegeCourseSpec, mergeOptions,
-  mergeOptionsDetailed, mergeCollegeCourseSpecsDetailed, hiddenCategory,
+  mergeOptionsDetailed, mergeCollegeCourseSpecsDetailed, hiddenCategory, nextSortOrder,
   OptionItem, CollegeCourseSpecItem
 } from '../lib/options';
 import { DEPARTMENTS, BATCHES, COLLEGES_COURSES_SPECIALIZATIONS } from '../data/constants';
@@ -140,11 +140,11 @@ function OptionsTab({ fieldOptions, onChange }: { fieldOptions: FieldOption[]; o
         if (!college || !course) return;
         const spec: CollegeCourseSpec = { college, course, specialization };
         const display = `${college} — ${course}${specialization ? ` (${specialization})` : ''}`;
-        await addFieldOption(category, JSON.stringify(spec), display);
+        await addFieldOption(category, JSON.stringify(spec), display, nextSortOrder(collegeItems));
         setCollege(''); setCourse(''); setSpecialization('');
       } else {
         if (!label.trim()) return;
-        await addFieldOption(category, label.trim(), label.trim());
+        await addFieldOption(category, label.trim(), label.trim(), nextSortOrder(items));
         setLabel('');
       }
       await onChange();
@@ -170,7 +170,7 @@ function OptionsTab({ fieldOptions, onChange }: { fieldOptions: FieldOption[]; o
       if (item.isStatic) {
         if (newLabel !== item.value) {
           await addFieldOption(hiddenCategory(category), item.value, item.value);
-          await addFieldOption(category, newLabel, newLabel);
+          await addFieldOption(category, newLabel, newLabel, item.sortOrder);
         }
       } else if (item.id && newLabel !== item.label) {
         await updateFieldOption(item.id, newLabel, newLabel);
@@ -214,7 +214,7 @@ function OptionsTab({ fieldOptions, onChange }: { fieldOptions: FieldOption[]; o
       if (item.isStatic) {
         const oldKey = JSON.stringify(item.spec);
         await addFieldOption(hiddenCategory(COLLEGE_OPTION_CATEGORY), oldKey, oldKey);
-        await addFieldOption(COLLEGE_OPTION_CATEGORY, JSON.stringify(newSpec), display);
+        await addFieldOption(COLLEGE_OPTION_CATEGORY, JSON.stringify(newSpec), display, item.sortOrder);
       } else if (item.id) {
         await updateFieldOption(item.id, JSON.stringify(newSpec), display);
       }
