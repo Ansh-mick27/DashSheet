@@ -50,12 +50,7 @@ export interface TrainingReport {
   learningObjectives: string;
   duration: string;
   methods: {
-    lecture: boolean;
-    groupDiscussion: boolean;
-    caseStudy: boolean;
-    rolePlay: boolean;
-    presentation: boolean;
-    practical: boolean;
+    selected: string[];
     other: string;
   };
   studentsPresent: number;

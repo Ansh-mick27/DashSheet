@@ -56,17 +56,11 @@ export default function TrainingReportsPage({ reports }: TrainingReportsPageProp
 
   // Methods usage
   const methodsData = useMemo(() => {
-    const counts: Record<string, number> = {
-      Lecture: 0, 'Group Discussion': 0, 'Case Study': 0,
-      'Role Play': 0, Presentation: 0, Practical: 0
-    };
+    const counts: Record<string, number> = {};
     reports.forEach(r => {
-      if (r.methods.lecture) counts['Lecture']++;
-      if (r.methods.groupDiscussion) counts['Group Discussion']++;
-      if (r.methods.caseStudy) counts['Case Study']++;
-      if (r.methods.rolePlay) counts['Role Play']++;
-      if (r.methods.presentation) counts['Presentation']++;
-      if (r.methods.practical) counts['Practical']++;
+      (r.methods?.selected ?? []).forEach(method => {
+        counts[method] = (counts[method] || 0) + 1;
+      });
     });
     return Object.entries(counts).map(([name, value]) => ({ name, value }));
   }, [reports]);

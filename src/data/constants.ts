@@ -28,14 +28,7 @@ export const DURATIONS = ['1 Hour', '2 Hours', '3 Hours', 'Full Day'];
 
 export const PARTICIPATION_LEVELS = ['High', 'Moderate', 'Low'];
 
-export const TEACHING_METHODS: { key: 'lecture' | 'groupDiscussion' | 'caseStudy' | 'rolePlay' | 'presentation' | 'practical'; label: string }[] = [
-  { key: 'lecture', label: 'Lecture' },
-  { key: 'groupDiscussion', label: 'Group Discussion' },
-  { key: 'caseStudy', label: 'Case Study' },
-  { key: 'rolePlay', label: 'Role Play' },
-  { key: 'presentation', label: 'Presentation' },
-  { key: 'practical', label: 'Practical' }
-];
+export const TEACHING_METHODS = ['Lecture', 'Group Discussion', 'Case Study', 'Role Play', 'Presentation', 'Practical'];
 
 export const TIME_SLOTS = [
   'Slot 1 (8:50-9:05)',

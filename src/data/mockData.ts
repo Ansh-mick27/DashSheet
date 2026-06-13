@@ -2,6 +2,7 @@
 // DashSheet — Mock Data for Development
 // ==========================================
 import { Member, TrainingReport, WorkReport, OfficeAdminReport, PlacementReport } from '../types';
+import { TEACHING_METHODS } from './constants';
 
 const TRAINER_NAMES = [
   'Aarav Sharma', 'Priya Patel', 'Rohan Gupta', 'Neha Singh', 'Vikram Reddy',
@@ -157,12 +158,7 @@ export function generateTrainingReports(): TrainingReport[] {
         duration: randomItem(DURATIONS),
         learningObjectives: `Understand ${randomItem(TOPICS).toLowerCase()} concepts and apply them practically`,
         methods: {
-          lecture: Math.random() > 0.3,
-          groupDiscussion: Math.random() > 0.5,
-          caseStudy: Math.random() > 0.6,
-          rolePlay: Math.random() > 0.7,
-          presentation: Math.random() > 0.4,
-          practical: Math.random() > 0.3,
+          selected: TEACHING_METHODS.filter(() => Math.random() > 0.5),
           other: Math.random() > 0.8 ? 'Online Demo' : ''
         },
         studentsPresent: randomInt(Math.floor(totalEnrolled * 0.6), totalEnrolled),

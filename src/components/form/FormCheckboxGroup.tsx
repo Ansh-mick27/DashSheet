@@ -10,25 +10,29 @@ interface FormCheckboxGroupProps {
   label: string;
   value: Methods;
   onChange: (value: Methods) => void;
+  methods?: string[];
 }
 
-export default function FormCheckboxGroup({ label, value, onChange }: FormCheckboxGroupProps) {
-  const toggle = (key: keyof Omit<Methods, 'other'>) => {
-    onChange({ ...value, [key]: !value[key] });
+export default function FormCheckboxGroup({ label, value, onChange, methods = TEACHING_METHODS }: FormCheckboxGroupProps) {
+  const toggle = (method: string) => {
+    const selected = value.selected.includes(method)
+      ? value.selected.filter(m => m !== method)
+      : [...value.selected, method];
+    onChange({ ...value, selected });
   };
 
   return (
     <div className="settings-form__field">
       <label>{label}</label>
       <div className="form-checkbox-group">
-        {TEACHING_METHODS.map(({ key, label: methodLabel }) => (
-          <label key={key} className="form-checkbox">
+        {methods.map(method => (
+          <label key={method} className="form-checkbox">
             <input
               type="checkbox"
-              checked={value[key]}
-              onChange={() => toggle(key)}
+              checked={value.selected.includes(method)}
+              onChange={() => toggle(method)}
             />
-            <span>{methodLabel}</span>
+            <span>{method}</span>
           </label>
         ))}
       </div>

@@ -6,7 +6,7 @@ import { CheckCircle2, AlertCircle, Send } from 'lucide-react';
 import { useAuth } from '../../contexts/AuthContext';
 import { submitTrainingReport } from '../../services/dataApi';
 import { todayISO, isoToDDMMYYYY } from '../../lib/dateUtils';
-import { COLLEGES_COURSES_SPECIALIZATIONS, DURATIONS, PARTICIPATION_LEVELS } from '../../data/constants';
+import { COLLEGES_COURSES_SPECIALIZATIONS, DURATIONS, PARTICIPATION_LEVELS, TEACHING_METHODS } from '../../data/constants';
 import { TrainingReport, ExtraFields } from '../../types';
 import { useFormConfig } from '../../lib/useFormConfig';
 import { mergeOptions, mergeCollegeCourseSpecs } from '../../lib/options';
@@ -17,12 +17,7 @@ import FormCheckboxGroup from '../../components/form/FormCheckboxGroup';
 import CustomFieldsSection from '../../components/form/CustomFieldsSection';
 
 const EMPTY_METHODS: TrainingReport['methods'] = {
-  lecture: false,
-  groupDiscussion: false,
-  caseStudy: false,
-  rolePlay: false,
-  presentation: false,
-  practical: false,
+  selected: [],
   other: ''
 };
 
@@ -56,6 +51,7 @@ export default function TrainingReportFormPage() {
   );
   const durations = useMemo(() => mergeOptions(DURATIONS, fieldOptions, 'durations'), [fieldOptions]);
   const participationLevels = useMemo(() => mergeOptions(PARTICIPATION_LEVELS, fieldOptions, 'participationLevels'), [fieldOptions]);
+  const teachingMethods = useMemo(() => mergeOptions(TEACHING_METHODS, fieldOptions, 'teachingMethods'), [fieldOptions]);
 
   const colleges = useMemo(
     () => Array.from(new Set(collegeCourseSpecs.map(c => c.college))),
@@ -166,7 +162,7 @@ export default function TrainingReportFormPage() {
 
           <FormTextarea label="Learning Objectives" name="learningObjectives" value={learningObjectives} onChange={setLearningObjectives} rows={2} />
 
-          <FormCheckboxGroup label="Teaching Methods Used" value={methods} onChange={setMethods} />
+          <FormCheckboxGroup label="Teaching Methods Used" value={methods} onChange={setMethods} methods={teachingMethods} />
 
           <div className="form-grid form-grid--3">
             <FormField label="Total Students Enrolled" name="totalEnrolled" type="number" value={totalEnrolled} onChange={setTotalEnrolled} required min={0} />

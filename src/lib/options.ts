@@ -15,6 +15,7 @@ export const OPTION_CATEGORIES: { key: string; label: string }[] = [
   { key: 'batches', label: 'Batches' },
   { key: 'durations', label: 'Training Durations' },
   { key: 'participationLevels', label: 'Participation Levels' },
+  { key: 'teachingMethods', label: 'Training Report Teaching Methods' },
   { key: 'timeSlots', label: 'Work Report Time Slots' },
   { key: 'tasks', label: 'Work Report Tasks' },
   { key: 'taskStatuses', label: 'Work Report Task Statuses' },
