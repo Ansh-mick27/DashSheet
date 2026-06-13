@@ -20,10 +20,7 @@ export default function LoginPage() {
     setError('');
     setLoading(true);
 
-    // Simulate brief loading
-    await new Promise(r => setTimeout(r, 500));
-
-    const success = login(username, password);
+    const success = await login(username, password);
     if (success) {
       navigate('/', { replace: true });
     } else {
@@ -46,7 +43,7 @@ export default function LoginPage() {
             <LayoutDashboard size={32} />
           </div>
           <h1 className="login-card__title">DashSheet</h1>
-          <p className="login-card__subtitle">Task Dashboard — Admin Access</p>
+          <p className="login-card__subtitle">CDC Portal — Sign in to continue</p>
         </div>
 
         <form className="login-card__form" onSubmit={handleSubmit}>
@@ -108,7 +105,7 @@ export default function LoginPage() {
         </form>
 
         <p className="login-card__footer">
-          Access restricted to authorized managers and admins only.
+          Access restricted to authorized staff and trainers only.
         </p>
       </div>
     </div>

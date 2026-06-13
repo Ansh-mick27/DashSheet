@@ -2,47 +2,62 @@
 // DashSheet — Auth Context
 // ==========================================
 import { createContext, useContext, useState, useCallback, ReactNode } from 'react';
+import { supabase } from '../lib/supabaseClient';
+import { Member } from '../types';
 
 interface AuthContextType {
   isAuthenticated: boolean;
-  userName: string;
-  login: (username: string, password: string) => boolean;
+  member: Member | null;
+  login: (username: string, password: string) => Promise<boolean>;
   logout: () => void;
 }
 
 const AuthContext = createContext<AuthContextType | null>(null);
 
-const ADMIN_USER = import.meta.env.VITE_ADMIN_USER || 'admin';
-const ADMIN_PASS = import.meta.env.VITE_ADMIN_PASS || 'dashsheet2026';
+function loadMember(): Member | null {
+  const raw = sessionStorage.getItem('dashsheet_member');
+  if (!raw) return null;
+  try {
+    return JSON.parse(raw) as Member;
+  } catch {
+    return null;
+  }
+}
 
 export function AuthProvider({ children }: { children: ReactNode }) {
-  const [isAuthenticated, setIsAuthenticated] = useState(() => {
-    return sessionStorage.getItem('dashsheet_auth') === 'true';
-  });
-  const [userName, setUserName] = useState(() => {
-    return sessionStorage.getItem('dashsheet_user') || '';
-  });
+  const [member, setMember] = useState<Member | null>(() => loadMember());
 
-  const login = useCallback((username: string, password: string): boolean => {
-    if (username === ADMIN_USER && password === ADMIN_PASS) {
-      setIsAuthenticated(true);
-      setUserName(username);
-      sessionStorage.setItem('dashsheet_auth', 'true');
-      sessionStorage.setItem('dashsheet_user', username);
-      return true;
-    }
-    return false;
+  const login = useCallback(async (username: string, password: string): Promise<boolean> => {
+    const { data, error } = await supabase.rpc('login_member', {
+      p_username: username.trim().toLowerCase(),
+      p_password: password
+    });
+
+    if (error || !data || data.length === 0) return false;
+
+    const row = data[0];
+    const loggedInMember: Member = {
+      id: row.id,
+      name: row.name,
+      department: row.department,
+      batch: row.batch,
+      email: row.email,
+      role: row.role,
+      username: row.username
+    };
+
+    setMember(loggedInMember);
+    sessionStorage.setItem('dashsheet_member', JSON.stringify(loggedInMember));
+    return true;
   }, []);
 
   const logout = useCallback(() => {
-    setIsAuthenticated(false);
-    setUserName('');
-    sessionStorage.removeItem('dashsheet_auth');
-    sessionStorage.removeItem('dashsheet_user');
+    setMember(null);
+    sessionStorage.removeItem('dashsheet_member');
   }, []);
 
   return (
-    <AuthContext.Provider value={{ isAuthenticated, userName, login, logout }}>
+    <AuthContext.Provider value={{ isAuthenticated: member !== null, member, login, logout }}>
       {children}
     </AuthContext.Provider>
   );

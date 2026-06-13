@@ -10,7 +10,7 @@ import {
 import ChartCard from '../components/ChartCard';
 import DataTable from '../components/DataTable';
 import { TrainingReport } from '../types';
-import { getAttendanceRate } from '../services/sheetsApi';
+import { getAttendanceRate } from '../services/dataApi';
 
 interface TrainingReportsPageProps {
   reports: TrainingReport[];

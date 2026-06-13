@@ -14,7 +14,7 @@ import ChartCard from '../components/ChartCard';
 import DataTable from '../components/DataTable';
 import EmptyState from '../components/EmptyState';
 import { OfficeAdminReport } from '../types';
-import { parseDate } from '../services/sheetsApi';
+import { parseDate } from '../services/dataApi';
 
 interface OfficeAdminPageProps {
   reports: OfficeAdminReport[];

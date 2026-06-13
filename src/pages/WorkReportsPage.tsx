@@ -9,7 +9,7 @@ import {
 import ChartCard from '../components/ChartCard';
 import DataTable from '../components/DataTable';
 import { WorkReport } from '../types';
-import { getCompletionRate } from '../services/sheetsApi';
+import { getCompletionRate } from '../services/dataApi';
 
 interface WorkReportsPageProps {
   reports: WorkReport[];

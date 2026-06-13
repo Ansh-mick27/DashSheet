@@ -1,0 +1,178 @@
+// ==========================================
+// DashSheet — Placement Sourcing Report Form Page
+// ==========================================
+import { useState, FormEvent } from 'react';
+import { CheckCircle2, AlertCircle, Send } from 'lucide-react';
+import { useAuth } from '../../contexts/AuthContext';
+import { submitPlacementReport } from '../../services/dataApi';
+import { todayISO, isoToDDMMYYYY } from '../../lib/dateUtils';
+import {
+  INDUSTRY_SECTORS, COMPANY_TYPES, SOURCE_CHANNELS, MODES_OF_CONTACT,
+  PLACEMENT_STATUSES, PRIORITIES, ASSIGNED_TO_OPTIONS
+} from '../../data/constants';
+import { PlacementReport } from '../../types';
+import FormField from '../../components/form/FormField';
+import FormSelect from '../../components/form/FormSelect';
+import FormTextarea from '../../components/form/FormTextarea';
+
+export default function PlacementReportFormPage() {
+  const { member } = useAuth();
+  const [companyName, setCompanyName] = useState('');
+  const [industrySector, setIndustrySector] = useState('');
+  const [companyType, setCompanyType] = useState('');
+  const [hqLocation, setHqLocation] = useState('');
+  const [contactPerson, setContactPerson] = useState('');
+  const [designation, setDesignation] = useState('');
+  const [emailId, setEmailId] = useState('');
+  const [phoneNumber, setPhoneNumber] = useState('');
+  const [sourceChannel, setSourceChannel] = useState('');
+  const [dateOfFirstContact, setDateOfFirstContact] = useState(todayISO());
+  const [modeOfContact, setModeOfContact] = useState('');
+  const [currentStatus, setCurrentStatus] = useState('');
+  const [rolesOffered, setRolesOffered] = useState('');
+  const [numberOfOpenings, setNumberOfOpenings] = useState('');
+  const [ctcLPA, setCtcLPA] = useState('');
+  const [driveDate, setDriveDate] = useState('');
+  const [studentsSelected, setStudentsSelected] = useState('');
+  const [remarks, setRemarks] = useState('');
+  const [priority, setPriority] = useState('');
+  const [nextFollowUpDate, setNextFollowUpDate] = useState('');
+  const [actionRequired, setActionRequired] = useState('');
+  const [assignedTo, setAssignedTo] = useState('');
+  const [followUpDone, setFollowUpDone] = useState(false);
+  const [status, setStatus] = useState<'idle' | 'saving' | 'success' | 'error'>('idle');
+
+  const resetForm = () => {
+    setCompanyName(''); setIndustrySector(''); setCompanyType(''); setHqLocation('');
+    setContactPerson(''); setDesignation(''); setEmailId(''); setPhoneNumber('');
+    setSourceChannel(''); setDateOfFirstContact(todayISO()); setModeOfContact('');
+    setCurrentStatus(''); setRolesOffered(''); setNumberOfOpenings(''); setCtcLPA('');
+    setDriveDate(''); setStudentsSelected(''); setRemarks(''); setPriority('');
+    setNextFollowUpDate(''); setActionRequired(''); setAssignedTo(''); setFollowUpDone(false);
+  };
+
+  const handleSubmit = async (e: FormEvent) => {
+    e.preventDefault();
+    if (!member) return;
+    setStatus('saving');
+    try {
+      const report: PlacementReport = {
+        timestamp: new Date().toISOString(),
+        staffName: member.name,
+        companyName,
+        industrySector: industrySector as PlacementReport['industrySector'],
+        companyType: companyType as PlacementReport['companyType'],
+        hqLocation,
+        contactPerson,
+        designation,
+        emailId,
+        phoneNumber,
+        sourceChannel: sourceChannel as PlacementReport['sourceChannel'],
+        dateOfFirstContact: isoToDDMMYYYY(dateOfFirstContact),
+        modeOfContact: modeOfContact as PlacementReport['modeOfContact'],
+        currentStatus: currentStatus as PlacementReport['currentStatus'],
+        rolesOffered,
+        numberOfOpenings: Number(numberOfOpenings) || 0,
+        ctcLPA: Number(ctcLPA) || 0,
+        driveDate: driveDate || 'TBD',
+        studentsSelected: Number(studentsSelected) || 0,
+        remarks,
+        priority: priority as PlacementReport['priority'],
+        nextFollowUpDate,
+        actionRequired,
+        assignedTo: assignedTo as PlacementReport['assignedTo'],
+        followUpDone
+      };
+      await submitPlacementReport(report);
+      setStatus('success');
+      resetForm();
+      setTimeout(() => setStatus('idle'), 4000);
+    } catch (err) {
+      console.error(err);
+      setStatus('error');
+    }
+  };
+
+  return (
+    <div className="settings-page">
+      <div className="page-header">
+        <div>
+          <h2 className="page-title">Company Sourcing Report</h2>
+          <p className="page-subtitle">Log a new company contact or placement drive update</p>
+        </div>
+      </div>
+
+      <div className="settings-card">
+        <form onSubmit={handleSubmit} className="settings-form">
+          <FormField label="Staff Name" name="staffName" value={member?.name ?? ''} onChange={() => {}} readOnly />
+
+          <div className="form-section-title">Company Details</div>
+          <div className="form-grid form-grid--3">
+            <FormField label="Company Name" name="companyName" value={companyName} onChange={setCompanyName} required />
+            <FormSelect label="Industry Sector" name="industrySector" value={industrySector} onChange={setIndustrySector} options={INDUSTRY_SECTORS} required />
+            <FormSelect label="Company Type" name="companyType" value={companyType} onChange={setCompanyType} options={COMPANY_TYPES} required />
+          </div>
+          <FormField label="HQ Location" name="hqLocation" value={hqLocation} onChange={setHqLocation} />
+
+          <div className="form-section-title">Contact Details</div>
+          <div className="form-grid form-grid--3">
+            <FormField label="Contact Person" name="contactPerson" value={contactPerson} onChange={setContactPerson} />
+            <FormField label="Designation" name="designation" value={designation} onChange={setDesignation} />
+            <FormField label="Email ID" name="emailId" type="email" value={emailId} onChange={setEmailId} />
+          </div>
+          <div className="form-grid">
+            <FormField label="Phone Number" name="phoneNumber" value={phoneNumber} onChange={setPhoneNumber} />
+            <FormSelect label="Source Channel" name="sourceChannel" value={sourceChannel} onChange={setSourceChannel} options={SOURCE_CHANNELS} required />
+          </div>
+          <div className="form-grid">
+            <FormField label="Date of First Contact" name="dateOfFirstContact" type="date" value={dateOfFirstContact} onChange={setDateOfFirstContact} required />
+            <FormSelect label="Mode of Contact" name="modeOfContact" value={modeOfContact} onChange={setModeOfContact} options={MODES_OF_CONTACT} required />
+          </div>
+
+          <div className="form-section-title">Drive Progress</div>
+          <div className="form-grid">
+            <FormSelect label="Current Status" name="currentStatus" value={currentStatus} onChange={setCurrentStatus} options={PLACEMENT_STATUSES} required />
+            <FormField label="Roles Offered" name="rolesOffered" value={rolesOffered} onChange={setRolesOffered} />
+          </div>
+          <div className="form-grid form-grid--3">
+            <FormField label="Number of Openings" name="numberOfOpenings" type="number" value={numberOfOpenings} onChange={setNumberOfOpenings} min={0} />
+            <FormField label="CTC (LPA)" name="ctcLPA" type="number" value={ctcLPA} onChange={setCtcLPA} min={0} />
+            <FormField label="Students Selected" name="studentsSelected" type="number" value={studentsSelected} onChange={setStudentsSelected} min={0} />
+          </div>
+          <FormField label="Drive Date" name="driveDate" type="date" value={driveDate} onChange={setDriveDate} />
+
+          <div className="form-section-title">Follow-up</div>
+          <FormTextarea label="Remarks" name="remarks" value={remarks} onChange={setRemarks} rows={2} />
+          <div className="form-grid form-grid--3">
+            <FormSelect label="Priority" name="priority" value={priority} onChange={setPriority} options={PRIORITIES} required />
+            <FormField label="Next Follow-up Date" name="nextFollowUpDate" type="date" value={nextFollowUpDate} onChange={setNextFollowUpDate} />
+            <FormSelect label="Assigned To" name="assignedTo" value={assignedTo} onChange={setAssignedTo} options={ASSIGNED_TO_OPTIONS} />
+          </div>
+          <FormTextarea label="Action Required" name="actionRequired" value={actionRequired} onChange={setActionRequired} rows={2} />
+          <label className="form-checkbox form-checkbox-inline">
+            <input type="checkbox" checked={followUpDone} onChange={e => setFollowUpDone(e.target.checked)} />
+            <span>Follow-up done</span>
+          </label>
+
+          <div className="settings-form__actions">
+            <button type="submit" disabled={status === 'saving'} className="btn btn--primary">
+              <Send size={18} />
+              {status === 'saving' ? 'Submitting...' : 'Submit Report'}
+            </button>
+
+            {status === 'success' && (
+              <span className="settings-form__status settings-form__status--success">
+                <CheckCircle2 size={18} /> Report submitted successfully!
+              </span>
+            )}
+            {status === 'error' && (
+              <span className="settings-form__status settings-form__status--error">
+                <AlertCircle size={18} /> Failed to submit report. Please try again.
+              </span>
+            )}
+          </div>
+        </form>
+      </div>
+    </div>
+  );
+}

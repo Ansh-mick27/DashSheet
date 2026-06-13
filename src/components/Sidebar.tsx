@@ -5,20 +5,25 @@ import { NavLink, useNavigate } from 'react-router-dom';
 import {
   LayoutDashboard, BookOpen, ClipboardList, Users,
   LogOut, ChevronLeft, ChevronRight, Settings,
-  Package, Briefcase, Sun, Moon, Search
+  Package, Briefcase, Sun, Moon, Search, ClipboardPlus
 } from 'lucide-react';
 import { useAuth } from '../contexts/AuthContext';
 import { useTheme } from '../contexts/ThemeContext';
 import { useState } from 'react';
 
-const NAV_ITEMS = [
+const ADMIN_NAV_ITEMS = [
   { path: '/', icon: LayoutDashboard, label: 'Overview' },
   { path: '/training', icon: BookOpen, label: 'Training Reports' },
   { path: '/work', icon: ClipboardList, label: 'Work Reports' },
   { path: '/members', icon: Users, label: 'Members' },
   { path: '/inventory', icon: Package, label: 'Inventory' },
   { path: '/placement', icon: Briefcase, label: 'Placement' },
+  { path: '/portal', icon: ClipboardPlus, label: 'Portal' },
   { path: '/settings', icon: Settings, label: 'Settings' },
+];
+
+const PORTAL_NAV_ITEMS = [
+  { path: '/portal', icon: ClipboardPlus, label: 'Portal' },
 ];
 
 interface SidebarProps {
@@ -26,11 +31,12 @@ interface SidebarProps {
 }
 
 export default function Sidebar({ onSearch }: SidebarProps) {
-  const { logout, userName } = useAuth();
+  const { logout, member } = useAuth();
   const { theme, toggleTheme } = useTheme();
   const [collapsed, setCollapsed] = useState(false);
   const [searchVal, setSearchVal] = useState('');
   const navigate = useNavigate();
+  const navItems = member?.role === 'Admin' ? ADMIN_NAV_ITEMS : PORTAL_NAV_ITEMS;
 
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();
@@ -63,7 +69,7 @@ export default function Sidebar({ onSearch }: SidebarProps) {
         </button>
       </div>
 
-      {!collapsed && (
+      {!collapsed && member?.role === 'Admin' && (
         <form className="sidebar__search" onSubmit={handleSearch}>
           <Search size={14} className="sidebar__search-icon" />
           <input
@@ -77,7 +83,7 @@ export default function Sidebar({ onSearch }: SidebarProps) {
       )}
 
       <nav className="sidebar__nav">
-        {NAV_ITEMS.map(item => (
+        {navItems.map(item => (
           <NavLink
             key={item.path}
             to={item.path}
@@ -106,9 +112,9 @@ export default function Sidebar({ onSearch }: SidebarProps) {
         {!collapsed && (
           <div className="sidebar__user">
             <div className="sidebar__avatar">
-              {(userName || 'A').charAt(0).toUpperCase()}
+              {(member?.name || 'U').charAt(0).toUpperCase()}
             </div>
-            <span className="sidebar__username">{userName || 'Admin'}</span>
+            <span className="sidebar__username">{member?.name || 'User'}</span>
           </div>
         )}
         <button className="sidebar__logout" onClick={logout} aria-label="Logout">

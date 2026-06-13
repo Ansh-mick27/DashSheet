@@ -17,14 +17,20 @@ import MemberDetailPage from './pages/MemberDetailPage';
 import SettingsPage from './pages/SettingsPage';
 import OfficeAdminPage from './pages/OfficeAdminPage';
 import PlacementPage from './pages/PlacementPage';
+import PortalHomePage from './pages/portal/PortalHomePage';
+import TrainingReportFormPage from './pages/portal/TrainingReportFormPage';
+import WorkReportFormPage from './pages/portal/WorkReportFormPage';
+import InventoryReportFormPage from './pages/portal/InventoryReportFormPage';
+import PlacementReportFormPage from './pages/portal/PlacementReportFormPage';
 import { useAuth } from './contexts/AuthContext';
-import { fetchSheetData, refreshData, parseDate, generateNotifications } from './services/sheetsApi';
+import { fetchSheetData, refreshData, parseDate, generateNotifications } from './services/dataApi';
 import {
   Member, TrainingReport, WorkReport, OfficeAdminReport,
   PlacementReport, DashboardFilters, Notification
 } from './types';
 
 function DashboardLayout() {
+  const { member } = useAuth();
   const [members, setMembers] = useState<Member[]>([]);
   const [trainingReports, setTrainingReports] = useState<TrainingReport[]>([]);
   const [workReports, setWorkReports] = useState<WorkReport[]>([]);
@@ -158,15 +164,34 @@ function DashboardLayout() {
         <div className="dashboard-content">
           <Routes>
             <Route path="/" element={
-              <ErrorBoundary>
-                <OverviewPage
-                  trainingReports={filteredTraining}
-                  workReports={filteredWork}
-                  members={filteredMembers}
-                  officeAdminReports={filteredOfficeAdmin}
-                  placementReports={filteredPlacement}
-                />
-              </ErrorBoundary>
+              member?.role !== 'Admin' ? (
+                <Navigate to="/portal" replace />
+              ) : (
+                <ErrorBoundary>
+                  <OverviewPage
+                    trainingReports={filteredTraining}
+                    workReports={filteredWork}
+                    members={filteredMembers}
+                    officeAdminReports={filteredOfficeAdmin}
+                    placementReports={filteredPlacement}
+                  />
+                </ErrorBoundary>
+              )
+            } />
+            <Route path="/portal" element={
+              <ErrorBoundary><PortalHomePage /></ErrorBoundary>
+            } />
+            <Route path="/portal/training" element={
+              <ErrorBoundary><TrainingReportFormPage /></ErrorBoundary>
+            } />
+            <Route path="/portal/work" element={
+              <ErrorBoundary><WorkReportFormPage /></ErrorBoundary>
+            } />
+            <Route path="/portal/inventory" element={
+              <ErrorBoundary><InventoryReportFormPage /></ErrorBoundary>
+            } />
+            <Route path="/portal/placement" element={
+              <ErrorBoundary><PlacementReportFormPage /></ErrorBoundary>
             } />
             <Route path="/training" element={
               <ErrorBoundary><TrainingReportsPage reports={filteredTraining} /></ErrorBoundary>

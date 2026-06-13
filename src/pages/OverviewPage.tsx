@@ -15,7 +15,7 @@ import {
 import StatCard from '../components/StatCard';
 import ChartCard from '../components/ChartCard';
 import { TrainingReport, WorkReport, Member, OfficeAdminReport, PlacementReport } from '../types';
-import { getCompletionRate, getAttendanceRate, parseDate } from '../services/sheetsApi';
+import { getCompletionRate, getAttendanceRate, parseDate } from '../services/dataApi';
 
 interface OverviewPageProps {
   trainingReports: TrainingReport[];

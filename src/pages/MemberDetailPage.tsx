@@ -13,7 +13,7 @@ import DataTable from '../components/DataTable';
 import StatCard from '../components/StatCard';
 import EmptyState from '../components/EmptyState';
 import { Member, TrainingReport, WorkReport, OfficeAdminReport, PlacementReport } from '../types';
-import { getCompletionRate, getAttendanceRate } from '../services/sheetsApi';
+import { getCompletionRate, getAttendanceRate } from '../services/dataApi';
 
 interface MemberDetailPageProps {
   members: Member[];

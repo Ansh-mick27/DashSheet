@@ -96,32 +96,41 @@ export function generateMembers(): Member[] {
   const members: Member[] = [];
 
   TRAINER_NAMES.forEach((name, i) => {
+    const username = name.toLowerCase().replace(' ', '.');
     members.push({
+      id: username,
       name,
       department: DEPARTMENTS[i % DEPARTMENTS.length],
       batch: BATCHES[i % BATCHES.length],
-      email: `${name.toLowerCase().replace(' ', '.')}@org.com`,
-      role: i < 3 ? 'Admin' : 'Trainer'
+      email: `${username}@org.com`,
+      role: i < 3 ? 'Admin' : 'Trainer',
+      username
     });
   });
 
-  OFFICE_ADMIN_NAMES.forEach((name, i) => {
+  OFFICE_ADMIN_NAMES.forEach((name) => {
+    const username = name.toLowerCase().replace(' ', '.');
     members.push({
+      id: username,
       name,
       department: 'Administration',
       batch: '-',
-      email: `${name.toLowerCase().replace(' ', '.')}@org.com`,
-      role: 'OfficeAdmin'
+      email: `${username}@org.com`,
+      role: 'OfficeAdmin',
+      username
     });
   });
 
-  PLACEMENT_NAMES.forEach((name, i) => {
+  PLACEMENT_NAMES.forEach((name) => {
+    const username = name.toLowerCase().replace(' ', '.');
     members.push({
+      id: username,
       name,
       department: 'Placement Cell',
       batch: '-',
-      email: `${name.toLowerCase().replace(' ', '.')}@org.com`,
-      role: 'Placement'
+      email: `${username}@org.com`,
+      role: 'Placement',
+      username
     });
   });
 

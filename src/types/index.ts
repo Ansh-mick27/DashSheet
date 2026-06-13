@@ -5,11 +5,13 @@
 export type MemberRole = 'Trainer' | 'Admin' | 'OfficeAdmin' | 'Placement';
 
 export interface Member {
+  id: string;
   name: string;
   department: string;
   batch: string;
   email: string;
   role: MemberRole;
+  username: string;
 }
 
 export interface TrainingReport {

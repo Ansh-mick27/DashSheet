@@ -2117,3 +2117,196 @@ input, select { font: inherit; color: inherit; }
   .notif-dropdown { width: calc(100vw - 32px); right: -80px; }
   .member-detail__avatar { width: 48px; height: 48px; font-size: 1rem; }
 }
+
+
+/* ============================================
+   PORTAL FORMS
+   ============================================ */
+.form-textarea {
+  resize: vertical;
+  font-family: inherit;
+  line-height: 1.5;
+}
+
+.form-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 0 20px;
+}
+
+.form-grid--3 {
+  grid-template-columns: repeat(3, 1fr);
+}
+
+@media (max-width: 700px) {
+  .form-grid, .form-grid--3 {
+    grid-template-columns: 1fr;
+  }
+}
+
+.form-section-title {
+  font-size: 0.82rem;
+  font-weight: 600;
+  color: var(--text-secondary);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  margin: 24px 0 12px;
+  padding-top: 16px;
+  border-top: 1px solid var(--border-color);
+}
+
+.form-section-title:first-child {
+  margin-top: 0;
+  padding-top: 0;
+  border-top: none;
+}
+
+.form-checkbox-group {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px 18px;
+  margin-bottom: 10px;
+}
+
+.form-checkbox {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.85rem;
+  color: var(--text-primary);
+  cursor: pointer;
+}
+
+.form-checkbox input {
+  width: 16px;
+  height: 16px;
+  cursor: pointer;
+  accent-color: var(--accent-blue);
+}
+
+.form-checkbox-other {
+  margin-top: 4px;
+}
+
+.time-slot-grid {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.time-slot-grid__header,
+.time-slot-grid__row {
+  display: grid;
+  grid-template-columns: 1.4fr 1.6fr 1fr 1.6fr;
+  gap: 10px;
+  align-items: center;
+}
+
+.time-slot-grid__header {
+  font-size: 0.78rem;
+  font-weight: 600;
+  color: var(--text-secondary);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  padding: 0 2px;
+}
+
+.time-slot-grid__label {
+  font-size: 0.85rem;
+  color: var(--text-primary);
+  font-weight: 500;
+}
+
+@media (max-width: 800px) {
+  .time-slot-grid__header { display: none; }
+  .time-slot-grid__row {
+    grid-template-columns: 1fr;
+    gap: 6px;
+    padding: 12px;
+    background: var(--bg-card);
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-md);
+  }
+}
+
+.portal-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  gap: 18px;
+  margin-top: 8px;
+}
+
+.portal-card {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 12px;
+  background: var(--bg-card);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-lg);
+  padding: 24px;
+  text-decoration: none;
+  transition: transform var(--transition), border-color var(--transition);
+}
+
+.portal-card:hover {
+  transform: translateY(-2px);
+  border-color: var(--accent-blue);
+}
+
+.portal-card__icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 44px;
+  height: 44px;
+  border-radius: var(--radius-md);
+  background: linear-gradient(135deg, var(--accent-blue), var(--accent-purple));
+  color: white;
+}
+
+.portal-card__title {
+  font-size: 1rem;
+  font-weight: 700;
+  color: var(--text-heading);
+}
+
+.portal-card__desc {
+  font-size: 0.85rem;
+  color: var(--text-secondary);
+  line-height: 1.5;
+}
+
+.portal-welcome {
+  background: var(--bg-card);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-lg);
+  padding: 20px 24px;
+  margin-bottom: 24px;
+}
+
+.portal-welcome h3 {
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: var(--text-heading);
+  margin-bottom: 4px;
+}
+
+.portal-welcome p {
+  font-size: 0.85rem;
+  color: var(--text-secondary);
+}
+
+.form-readonly-note {
+  font-size: 0.78rem;
+  color: var(--text-secondary);
+  margin-top: -10px;
+  margin-bottom: 18px;
+}
+
+.form-checkbox-inline {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: 4px;
+}
