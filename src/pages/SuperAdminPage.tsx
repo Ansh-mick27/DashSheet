@@ -4,10 +4,10 @@
 // and staff members
 // ==========================================
 import { useEffect, useState } from 'react';
-import { Plus, Trash2, Pencil, X } from 'lucide-react';
+import { Plus, Trash2, Pencil, Check, X } from 'lucide-react';
 import {
   fetchFieldOptions, fetchCustomFields, fetchSheetData,
-  addFieldOption, deleteFieldOption,
+  addFieldOption, updateFieldOption, deleteFieldOption,
   upsertCustomField, deleteCustomField,
   upsertMember, deleteMember
 } from '../services/dataApi';
@@ -15,8 +15,12 @@ import {
   FieldOption, CustomField, CustomFieldType, CustomFieldFormType,
   Member, MemberRole
 } from '../types';
-import { OPTION_CATEGORIES, COLLEGE_OPTION_CATEGORY, CollegeCourseSpec, mergeOptions } from '../lib/options';
-import { DEPARTMENTS, BATCHES } from '../data/constants';
+import {
+  OPTION_CATEGORIES, COLLEGE_OPTION_CATEGORY, CollegeCourseSpec, mergeOptions,
+  mergeOptionsDetailed, mergeCollegeCourseSpecsDetailed, hiddenCategory,
+  OptionItem, CollegeCourseSpecItem
+} from '../lib/options';
+import { DEPARTMENTS, BATCHES, COLLEGES_COURSES_SPECIALIZATIONS } from '../data/constants';
 import FormField from '../components/form/FormField';
 import FormSelect from '../components/form/FormSelect';
 
@@ -108,9 +112,26 @@ function OptionsTab({ fieldOptions, onChange }: { fieldOptions: FieldOption[]; o
   const [specialization, setSpecialization] = useState('');
   const [saving, setSaving] = useState(false);
 
+  // Inline editing state — simple categories (single label)
+  const [editingKey, setEditingKey] = useState<string | null>(null);
+  const [editValue, setEditValue] = useState('');
+
+  // Inline editing state — college/course/specialization
+  const [editCollege, setEditCollege] = useState('');
+  const [editCourse, setEditCourse] = useState('');
+  const [editSpecialization, setEditSpecialization] = useState('');
+
   const isCollege = category === COLLEGE_OPTION_CATEGORY;
-  const filtered = fieldOptions.filter(f => f.category === category);
   const categoryLabel = ALL_OPTION_CATEGORIES.find(c => c.key === category)?.label ?? '';
+
+  const items = isCollege ? [] : mergeOptionsDetailed(category, fieldOptions);
+  const collegeItems = isCollege ? mergeCollegeCourseSpecsDetailed(COLLEGES_COURSES_SPECIALIZATIONS, fieldOptions) : [];
+
+  const changeCategory = (v: string) => {
+    const match = ALL_OPTION_CATEGORIES.find(c => c.label === v);
+    if (match) setCategory(match.key);
+    setEditingKey(null);
+  };
 
   const handleAdd = async () => {
     setSaving(true);
@@ -132,17 +153,99 @@ function OptionsTab({ fieldOptions, onChange }: { fieldOptions: FieldOption[]; o
     }
   };
 
-  const handleDelete = async (id: string) => {
-    await deleteFieldOption(id);
-    await onChange();
+  // --- Simple (single-label) categories ---
+
+  const startEdit = (item: OptionItem) => {
+    setEditingKey(item.key);
+    setEditValue(item.label);
+  };
+
+  const cancelEdit = () => setEditingKey(null);
+
+  const saveEdit = async (item: OptionItem) => {
+    const newLabel = editValue.trim();
+    if (!newLabel) return;
+    setSaving(true);
+    try {
+      if (item.isStatic) {
+        if (newLabel !== item.value) {
+          await addFieldOption(hiddenCategory(category), item.value, item.value);
+          await addFieldOption(category, newLabel, newLabel);
+        }
+      } else if (item.id && newLabel !== item.label) {
+        await updateFieldOption(item.id, newLabel, newLabel);
+      }
+      setEditingKey(null);
+      await onChange();
+    } finally {
+      setSaving(false);
+    }
+  };
+
+  const handleDeleteItem = async (item: OptionItem) => {
+    setSaving(true);
+    try {
+      if (item.isStatic) {
+        await addFieldOption(hiddenCategory(category), item.value, item.value);
+      } else if (item.id) {
+        await deleteFieldOption(item.id);
+      }
+      await onChange();
+    } finally {
+      setSaving(false);
+    }
+  };
+
+  // --- College / Course / Specialization category ---
+
+  const startEditCollege = (item: CollegeCourseSpecItem) => {
+    setEditingKey(item.key);
+    setEditCollege(item.spec.college);
+    setEditCourse(item.spec.course);
+    setEditSpecialization(item.spec.specialization);
+  };
+
+  const saveEditCollege = async (item: CollegeCourseSpecItem) => {
+    if (!editCollege.trim() || !editCourse.trim()) return;
+    const newSpec: CollegeCourseSpec = { college: editCollege.trim(), course: editCourse.trim(), specialization: editSpecialization.trim() };
+    const display = `${newSpec.college} — ${newSpec.course}${newSpec.specialization ? ` (${newSpec.specialization})` : ''}`;
+    setSaving(true);
+    try {
+      if (item.isStatic) {
+        const oldKey = JSON.stringify(item.spec);
+        await addFieldOption(hiddenCategory(COLLEGE_OPTION_CATEGORY), oldKey, oldKey);
+        await addFieldOption(COLLEGE_OPTION_CATEGORY, JSON.stringify(newSpec), display);
+      } else if (item.id) {
+        await updateFieldOption(item.id, JSON.stringify(newSpec), display);
+      }
+      setEditingKey(null);
+      await onChange();
+    } finally {
+      setSaving(false);
+    }
+  };
+
+  const handleDeleteCollegeItem = async (item: CollegeCourseSpecItem) => {
+    setSaving(true);
+    try {
+      if (item.isStatic) {
+        const key = JSON.stringify(item.spec);
+        await addFieldOption(hiddenCategory(COLLEGE_OPTION_CATEGORY), key, key);
+      } else if (item.id) {
+        await deleteFieldOption(item.id);
+      }
+      await onChange();
+    } finally {
+      setSaving(false);
+    }
   };
 
   return (
     <div className="settings-card">
       <h3>Dropdown Options</h3>
       <p className="settings-card__desc">
-        Add new choices to dropdown menus used across the portal forms. New options appear
-        alongside the built-in defaults immediately.
+        Add, edit, or remove choices for dropdown menus used across the portal forms — including
+        the built-in defaults. Changes appear in the forms immediately.
       </p>
 
       <div className="form-grid" style={{ marginBottom: 16 }}>
@@ -150,10 +253,7 @@ function OptionsTab({ fieldOptions, onChange }: { fieldOptions: FieldOption[]; o
           label="Category"
           name="category"
           value={categoryLabel}
-          onChange={v => {
-            const match = ALL_OPTION_CATEGORIES.find(c => c.label === v);
-            if (match) setCategory(match.key);
-          }}
+          onChange={changeCategory}
           options={ALL_OPTION_CATEGORIES.map(c => c.label)}
         />
       </div>
@@ -175,15 +275,88 @@ function OptionsTab({ fieldOptions, onChange }: { fieldOptions: FieldOption[]; o
       </button>
 
       <div className="admin-list">
-        {filtered.length === 0 && <p className="settings-card__desc" style={{ marginTop: 16 }}>No custom options added yet for this category.</p>}
-        {filtered.map(f => (
-          <div className="admin-list__row" key={f.id}>
-            <span>{f.label}</span>
-            <button className="btn btn--ghost btn--sm" onClick={() => handleDelete(f.id)} aria-label="Delete option">
-              <Trash2 size={14} />
-            </button>
-          </div>
-        ))}
+        {isCollege ? (
+          <>
+            {collegeItems.length === 0 && <p className="settings-card__desc" style={{ marginTop: 16 }}>No options available for this category.</p>}
+            {collegeItems.map(item => (
+              <div className="admin-list__row" key={item.key}>
+                {editingKey === item.key ? (
+                  <>
+                    <div className="form-grid form-grid--3" style={{ flex: 1 }}>
+                      <FormField label="College" name="editCollege" value={editCollege} onChange={setEditCollege} />
+                      <FormField label="Course" name="editCourse" value={editCourse} onChange={setEditCourse} />
+                      <FormField label="Specialization" name="editSpecialization" value={editSpecialization} onChange={setEditSpecialization} />
+                    </div>
+                    <div className="admin-list__actions">
+                      <button className="btn btn--ghost btn--sm" onClick={() => saveEditCollege(item)} disabled={saving} aria-label="Save option">
+                        <Check size={14} />
+                      </button>
+                      <button className="btn btn--ghost btn--sm" onClick={cancelEdit} aria-label="Cancel edit">
+                        <X size={14} />
+                      </button>
+                    </div>
+                  </>
+                ) : (
+                  <>
+                    <span>
+                      {item.spec.college} — {item.spec.course}{item.spec.specialization ? ` (${item.spec.specialization})` : ''}
+                      {item.isStatic && <em style={{ opacity: 0.6 }}> (default)</em>}
+                    </span>
+                    <div className="admin-list__actions">
+                      <button className="btn btn--ghost btn--sm" onClick={() => startEditCollege(item)} aria-label="Edit option">
+                        <Pencil size={14} />
+                      </button>
+                      <button className="btn btn--ghost btn--sm" onClick={() => handleDeleteCollegeItem(item)} aria-label="Delete option">
+                        <Trash2 size={14} />
+                      </button>
+                    </div>
+                  </>
+                )}
+              </div>
+            ))}
+          </>
+        ) : (
+          <>
+            {items.length === 0 && <p className="settings-card__desc" style={{ marginTop: 16 }}>No options available for this category.</p>}
+            {items.map(item => (
+              <div className="admin-list__row" key={item.key}>
+                {editingKey === item.key ? (
+                  <>
+                    <input
+                      className="settings-form__input"
+                      value={editValue}
+                      onChange={e => setEditValue(e.target.value)}
+                      style={{ flex: 1 }}
+                    />
+                    <div className="admin-list__actions">
+                      <button className="btn btn--ghost btn--sm" onClick={() => saveEdit(item)} disabled={saving} aria-label="Save option">
+                        <Check size={14} />
+                      </button>
+                      <button className="btn btn--ghost btn--sm" onClick={cancelEdit} aria-label="Cancel edit">
+                        <X size={14} />
+                      </button>
+                    </div>
+                  </>
+                ) : (
+                  <>
+                    <span>
+                      {item.label}
+                      {item.isStatic && <em style={{ opacity: 0.6 }}> (default)</em>}
+                    </span>
+                    <div className="admin-list__actions">
+                      <button className="btn btn--ghost btn--sm" onClick={() => startEdit(item)} aria-label="Edit option">
+                        <Pencil size={14} />
+                      </button>
+                      <button className="btn btn--ghost btn--sm" onClick={() => handleDeleteItem(item)} aria-label="Delete option">
+                        <Trash2 size={14} />
+                      </button>
+                    </div>
+                  </>
+                )}
+              </div>
+            ))}
+          </>
+        )}
       </div>
     </div>
   );

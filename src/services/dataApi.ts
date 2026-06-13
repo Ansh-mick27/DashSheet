@@ -409,6 +409,12 @@ export async function addFieldOption(category: string, value: string, label: str
   refreshData();
 }
 
+export async function updateFieldOption(id: string, value: string, label: string): Promise<void> {
+  const { error } = await supabase.from('field_options').update({ value, label }).eq('id', id);
+  if (error) throw error;
+  refreshData();
+}
+
 export async function deleteFieldOption(id: string): Promise<void> {
   const { error } = await supabase.from('field_options').delete().eq('id', id);
   if (error) throw error;
