@@ -42,6 +42,9 @@ const ALL_OPTION_CATEGORIES = [
 ];
 
 const ADD_NEW_COLLEGE = '+ Add New College';
+const ADD_NEW_COURSE = '+ Add New Course';
+const ADD_NEW_SPECIALIZATION = '+ Add New Specialization';
+const NO_SPECIALIZATION = '(none)';
 
 const EMPTY_MEMBER_FORM = {
   id: undefined as string | undefined,
@@ -114,6 +117,9 @@ function OptionsTab({ fieldOptions, onChange }: { fieldOptions: FieldOption[]; o
   const [specialization, setSpecialization] = useState('');
   const [saving, setSaving] = useState(false);
   const [collegeMode, setCollegeMode] = useState<'select' | 'new'>('select');
+  const [courseMode, setCourseMode] = useState<'select' | 'new'>('select');
+  const [specializationMode, setSpecializationMode] = useState<'select' | 'new'>('select');
+  const [addError, setAddError] = useState<string | null>(null);
 
   // Inline editing state — simple categories (single label)
   const [editingKey, setEditingKey] = useState<string | null>(null);
@@ -124,6 +130,8 @@ function OptionsTab({ fieldOptions, onChange }: { fieldOptions: FieldOption[]; o
   const [editCourse, setEditCourse] = useState('');
   const [editSpecialization, setEditSpecialization] = useState('');
   const [editCollegeMode, setEditCollegeMode] = useState<'select' | 'new'>('select');
+  const [editCourseMode, setEditCourseMode] = useState<'select' | 'new'>('select');
+  const [editSpecializationMode, setEditSpecializationMode] = useState<'select' | 'new'>('select');
 
   const isCollege = category === COLLEGE_OPTION_CATEGORY;
   const categoryLabel = ALL_OPTION_CATEGORIES.find(c => c.key === category)?.label ?? '';
@@ -134,30 +142,65 @@ function OptionsTab({ fieldOptions, onChange }: { fieldOptions: FieldOption[]; o
     () => Array.from(new Set(collegeItems.map(i => i.spec.college))).sort(),
     [collegeItems]
   );
+  const existingCourses = useMemo(
+    () => Array.from(new Set(collegeItems.map(i => i.spec.course))).sort(),
+    [collegeItems]
+  );
+  const existingSpecializations = useMemo(
+    () => Array.from(new Set(collegeItems.map(i => i.spec.specialization).filter(Boolean))).sort(),
+    [collegeItems]
+  );
 
   useEffect(() => {
     if (existingColleges.length === 0) setCollegeMode('new');
   }, [existingColleges.length]);
 
+  useEffect(() => {
+    if (existingCourses.length === 0) setCourseMode('new');
+  }, [existingCourses.length]);
+
+  useEffect(() => {
+    if (existingSpecializations.length === 0) setSpecializationMode('new');
+  }, [existingSpecializations.length]);
+
   const changeCategory = (v: string) => {
     const match = ALL_OPTION_CATEGORIES.find(c => c.label === v);
     if (match) setCategory(match.key);
     setEditingKey(null);
+    setAddError(null);
   };
 
   const handleAdd = async () => {
+    setAddError(null);
     setSaving(true);
     try {
       if (isCollege) {
         if (!college || !course) return;
-        const spec: CollegeCourseSpec = { college, course, specialization };
-        const display = `${college} — ${course}${specialization ? ` (${specialization})` : ''}`;
+        const spec: CollegeCourseSpec = { college: college.trim(), course: course.trim(), specialization: specialization.trim() };
+        const isDuplicate = collegeItems.some(i =>
+          i.spec.college.toLowerCase() === spec.college.toLowerCase() &&
+          i.spec.course.toLowerCase() === spec.course.toLowerCase() &&
+          i.spec.specialization.toLowerCase() === spec.specialization.toLowerCase()
+        );
+        if (isDuplicate) {
+          setAddError('This College / Course / Specialization combination already exists.');
+          return;
+        }
+        const display = `${spec.college} — ${spec.course}${spec.specialization ? ` (${spec.specialization})` : ''}`;
         await addFieldOption(category, JSON.stringify(spec), display, nextSortOrder(collegeItems));
         setCollege(''); setCourse(''); setSpecialization('');
         setCollegeMode(existingColleges.length > 0 ? 'select' : 'new');
+        setCourseMode(existingCourses.length > 0 ? 'select' : 'new');
+        setSpecializationMode(existingSpecializations.length > 0 ? 'select' : 'new');
       } else {
-        if (!label.trim()) return;
-        await addFieldOption(category, label.trim(), label.trim(), nextSortOrder(items));
+        const trimmed = label.trim();
+        if (!trimmed) return;
+        const isDuplicate = items.some(i => i.label.toLowerCase() === trimmed.toLowerCase());
+        if (isDuplicate) {
+          setAddError(`"${trimmed}" already exists in this list.`);
+          return;
+        }
+        await addFieldOption(category, trimmed, trimmed, nextSortOrder(items));
         setLabel('');
       }
       await onChange();
@@ -171,13 +214,19 @@ function OptionsTab({ fieldOptions, onChange }: { fieldOptions: FieldOption[]; o
   const startEdit = (item: OptionItem) => {
     setEditingKey(item.key);
     setEditValue(item.label);
+    setAddError(null);
   };
 
-  const cancelEdit = () => setEditingKey(null);
+  const cancelEdit = () => { setEditingKey(null); setAddError(null); };
 
   const saveEdit = async (item: OptionItem) => {
     const newLabel = editValue.trim();
     if (!newLabel) return;
+    const isDuplicate = items.some(i => i.key !== item.key && i.label.toLowerCase() === newLabel.toLowerCase());
+    if (isDuplicate) {
+      setAddError(`"${newLabel}" already exists in this list.`);
+      return;
+    }
     setSaving(true);
     try {
       if (item.isStatic) {
@@ -217,11 +266,24 @@ function OptionsTab({ fieldOptions, onChange }: { fieldOptions: FieldOption[]; o
     setEditCourse(item.spec.course);
     setEditSpecialization(item.spec.specialization);
     setEditCollegeMode('select');
+    setEditCourseMode('select');
+    setEditSpecializationMode('select');
+    setAddError(null);
   };
 
   const saveEditCollege = async (item: CollegeCourseSpecItem) => {
     if (!editCollege.trim() || !editCourse.trim()) return;
     const newSpec: CollegeCourseSpec = { college: editCollege.trim(), course: editCourse.trim(), specialization: editSpecialization.trim() };
+    const isDuplicate = collegeItems.some(i =>
+      i.key !== item.key &&
+      i.spec.college.toLowerCase() === newSpec.college.toLowerCase() &&
+      i.spec.course.toLowerCase() === newSpec.course.toLowerCase() &&
+      i.spec.specialization.toLowerCase() === newSpec.specialization.toLowerCase()
+    );
+    if (isDuplicate) {
+      setAddError('This College / Course / Specialization combination already exists.');
+      return;
+    }
     const display = `${newSpec.college} — ${newSpec.course}${newSpec.specialization ? ` (${newSpec.specialization})` : ''}`;
     setSaving(true);
     try {
@@ -291,13 +353,52 @@ function OptionsTab({ fieldOptions, onChange }: { fieldOptions: FieldOption[]; o
           {existingColleges.length > 0 && collegeMode === 'new' && (
             <FormField label="New College Name" name="newCollege" value={college} onChange={setCollege} placeholder="College name" />
           )}
-          <FormField label="Course" name="course" value={course} onChange={setCourse} placeholder="e.g. B. Tech." />
-          <FormField label="Specialization (optional)" name="specialization" value={specialization} onChange={setSpecialization} placeholder="e.g. CSE" />
+
+          {existingCourses.length > 0 ? (
+            <FormSelect
+              label="Course"
+              name="course"
+              value={courseMode === 'new' ? ADD_NEW_COURSE : course}
+              onChange={v => {
+                if (v === ADD_NEW_COURSE) { setCourseMode('new'); setCourse(''); }
+                else { setCourseMode('select'); setCourse(v); }
+              }}
+              options={[...existingCourses, ADD_NEW_COURSE]}
+            />
+          ) : (
+            <FormField label="Course" name="course" value={course} onChange={setCourse} placeholder="e.g. B. Tech." />
+          )}
+          {existingCourses.length > 0 && courseMode === 'new' && (
+            <FormField label="New Course Name" name="newCourse" value={course} onChange={setCourse} placeholder="e.g. B. Tech." />
+          )}
+
+          {existingSpecializations.length > 0 ? (
+            <FormSelect
+              label="Specialization (optional)"
+              name="specialization"
+              value={specializationMode === 'new' ? ADD_NEW_SPECIALIZATION : (specialization || NO_SPECIALIZATION)}
+              onChange={v => {
+                if (v === ADD_NEW_SPECIALIZATION) { setSpecializationMode('new'); setSpecialization(''); }
+                else if (v === NO_SPECIALIZATION) { setSpecializationMode('select'); setSpecialization(''); }
+                else { setSpecializationMode('select'); setSpecialization(v); }
+              }}
+              options={[NO_SPECIALIZATION, ...existingSpecializations, ADD_NEW_SPECIALIZATION]}
+            />
+          ) : (
+            <FormField label="Specialization (optional)" name="specialization" value={specialization} onChange={setSpecialization} placeholder="e.g. CSE" />
+          )}
+          {existingSpecializations.length > 0 && specializationMode === 'new' && (
+            <FormField label="New Specialization Name" name="newSpecialization" value={specialization} onChange={setSpecialization} placeholder="e.g. CSE" />
+          )}
         </div>
       ) : (
         <div className="form-grid" style={{ marginBottom: 16 }}>
           <FormField label="New Option" name="label" value={label} onChange={setLabel} placeholder="Enter new option value" />
         </div>
+      )}
+
+      {addError && (
+        <p className="settings-card__desc" style={{ color: '#ef4444', marginTop: -8, marginBottom: 12 }}>{addError}</p>
       )}
 
       <button className="btn btn--primary" onClick={handleAdd} disabled={saving}>
@@ -330,9 +431,47 @@ function OptionsTab({ fieldOptions, onChange }: { fieldOptions: FieldOption[]; o
                       {existingColleges.length > 0 && editCollegeMode === 'new' && (
                         <FormField label="New College Name" name="editNewCollege" value={editCollege} onChange={setEditCollege} />
                       )}
-                      <FormField label="Course" name="editCourse" value={editCourse} onChange={setEditCourse} />
-                      <FormField label="Specialization" name="editSpecialization" value={editSpecialization} onChange={setEditSpecialization} />
+
+                      {existingCourses.length > 0 ? (
+                        <FormSelect
+                          label="Course"
+                          name="editCourse"
+                          value={editCourseMode === 'new' ? ADD_NEW_COURSE : editCourse}
+                          onChange={v => {
+                            if (v === ADD_NEW_COURSE) { setEditCourseMode('new'); setEditCourse(''); }
+                            else { setEditCourseMode('select'); setEditCourse(v); }
+                          }}
+                          options={[...existingCourses, ADD_NEW_COURSE]}
+                        />
+                      ) : (
+                        <FormField label="Course" name="editCourse" value={editCourse} onChange={setEditCourse} />
+                      )}
+                      {existingCourses.length > 0 && editCourseMode === 'new' && (
+                        <FormField label="New Course Name" name="editNewCourse" value={editCourse} onChange={setEditCourse} />
+                      )}
+
+                      {existingSpecializations.length > 0 ? (
+                        <FormSelect
+                          label="Specialization"
+                          name="editSpecialization"
+                          value={editSpecializationMode === 'new' ? ADD_NEW_SPECIALIZATION : (editSpecialization || NO_SPECIALIZATION)}
+                          onChange={v => {
+                            if (v === ADD_NEW_SPECIALIZATION) { setEditSpecializationMode('new'); setEditSpecialization(''); }
+                            else if (v === NO_SPECIALIZATION) { setEditSpecializationMode('select'); setEditSpecialization(''); }
+                            else { setEditSpecializationMode('select'); setEditSpecialization(v); }
+                          }}
+                          options={[NO_SPECIALIZATION, ...existingSpecializations, ADD_NEW_SPECIALIZATION]}
+                        />
+                      ) : (
+                        <FormField label="Specialization" name="editSpecialization" value={editSpecialization} onChange={setEditSpecialization} />
+                      )}
+                      {existingSpecializations.length > 0 && editSpecializationMode === 'new' && (
+                        <FormField label="New Specialization Name" name="editNewSpecialization" value={editSpecialization} onChange={setEditSpecialization} />
+                      )}
                     </div>
+                    {addError && (
+                      <p className="settings-card__desc" style={{ color: '#ef4444', width: '100%', marginTop: 8 }}>{addError}</p>
+                    )}
                     <div className="admin-list__actions">
                       <button className="btn btn--ghost btn--sm" onClick={() => saveEditCollege(item)} disabled={saving} aria-label="Save option">
                         <Check size={14} />
