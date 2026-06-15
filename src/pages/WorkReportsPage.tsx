@@ -143,7 +143,7 @@ export default function WorkReportsPage({ reports }: WorkReportsPageProps) {
                 innerRadius={55}
                 outerRadius={90}
                 dataKey="value"
-                label={({ name, percent }) => `${name} ${(percent * 100).toFixed(0)}%`}
+                label={({ name, percent }) => percent > 0 ? `${name} ${(percent * 100).toFixed(0)}%` : ''}
                 labelLine={false}
               >
                 <Cell fill="#10b981" />
@@ -156,6 +156,8 @@ export default function WorkReportsPage({ reports }: WorkReportsPageProps) {
                   borderRadius: '8px',
                   color: '#e2e8f0'
                 }}
+                itemStyle={{ color: '#e2e8f0' }}
+                labelStyle={{ color: '#e2e8f0' }}
               />
               <Legend />
             </PieChart>
@@ -176,6 +178,8 @@ export default function WorkReportsPage({ reports }: WorkReportsPageProps) {
                   borderRadius: '8px',
                   color: '#e2e8f0'
                 }}
+                itemStyle={{ color: '#e2e8f0' }}
+                labelStyle={{ color: '#e2e8f0' }}
               />
               <Bar dataKey="rate" fill="#6366f1" radius={[4, 4, 0, 0]} />
             </BarChart>
@@ -198,6 +202,8 @@ export default function WorkReportsPage({ reports }: WorkReportsPageProps) {
                   borderRadius: '8px',
                   color: '#e2e8f0'
                 }}
+                itemStyle={{ color: '#e2e8f0' }}
+                labelStyle={{ color: '#e2e8f0' }}
               />
               <Bar dataKey="rate" fill="#22d3ee" radius={[0, 4, 4, 0]} />
             </BarChart>
@@ -217,6 +223,8 @@ export default function WorkReportsPage({ reports }: WorkReportsPageProps) {
                   borderRadius: '8px',
                   color: '#e2e8f0'
                 }}
+                itemStyle={{ color: '#e2e8f0' }}
+                labelStyle={{ color: '#e2e8f0' }}
               />
               <Legend />
               <Bar dataKey="Completed" fill="#10b981" radius={[4, 4, 0, 0]} />

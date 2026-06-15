@@ -336,7 +336,7 @@ export default function PlacementPage({ reports }: PlacementPageProps) {
                   <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.06)" />
                   <XAxis type="number" stroke="rgba(255,255,255,0.4)" fontSize={11} allowDecimals={false} />
                   <YAxis dataKey="name" type="category" stroke="rgba(255,255,255,0.4)" fontSize={10} width={120} />
-                  <Tooltip contentStyle={CHART_TOOLTIP_STYLE} />
+                  <Tooltip contentStyle={CHART_TOOLTIP_STYLE} itemStyle={{ color: '#e2e8f0' }} labelStyle={{ color: '#e2e8f0' }} />
                   <Bar dataKey="Count" radius={[0, 4, 4, 0]}>
                     {statusChartData.map((d, i) => (
                       <Cell key={i} fill={STATUS_COLOR[d.name] || PIE_COLORS[i % PIE_COLORS.length]} />
@@ -352,7 +352,7 @@ export default function PlacementPage({ reports }: PlacementPageProps) {
                   <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.06)" />
                   <XAxis type="number" stroke="rgba(255,255,255,0.4)" fontSize={11} allowDecimals={false} />
                   <YAxis dataKey="name" type="category" stroke="rgba(255,255,255,0.4)" fontSize={10} width={120} />
-                  <Tooltip contentStyle={CHART_TOOLTIP_STYLE} />
+                  <Tooltip contentStyle={CHART_TOOLTIP_STYLE} itemStyle={{ color: '#e2e8f0' }} labelStyle={{ color: '#e2e8f0' }} />
                   <Bar dataKey="value" name="Companies" fill="#22d3ee" radius={[0, 4, 4, 0]}>
                     {sourceData.map((_, i) => <Cell key={i} fill={PIE_COLORS[i % PIE_COLORS.length]} />)}
                   </Bar>
@@ -366,13 +366,13 @@ export default function PlacementPage({ reports }: PlacementPageProps) {
               <ResponsiveContainer width="100%" height={250}>
                 <PieChart>
                   <Pie data={priorityData} cx="50%" cy="50%" outerRadius={90}
-                    dataKey="value" label={({ name, percent }) => `${name} ${(percent * 100).toFixed(0)}%`}
+                    dataKey="value" label={({ name, percent }) => percent > 0 ? `${name} ${(percent * 100).toFixed(0)}%` : ''}
                     labelLine={false}>
                     {priorityData.map((_, i) => (
                       <Cell key={i} fill={['#ef4444', '#f59e0b', '#10b981'][i % 3]} />
                     ))}
                   </Pie>
-                  <Tooltip contentStyle={CHART_TOOLTIP_STYLE} />
+                  <Tooltip contentStyle={CHART_TOOLTIP_STYLE} itemStyle={{ color: '#e2e8f0' }} labelStyle={{ color: '#e2e8f0' }} />
                 </PieChart>
               </ResponsiveContainer>
             </ChartCard>
@@ -383,7 +383,7 @@ export default function PlacementPage({ reports }: PlacementPageProps) {
                   <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.06)" />
                   <XAxis type="number" stroke="rgba(255,255,255,0.4)" fontSize={11} allowDecimals={false} />
                   <YAxis dataKey="name" type="category" stroke="rgba(255,255,255,0.4)" fontSize={10} width={90} />
-                  <Tooltip contentStyle={CHART_TOOLTIP_STYLE} />
+                  <Tooltip contentStyle={CHART_TOOLTIP_STYLE} itemStyle={{ color: '#e2e8f0' }} labelStyle={{ color: '#e2e8f0' }} />
                   <Bar dataKey="count" name="Companies" fill="#6366f1" radius={[0, 4, 4, 0]}>
                     {sectorChartData.map((_, i) => <Cell key={i} fill={PIE_COLORS[i % PIE_COLORS.length]} />)}
                   </Bar>

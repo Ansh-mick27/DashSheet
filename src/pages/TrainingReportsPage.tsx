@@ -130,6 +130,8 @@ export default function TrainingReportsPage({ reports }: TrainingReportsPageProp
                   borderRadius: '8px',
                   color: '#e2e8f0'
                 }}
+                itemStyle={{ color: '#e2e8f0' }}
+                labelStyle={{ color: '#e2e8f0' }}
               />
               <Line type="monotone" dataKey="rate" stroke="#6366f1" strokeWidth={2} dot={{ r: 3 }} />
             </LineChart>
@@ -146,7 +148,7 @@ export default function TrainingReportsPage({ reports }: TrainingReportsPageProp
                 innerRadius={55}
                 outerRadius={90}
                 dataKey="value"
-                label={({ name, percent }) => `${name} ${(percent * 100).toFixed(0)}%`}
+                label={({ name, percent }) => percent > 0 ? `${name} ${(percent * 100).toFixed(0)}%` : ''}
                 labelLine={false}
               >
                 {participationData.map((entry) => (
@@ -160,6 +162,8 @@ export default function TrainingReportsPage({ reports }: TrainingReportsPageProp
                   borderRadius: '8px',
                   color: '#e2e8f0'
                 }}
+                itemStyle={{ color: '#e2e8f0' }}
+                labelStyle={{ color: '#e2e8f0' }}
               />
             </PieChart>
           </ResponsiveContainer>
@@ -180,6 +184,8 @@ export default function TrainingReportsPage({ reports }: TrainingReportsPageProp
                   borderRadius: '8px',
                   color: '#e2e8f0'
                 }}
+                itemStyle={{ color: '#e2e8f0' }}
+                labelStyle={{ color: '#e2e8f0' }}
               />
               <Bar dataKey="value" radius={[4, 4, 0, 0]}>
                 {methodsData.map((_, i) => (
@@ -203,6 +209,8 @@ export default function TrainingReportsPage({ reports }: TrainingReportsPageProp
                   borderRadius: '8px',
                   color: '#e2e8f0'
                 }}
+                itemStyle={{ color: '#e2e8f0' }}
+                labelStyle={{ color: '#e2e8f0' }}
               />
               <Bar dataKey="sessions" fill="#22d3ee" radius={[0, 4, 4, 0]} />
             </BarChart>

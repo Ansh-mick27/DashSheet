@@ -189,7 +189,7 @@ export default function OverviewPage({
               <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.06)" />
               <XAxis dataKey="date" stroke="rgba(255,255,255,0.4)" fontSize={11} />
               <YAxis stroke="rgba(255,255,255,0.4)" fontSize={11} />
-              <Tooltip contentStyle={TOOLTIP_STYLE} />
+              <Tooltip contentStyle={TOOLTIP_STYLE} itemStyle={{ color: '#e2e8f0' }} labelStyle={{ color: '#e2e8f0' }} />
               <Legend />
               <Area type="monotone" dataKey="Training" stroke="#6366f1" fill="url(#gradT)" strokeWidth={2} />
               <Area type="monotone" dataKey="Work" stroke="#22d3ee" fill="url(#gradW)" strokeWidth={2} />
@@ -203,13 +203,13 @@ export default function OverviewPage({
             <PieChart>
               <Pie data={participationData} cx="50%" cy="50%" innerRadius={60} outerRadius={100}
                 dataKey="value"
-                label={({ name, percent }) => `${name} ${(percent * 100).toFixed(0)}%`}
+                label={({ name, percent }) => percent > 0 ? `${name} ${(percent * 100).toFixed(0)}%` : ''}
                 labelLine={false}>
                 {participationData.map((entry) => (
                   <Cell key={entry.name} fill={PARTICIPATION_COLORS[entry.name as keyof typeof PARTICIPATION_COLORS]} />
                 ))}
               </Pie>
-              <Tooltip contentStyle={TOOLTIP_STYLE} />
+              <Tooltip contentStyle={TOOLTIP_STYLE} itemStyle={{ color: '#e2e8f0' }} labelStyle={{ color: '#e2e8f0' }} />
             </PieChart>
           </ResponsiveContainer>
         </ChartCard>
@@ -222,7 +222,7 @@ export default function OverviewPage({
               <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.06)" />
               <XAxis dataKey="department" stroke="rgba(255,255,255,0.4)" fontSize={11} />
               <YAxis stroke="rgba(255,255,255,0.4)" fontSize={11} />
-              <Tooltip contentStyle={TOOLTIP_STYLE} />
+              <Tooltip contentStyle={TOOLTIP_STYLE} itemStyle={{ color: '#e2e8f0' }} labelStyle={{ color: '#e2e8f0' }} />
               <Legend />
               <Bar dataKey="Completed" fill="#10b981" radius={[4,4,0,0]} />
               <Bar dataKey="Pending" fill="#f59e0b" radius={[4,4,0,0]} />
@@ -236,7 +236,7 @@ export default function OverviewPage({
               <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.06)" />
               <XAxis type="number" domain={[0, 100]} stroke="rgba(255,255,255,0.4)" fontSize={11} />
               <YAxis dataKey="name" type="category" stroke="rgba(255,255,255,0.4)" fontSize={11} width={60} />
-              <Tooltip formatter={(v: number) => `${v}%`} contentStyle={TOOLTIP_STYLE} />
+              <Tooltip formatter={(v: number) => `${v}%`} contentStyle={TOOLTIP_STYLE} itemStyle={{ color: '#e2e8f0' }} labelStyle={{ color: '#e2e8f0' }} />
               <Bar dataKey="rate" fill="#6366f1" radius={[0,4,4,0]} />
             </BarChart>
           </ResponsiveContainer>
@@ -250,7 +250,7 @@ export default function OverviewPage({
               <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.06)" />
               <XAxis dataKey="name" stroke="rgba(255,255,255,0.4)" fontSize={11} />
               <YAxis stroke="rgba(255,255,255,0.4)" fontSize={11} />
-              <Tooltip contentStyle={TOOLTIP_STYLE} />
+              <Tooltip contentStyle={TOOLTIP_STYLE} itemStyle={{ color: '#e2e8f0' }} labelStyle={{ color: '#e2e8f0' }} />
               <Bar dataKey="value" radius={[4,4,0,0]}>
                 {methodsData.map((_, i) => <Cell key={i} fill={PIE_COLORS[i % PIE_COLORS.length]} />)}
               </Bar>

@@ -132,11 +132,11 @@ export default function OfficeAdminPage({ reports }: OfficeAdminPageProps) {
               <ResponsiveContainer width="100%" height={280}>
                 <PieChart>
                   <Pie data={categoryData} cx="50%" cy="50%" outerRadius={100}
-                    dataKey="value" label={({ name, percent }) => `${name} ${(percent * 100).toFixed(0)}%`}
+                    dataKey="value" label={({ name, percent }) => percent > 0 ? `${name} ${(percent * 100).toFixed(0)}%` : ''}
                     labelLine={false}>
                     {categoryData.map((_, i) => <Cell key={i} fill={PIE_COLORS[i % PIE_COLORS.length]} />)}
                   </Pie>
-                  <Tooltip contentStyle={CHART_TOOLTIP_STYLE} />
+                  <Tooltip contentStyle={CHART_TOOLTIP_STYLE} itemStyle={{ color: '#e2e8f0' }} labelStyle={{ color: '#e2e8f0' }} />
                 </PieChart>
               </ResponsiveContainer>
             </ChartCard>
@@ -147,7 +147,7 @@ export default function OfficeAdminPage({ reports }: OfficeAdminPageProps) {
                   <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.06)" />
                   <XAxis dataKey="name" stroke="rgba(255,255,255,0.4)" fontSize={11} />
                   <YAxis stroke="rgba(255,255,255,0.4)" fontSize={11} />
-                  <Tooltip contentStyle={CHART_TOOLTIP_STYLE} />
+                  <Tooltip contentStyle={CHART_TOOLTIP_STYLE} itemStyle={{ color: '#e2e8f0' }} labelStyle={{ color: '#e2e8f0' }} />
                   <Bar dataKey="value" radius={[4,4,0,0]}>
                     {actionData.map((_, i) => <Cell key={i} fill={PIE_COLORS[i % PIE_COLORS.length]} />)}
                   </Bar>
@@ -163,7 +163,7 @@ export default function OfficeAdminPage({ reports }: OfficeAdminPageProps) {
                   <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.06)" />
                   <XAxis type="number" stroke="rgba(255,255,255,0.4)" fontSize={11} />
                   <YAxis dataKey="name" type="category" stroke="rgba(255,255,255,0.4)" fontSize={11} width={70} />
-                  <Tooltip contentStyle={CHART_TOOLTIP_STYLE} />
+                  <Tooltip contentStyle={CHART_TOOLTIP_STYLE} itemStyle={{ color: '#e2e8f0' }} labelStyle={{ color: '#e2e8f0' }} />
                   <Bar dataKey="value" fill="#6366f1" radius={[0,4,4,0]} />
                 </BarChart>
               </ResponsiveContainer>
@@ -175,7 +175,7 @@ export default function OfficeAdminPage({ reports }: OfficeAdminPageProps) {
                   <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.06)" />
                   <XAxis dataKey="date" stroke="rgba(255,255,255,0.4)" fontSize={11} />
                   <YAxis stroke="rgba(255,255,255,0.4)" fontSize={11} />
-                  <Tooltip contentStyle={CHART_TOOLTIP_STYLE} />
+                  <Tooltip contentStyle={CHART_TOOLTIP_STYLE} itemStyle={{ color: '#e2e8f0' }} labelStyle={{ color: '#e2e8f0' }} />
                   <Line type="monotone" dataKey="Actions" stroke="#22d3ee" strokeWidth={2} dot={false} />
                 </LineChart>
               </ResponsiveContainer>

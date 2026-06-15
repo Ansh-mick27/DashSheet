@@ -233,11 +233,11 @@ export default function MemberDetailPage({
               <ResponsiveContainer width="100%" height={240}>
                 <PieChart>
                   <Pie data={taskStatusData} cx="50%" cy="50%" innerRadius={50} outerRadius={80}
-                    dataKey="value" label={({ name, percent }) => `${name} ${(percent * 100).toFixed(0)}%`}
+                    dataKey="value" label={({ name, percent }) => percent > 0 ? `${name} ${(percent * 100).toFixed(0)}%` : ''}
                     labelLine={false}>
                     <Cell fill="#10b981" /><Cell fill="#f59e0b" />
                   </Pie>
-                  <Tooltip contentStyle={CHART_TOOLTIP} />
+                  <Tooltip contentStyle={CHART_TOOLTIP} itemStyle={{ color: '#e2e8f0' }} labelStyle={{ color: '#e2e8f0' }} />
                 </PieChart>
               </ResponsiveContainer>
             </ChartCard>
@@ -247,7 +247,7 @@ export default function MemberDetailPage({
                   <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.06)" />
                   <XAxis dataKey="date" stroke="rgba(255,255,255,0.4)" fontSize={11} />
                   <YAxis domain={[0, 100]} stroke="rgba(255,255,255,0.4)" fontSize={11} />
-                  <Tooltip formatter={(v: number) => `${v}%`} contentStyle={CHART_TOOLTIP} />
+                  <Tooltip formatter={(v: number) => `${v}%`} contentStyle={CHART_TOOLTIP} itemStyle={{ color: '#e2e8f0' }} labelStyle={{ color: '#e2e8f0' }} />
                   <Bar dataKey="rate" fill="#6366f1" radius={[4,4,0,0]} />
                 </BarChart>
               </ResponsiveContainer>
@@ -284,12 +284,12 @@ export default function MemberDetailPage({
               <ResponsiveContainer width="100%" height={240}>
                 <PieChart>
                   <Pie data={invCategoryData} cx="50%" cy="50%" outerRadius={80} dataKey="value"
-                    label={({ name, percent }) => `${name} ${(percent * 100).toFixed(0)}%`} labelLine={false}>
+                    label={({ name, percent }) => percent > 0 ? `${name} ${(percent * 100).toFixed(0)}%` : ''} labelLine={false}>
                     {invCategoryData.map((_, i) => (
                       <Cell key={i} fill={['#6366f1','#22d3ee','#f59e0b','#10b981','#8b5cf6'][i % 5]} />
                     ))}
                   </Pie>
-                  <Tooltip contentStyle={CHART_TOOLTIP} />
+                  <Tooltip contentStyle={CHART_TOOLTIP} itemStyle={{ color: '#e2e8f0' }} labelStyle={{ color: '#e2e8f0' }} />
                 </PieChart>
               </ResponsiveContainer>
             </ChartCard>
@@ -317,12 +317,12 @@ export default function MemberDetailPage({
               <ResponsiveContainer width="100%" height={240}>
                 <PieChart>
                   <Pie data={placementOutcomeData} cx="50%" cy="50%" outerRadius={80} dataKey="value"
-                    label={({ name, percent }) => `${(percent * 100).toFixed(0)}%`} labelLine={false}>
+                    label={({ name, percent }) => percent > 0 ? `${name} ${(percent * 100).toFixed(0)}%` : ''} labelLine={false}>
                     {placementOutcomeData.map((_, i) => (
                       <Cell key={i} fill={['#10b981','#6366f1','#f59e0b','#ef4444','#22d3ee','#8b5cf6','#ec4899'][i % 7]} />
                     ))}
                   </Pie>
-                  <Tooltip contentStyle={CHART_TOOLTIP} />
+                  <Tooltip contentStyle={CHART_TOOLTIP} itemStyle={{ color: '#e2e8f0' }} labelStyle={{ color: '#e2e8f0' }} />
                 </PieChart>
               </ResponsiveContainer>
             </ChartCard>
@@ -332,7 +332,7 @@ export default function MemberDetailPage({
                   <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.06)" />
                   <XAxis dataKey="date" stroke="rgba(255,255,255,0.4)" fontSize={11} />
                   <YAxis stroke="rgba(255,255,255,0.4)" fontSize={11} />
-                  <Tooltip contentStyle={CHART_TOOLTIP} />
+                  <Tooltip contentStyle={CHART_TOOLTIP} itemStyle={{ color: '#e2e8f0' }} labelStyle={{ color: '#e2e8f0' }} />
                   <Line type="monotone" dataKey="Interactions" stroke="#22d3ee" strokeWidth={2} dot={false} />
                 </LineChart>
               </ResponsiveContainer>
