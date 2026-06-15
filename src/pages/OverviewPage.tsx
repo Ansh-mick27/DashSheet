@@ -266,7 +266,7 @@ export default function OverviewPage({
                 labelLine={false}>
                 {roleData.map((_, i) => <Cell key={i} fill={PIE_COLORS[i % PIE_COLORS.length]} />)}
               </Pie>
-              <Tooltip contentStyle={TOOLTIP_STYLE} />
+              <Tooltip contentStyle={TOOLTIP_STYLE} itemStyle={{ color: '#e2e8f0' }} labelStyle={{ color: '#e2e8f0' }} />
             </PieChart>
           </ResponsiveContainer>
         </ChartCard>

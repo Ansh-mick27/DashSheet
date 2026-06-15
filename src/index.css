@@ -596,6 +596,48 @@ input, select { font: inherit; color: inherit; }
   background: rgba(239, 68, 68, 0.1);
 }
 
+/* The sidebar surface stays a fixed dark color in both themes, so its
+   text/border colors must NOT flip with the --text- / --border- variables in light mode. */
+[data-theme="light"] .sidebar {
+  border-right: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+[data-theme="light"] .sidebar__header {
+  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+[data-theme="light"] .sidebar__title {
+  color: #f1f5f9;
+}
+
+[data-theme="light"] .sidebar__subtitle {
+  color: #64748b;
+}
+
+[data-theme="light"] .sidebar__toggle {
+  color: #64748b;
+}
+
+[data-theme="light"] .sidebar__toggle:hover {
+  color: #e2e8f0;
+}
+
+[data-theme="light"] .sidebar__link {
+  color: #94a3b8;
+}
+
+[data-theme="light"] .sidebar__link:hover {
+  color: #e2e8f0;
+}
+
+[data-theme="light"] .sidebar__footer {
+  border-top: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+[data-theme="light"] .sidebar__username {
+  color: #94a3b8;
+}
+
 
 /* ============================================
    FILTER BAR
@@ -861,7 +903,6 @@ input, select { font: inherit; color: inherit; }
   background: var(--bg-card);
   border: 1px solid var(--border-color);
   border-radius: var(--radius-lg);
-  overflow: hidden;
   transition: all var(--transition);
 }
 
