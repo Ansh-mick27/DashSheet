@@ -16,6 +16,7 @@ import StatCard from '../components/StatCard';
 import ChartCard from '../components/ChartCard';
 import { TrainingReport, WorkReport, Member, OfficeAdminReport, PlacementReport } from '../types';
 import { getCompletionRate, getAttendanceRate, parseDate } from '../services/dataApi';
+import { getSelectedMethods } from '../lib/options';
 
 interface OverviewPageProps {
   trainingReports: TrainingReport[];
@@ -26,6 +27,8 @@ interface OverviewPageProps {
 }
 
 const PIE_COLORS = ['#6366f1', '#22d3ee', '#f59e0b', '#ef4444', '#10b981', '#8b5cf6'];
+
+const PARTICIPATION_COLORS: Record<string, string> = { High: '#10b981', Moderate: '#f59e0b', Low: '#ef4444' };
 
 const TOOLTIP_STYLE = {
   background: 'rgba(15,23,42,0.95)',
@@ -68,7 +71,9 @@ export default function OverviewPage({
   const participationData = useMemo(() => {
     const counts = { High: 0, Moderate: 0, Low: 0 };
     trainingReports.forEach(r => { counts[r.participationLevel]++; });
-    return Object.entries(counts).map(([name, value]) => ({ name, value }));
+    return Object.entries(counts)
+      .filter(([, value]) => value > 0)
+      .map(([name, value]) => ({ name, value }));
   }, [trainingReports]);
 
   // Tasks by department
@@ -129,7 +134,7 @@ export default function OverviewPage({
   const methodsData = useMemo(() => {
     const counts: Record<string, number> = {};
     trainingReports.forEach(r => {
-      (r.methods?.selected ?? []).forEach(method => {
+      getSelectedMethods(r.methods).forEach(method => {
         counts[method] = (counts[method] || 0) + 1;
       });
     });
@@ -200,8 +205,8 @@ export default function OverviewPage({
                 dataKey="value"
                 label={({ name, percent }) => `${name} ${(percent * 100).toFixed(0)}%`}
                 labelLine={false}>
-                {participationData.map((_, i) => (
-                  <Cell key={i} fill={['#10b981', '#f59e0b', '#ef4444'][i]} />
+                {participationData.map((entry) => (
+                  <Cell key={entry.name} fill={PARTICIPATION_COLORS[entry.name as keyof typeof PARTICIPATION_COLORS]} />
                 ))}
               </Pie>
               <Tooltip contentStyle={TOOLTIP_STYLE} />

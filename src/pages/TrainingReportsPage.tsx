@@ -11,6 +11,7 @@ import ChartCard from '../components/ChartCard';
 import DataTable from '../components/DataTable';
 import { TrainingReport } from '../types';
 import { getAttendanceRate } from '../services/dataApi';
+import { getSelectedMethods } from '../lib/options';
 
 interface TrainingReportsPageProps {
   reports: TrainingReport[];
@@ -51,14 +52,16 @@ export default function TrainingReportsPage({ reports }: TrainingReportsPageProp
   const participationData = useMemo(() => {
     const counts: Record<string, number> = { High: 0, Moderate: 0, Low: 0 };
     reports.forEach(r => counts[r.participationLevel]++);
-    return Object.entries(counts).map(([name, value]) => ({ name, value }));
+    return Object.entries(counts)
+      .filter(([, value]) => value > 0)
+      .map(([name, value]) => ({ name, value }));
   }, [reports]);
 
   // Methods usage
   const methodsData = useMemo(() => {
     const counts: Record<string, number> = {};
     reports.forEach(r => {
-      (r.methods?.selected ?? []).forEach(method => {
+      getSelectedMethods(r.methods).forEach(method => {
         counts[method] = (counts[method] || 0) + 1;
       });
     });

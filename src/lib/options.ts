@@ -114,6 +114,19 @@ export function nextSortOrder(items: { sortOrder: number }[]): number {
   return items.reduce((max, item) => Math.max(max, item.sortOrder), -1) + 1;
 }
 
+// Training reports created before "methods" became a customizable
+// {selected, other} object stored each method as its own boolean flag
+// (e.g. { Lecture: true, "Group Discussion": false }). Support both shapes
+// so charts built from older records still show data.
+export function getSelectedMethods(methods: unknown): string[] {
+  if (!methods || typeof methods !== 'object') return [];
+  const m = methods as Record<string, unknown>;
+  if (Array.isArray(m.selected)) return m.selected as string[];
+  return Object.entries(m)
+    .filter(([key, value]) => key !== 'other' && value === true)
+    .map(([key]) => key);
+}
+
 export interface CollegeCourseSpecItem {
   key: string;
   spec: CollegeCourseSpec;

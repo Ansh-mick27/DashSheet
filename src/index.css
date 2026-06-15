@@ -252,6 +252,13 @@ input, select { font: inherit; color: inherit; }
   background-clip: text;
 }
 
+[data-theme="light"] .login-card__title {
+  background: linear-gradient(135deg, #1e293b, #475569);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
 .login-card__subtitle {
   color: var(--text-secondary);
   font-size: 0.875rem;
@@ -275,6 +282,12 @@ input, select { font: inherit; color: inherit; }
   color: #fca5a5;
   font-size: 0.85rem;
   animation: shake 0.4s ease;
+}
+
+[data-theme="light"] .login-card__error {
+  background: rgba(239, 68, 68, 0.08);
+  border-color: rgba(239, 68, 68, 0.25);
+  color: #b91c1c;
 }
 
 @keyframes shake {
