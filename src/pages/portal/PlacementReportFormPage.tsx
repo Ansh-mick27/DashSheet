@@ -155,7 +155,7 @@ export default function PlacementReportFormPage() {
           </div>
           <div className="form-grid form-grid--3">
             <FormField label="Number of Openings" name="numberOfOpenings" type="number" value={numberOfOpenings} onChange={setNumberOfOpenings} min={0} />
-            <FormField label="CTC (LPA)" name="ctcLPA" type="number" value={ctcLPA} onChange={setCtcLPA} min={0} />
+            <FormField label="CTC (LPA)" name="ctcLPA" type="number" value={ctcLPA} onChange={setCtcLPA} min={0} step="0.1" />
             <FormField label="Students Selected" name="studentsSelected" type="number" value={studentsSelected} onChange={setStudentsSelected} min={0} />
           </div>
           <FormField label="Drive Date" name="driveDate" type="date" value={driveDate} onChange={setDriveDate} />

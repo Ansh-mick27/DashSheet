@@ -56,18 +56,18 @@ export default function SuperAdminPage() {
   const [members, setMembers] = useState<Member[]>([]);
   const [loading, setLoading] = useState(true);
 
-  const reload = async () => {
-    setLoading(true);
+  const reload = async (showLoading = false) => {
+    if (showLoading) setLoading(true);
     const [opts, fields, data] = await Promise.all([
       fetchFieldOptions(), fetchCustomFields(), fetchSheetData()
     ]);
     setFieldOptions(opts);
     setCustomFields(fields);
     setMembers(data.members);
-    setLoading(false);
+    if (showLoading) setLoading(false);
   };
 
-  useEffect(() => { reload(); }, []);
+  useEffect(() => { reload(true); }, []);
 
   return (
     <div className="settings-page">

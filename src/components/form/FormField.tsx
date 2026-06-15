@@ -14,10 +14,11 @@ interface FormFieldProps {
   readOnly?: boolean;
   min?: number;
   max?: number;
+  step?: number | string;
 }
 
 export default function FormField({
-  label, name, type = 'text', value, onChange, required, placeholder, readOnly, min, max
+  label, name, type = 'text', value, onChange, required, placeholder, readOnly, min, max, step
 }: FormFieldProps) {
   const handleChange = (e: ChangeEvent<HTMLInputElement>) => onChange(e.target.value);
 
@@ -35,6 +36,7 @@ export default function FormField({
         readOnly={readOnly}
         min={min}
         max={max}
+        step={step}
         className="settings-form__input"
       />
     </div>

@@ -234,7 +234,7 @@ export default function PlacementPage({ reports }: PlacementPageProps) {
         <EmptyState
           icon={Building2}
           title="No companies tracked yet"
-          description="Placement team entries will appear here once submitted via the Google Form."
+          description="Placement team entries will appear here once submitted via the Staff Portal."
         />
       ) : (
         <>

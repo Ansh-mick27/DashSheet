@@ -123,7 +123,7 @@ export default function OfficeAdminPage({ reports }: OfficeAdminPageProps) {
         <EmptyState
           icon={Package}
           title="No inventory records yet"
-          description="Office admin reports will appear here once submitted via the Google Form."
+          description="Office admin reports will appear here once submitted via the Staff Portal."
         />
       ) : (
         <>
