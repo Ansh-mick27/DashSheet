@@ -76,17 +76,8 @@
 [data-theme="light"] .member-card { border-color: rgba(0,0,0,0.08); }
 [data-theme="light"] .member-card__progress { background: rgba(0,0,0,0.08); }
 
-/* restore dark theme defaults after light override */
+/* theme-agnostic design tokens (same in light and dark) */
 :root {
-
-  --text-primary: #e2e8f0;
-  --text-secondary: #94a3b8;
-  --text-muted: #64748b;
-  --text-heading: #f1f5f9;
-
-  --border-color: rgba(255, 255, 255, 0.06);
-  --border-light: rgba(255, 255, 255, 0.1);
-
   --accent-blue: #6366f1;
   --accent-blue-glow: rgba(99, 102, 241, 0.3);
   --accent-cyan: #22d3ee;
@@ -105,9 +96,6 @@
   --radius-lg: 16px;
   --radius-xl: 20px;
 
-  --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.3);
-  --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.4);
-  --shadow-lg: 0 8px 30px rgba(0, 0, 0, 0.5);
   --shadow-glow: 0 0 30px rgba(99, 102, 241, 0.15);
 
   --sidebar-width: 260px;
@@ -115,6 +103,21 @@
   --filter-height: 60px;
 
   --transition: 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* dark theme defaults (light theme overrides these above) */
+:root:not([data-theme="light"]) {
+  --text-primary: #e2e8f0;
+  --text-secondary: #94a3b8;
+  --text-muted: #64748b;
+  --text-heading: #f1f5f9;
+
+  --border-color: rgba(255, 255, 255, 0.06);
+  --border-light: rgba(255, 255, 255, 0.1);
+
+  --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.3);
+  --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.4);
+  --shadow-lg: 0 8px 30px rgba(0, 0, 0, 0.5);
 }
 
 /* ---- Reset & Base ---- */
@@ -218,6 +221,11 @@ input, select { font: inherit; color: inherit; }
   border-radius: var(--radius-xl);
   box-shadow: var(--shadow-lg), var(--shadow-glow);
   animation: slideUp 0.5s ease-out;
+}
+
+[data-theme="light"] .login-card {
+  background: rgba(255, 255, 255, 0.85);
+  border: 1px solid rgba(0, 0, 0, 0.06);
 }
 
 @keyframes slideUp {
