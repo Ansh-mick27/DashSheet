@@ -1876,6 +1876,41 @@ input, select { font: inherit; color: inherit; }
 .badge--action-maintenance { background: rgba(245,158,11,0.15); color: var(--accent-orange); }
 .badge--action-audited     { background: rgba(139,92,246,0.15); color: var(--accent-purple); }
 
+.badge--assigned { background: rgba(99,102,241,0.15); color: var(--accent-blue); }
+
+.text-muted { color: var(--text-muted); }
+
+/* ============================================
+   ASSIGNMENT REMINDER — "you are holding this item" banner
+   ============================================ */
+.assignment-reminder {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  padding: 14px 16px;
+  margin-bottom: 16px;
+  border: 1px solid rgba(99,102,241,0.25);
+  border-left: 4px solid var(--accent-blue);
+  border-radius: var(--radius-md);
+  background: rgba(99,102,241,0.08);
+  color: var(--text-primary);
+}
+
+.assignment-reminder__icon {
+  color: var(--accent-blue);
+  flex-shrink: 0;
+  margin-top: 2px;
+}
+
+.assignment-reminder__text {
+  font-size: 0.85rem;
+  line-height: 1.5;
+}
+
+.assignment-reminder__text strong {
+  color: var(--text-heading);
+}
+
 
 /* ============================================
    SETTINGS PAGE

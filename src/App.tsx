@@ -189,7 +189,7 @@ function DashboardLayout() {
               <ErrorBoundary><WorkReportFormPage /></ErrorBoundary>
             } />
             <Route path="/portal/inventory" element={
-              <ErrorBoundary><InventoryReportFormPage /></ErrorBoundary>
+              <ErrorBoundary><InventoryReportFormPage members={members} /></ErrorBoundary>
             } />
             <Route path="/portal/placement" element={
               <ErrorBoundary><PlacementReportFormPage /></ErrorBoundary>

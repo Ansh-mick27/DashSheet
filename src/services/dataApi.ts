@@ -89,6 +89,7 @@ function mapOfficeAdminReport(row: any): OfficeAdminReport {
     actionTaken: row.action_taken,
     location: row.location,
     notes: row.notes,
+    assignedTo: row.assigned_to ?? '',
     extraFields: row.extra_fields ?? {}
   };
 }
@@ -359,6 +360,7 @@ export async function submitOfficeAdminReport(report: OfficeAdminReport): Promis
     action_taken: report.actionTaken,
     location: report.location,
     notes: report.notes,
+    assigned_to: report.assignedTo ?? '',
     extra_fields: report.extraFields ?? {}
   });
   if (error) throw error;

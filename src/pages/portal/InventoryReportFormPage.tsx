@@ -7,7 +7,7 @@ import { useAuth } from '../../contexts/AuthContext';
 import { submitOfficeAdminReport } from '../../services/dataApi';
 import { todayISO, isoToDDMMYYYY } from '../../lib/dateUtils';
 import { INVENTORY_ITEMS, ITEM_CATEGORIES, ITEM_CONDITIONS, ACTIONS_TAKEN } from '../../data/constants';
-import { OfficeAdminReport, ExtraFields } from '../../types';
+import { OfficeAdminReport, ExtraFields, Member } from '../../types';
 import { useFormConfig } from '../../lib/useFormConfig';
 import { mergeOptions } from '../../lib/options';
 import FormField from '../../components/form/FormField';
@@ -15,7 +15,11 @@ import FormSelect from '../../components/form/FormSelect';
 import FormTextarea from '../../components/form/FormTextarea';
 import CustomFieldsSection from '../../components/form/CustomFieldsSection';
 
-export default function InventoryReportFormPage() {
+interface InventoryReportFormPageProps {
+  members: Member[];
+}
+
+export default function InventoryReportFormPage({ members }: InventoryReportFormPageProps) {
   const { member } = useAuth();
   const [date, setDate] = useState(todayISO());
   const [itemName, setItemName] = useState('');
@@ -25,6 +29,7 @@ export default function InventoryReportFormPage() {
   const [actionTaken, setActionTaken] = useState('');
   const [location, setLocation] = useState('');
   const [notes, setNotes] = useState('');
+  const [assignedTo, setAssignedTo] = useState('');
   const [extraFields, setExtraFields] = useState<ExtraFields>({});
   const [status, setStatus] = useState<'idle' | 'saving' | 'success' | 'error'>('idle');
 
@@ -33,6 +38,7 @@ export default function InventoryReportFormPage() {
   const itemCategories = useMemo(() => mergeOptions(ITEM_CATEGORIES, fieldOptions, 'itemCategories'), [fieldOptions]);
   const itemConditions = useMemo(() => mergeOptions(ITEM_CONDITIONS, fieldOptions, 'itemConditions'), [fieldOptions]);
   const actionsTaken = useMemo(() => mergeOptions(ACTIONS_TAKEN, fieldOptions, 'actionsTaken'), [fieldOptions]);
+  const memberNames = useMemo(() => members.map(m => m.name), [members]);
 
   const handleExtraChange = (key: string, value: string | number | boolean) => {
     setExtraFields(prev => ({ ...prev, [key]: value }));
@@ -42,6 +48,7 @@ export default function InventoryReportFormPage() {
     setDate(todayISO());
     setItemName(''); setItemCategory(''); setQuantity('');
     setCondition(''); setActionTaken(''); setLocation(''); setNotes('');
+    setAssignedTo('');
     setExtraFields({});
   };
 
@@ -61,6 +68,7 @@ export default function InventoryReportFormPage() {
         actionTaken: actionTaken as OfficeAdminReport['actionTaken'],
         location,
         notes,
+        assignedTo,
         extraFields
       };
       await submitOfficeAdminReport(report);
@@ -100,7 +108,10 @@ export default function InventoryReportFormPage() {
             <FormSelect label="Action Taken" name="actionTaken" value={actionTaken} onChange={setActionTaken} options={actionsTaken} required />
           </div>
 
-          <FormField label="Location" name="location" value={location} onChange={setLocation} required />
+          <div className="form-grid">
+            <FormField label="Location" name="location" value={location} onChange={setLocation} required />
+            <FormSelect label="Assigned To" name="assignedTo" value={assignedTo} onChange={setAssignedTo} options={memberNames} placeholder="Unassigned / In Storage" />
+          </div>
           <FormTextarea label="Notes" name="notes" value={notes} onChange={setNotes} rows={3} />
 
           <CustomFieldsSection fields={customFields} values={extraFields} onChange={handleExtraChange} />

@@ -98,6 +98,7 @@ export interface OfficeAdminReport {
   actionTaken: 'Added' | 'Removed' | 'Repaired' | 'Maintenance' | 'Audited';
   location: string;
   notes: string;
+  assignedTo: string;
   extraFields?: ExtraFields;
 }
 

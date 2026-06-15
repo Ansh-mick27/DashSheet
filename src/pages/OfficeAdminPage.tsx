@@ -15,6 +15,7 @@ import DataTable from '../components/DataTable';
 import EmptyState from '../components/EmptyState';
 import { OfficeAdminReport } from '../types';
 import { parseDate } from '../services/dataApi';
+import { getCurrentAssignment, getItemHistory, CurrentAssignment, AssignmentHistoryEntry } from '../lib/inventoryAssignments';
 
 interface OfficeAdminPageProps {
   reports: OfficeAdminReport[];
@@ -68,6 +69,23 @@ export default function OfficeAdminPage({ reports }: OfficeAdminPageProps) {
       .sort((a, b) => b.value - a.value);
   }, [reports]);
 
+  // Currently assigned items
+  const currentAssignments = useMemo(() => {
+    const itemNames = Array.from(new Set(reports.map(r => r.itemName)));
+    return itemNames
+      .map(itemName => getCurrentAssignment(itemName, reports))
+      .filter((a): a is CurrentAssignment => a !== null)
+      .sort((a, b) => b.durationDays - a.durationDays);
+  }, [reports]);
+
+  // Full assignment history across all items
+  const assignmentHistory = useMemo(() => {
+    const itemNames = Array.from(new Set(reports.map(r => r.itemName)));
+    const entries: AssignmentHistoryEntry[] = [];
+    itemNames.forEach(itemName => entries.push(...getItemHistory(itemName, reports)));
+    return entries.sort((a, b) => parseDate(b.from).getTime() - parseDate(a.from).getTime());
+  }, [reports]);
+
   // Activity over time (last 14 days)
   const timelineData = useMemo(() => {
     const dayMap: Record<string, number> = {};
@@ -102,7 +120,37 @@ export default function OfficeAdminPage({ reports }: OfficeAdminPageProps) {
       )
     },
     { key: 'location', header: 'Location', width: '120px' },
+    {
+      key: 'assignedTo', header: 'Assigned To', width: '130px',
+      render: (r: OfficeAdminReport) => (
+        r.assignedTo ? <span className="badge badge--assigned">{r.assignedTo}</span> : <span className="text-muted">—</span>
+      )
+    },
     { key: 'notes', header: 'Notes' }
+  ];
+
+  const currentAssignmentColumns = [
+    { key: 'itemName', header: 'Item', sortable: true },
+    {
+      key: 'holder', header: 'Held By', width: '160px', sortable: true,
+      render: (a: CurrentAssignment) => <span className="badge badge--assigned">{a.holder}</span>
+    },
+    { key: 'since', header: 'Since', width: '100px', sortable: true },
+    { key: 'durationDays', header: 'Days Held', width: '100px', sortable: true }
+  ];
+
+  const historyColumns = [
+    { key: 'itemName', header: 'Item', sortable: true },
+    {
+      key: 'holder', header: 'Held By', width: '160px', sortable: true,
+      render: (a: AssignmentHistoryEntry) => <span className="badge badge--assigned">{a.holder}</span>
+    },
+    { key: 'from', header: 'From', width: '100px', sortable: true },
+    {
+      key: 'to', header: 'To', width: '100px', sortable: true,
+      render: (a: AssignmentHistoryEntry) => a.to ?? <span className="badge badge--action-added">Present</span>
+    },
+    { key: 'durationDays', header: 'Days Held', width: '100px', sortable: true }
   ];
 
   return (
@@ -117,6 +165,7 @@ export default function OfficeAdminPage({ reports }: OfficeAdminPageProps) {
         <StatCard title="Unique Item Types" value={uniqueItems} icon={BarChart3} color="cyan" subtitle="Distinct items tracked" />
         <StatCard title="Maintenance / Repairs" value={maintenanceCount} icon={Wrench} color="orange" subtitle="Requiring attention" />
         <StatCard title="Actions This Week" value={recentActions} icon={CheckCircle2} color="green" subtitle="Last 7 days" />
+        <StatCard title="Items Currently Assigned" value={currentAssignments.length} icon={Package} color="purple" subtitle="Held by a staff member" />
       </div>
 
       {reports.length === 0 ? (
@@ -181,6 +230,31 @@ export default function OfficeAdminPage({ reports }: OfficeAdminPageProps) {
               </ResponsiveContainer>
             </ChartCard>
           </div>
+
+          {currentAssignments.length > 0 && (
+            <ChartCard title="Currently Assigned Items" subtitle="Items presently held by a staff member" className="mt-24">
+              <DataTable
+                columns={currentAssignmentColumns}
+                data={currentAssignments}
+                rowKey={(a, i) => `cur-${a.itemName}-${i}`}
+                pageSize={10}
+                emptyMessage="No items currently assigned"
+              />
+            </ChartCard>
+          )}
+
+          {assignmentHistory.length > 0 && (
+            <ChartCard title="Assignment History" subtitle="Who has held each item, and for how long" className="mt-24">
+              <DataTable
+                columns={historyColumns}
+                data={assignmentHistory}
+                rowKey={(a, i) => `hist-${a.itemName}-${a.holder}-${a.from}-${i}`}
+                pageSize={10}
+                exportFilename="inventory_assignment_history"
+                emptyMessage="No assignment history found"
+              />
+            </ChartCard>
+          )}
 
           <ChartCard title="Inventory Log" subtitle={`${reports.length} records`} className="mt-24">
             <DataTable

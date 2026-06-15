@@ -3,7 +3,7 @@
 // ==========================================
 import { useMemo } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { ArrowLeft, Mail, BookOpen, ClipboardList, CheckCircle2, Clock, Package, Briefcase, Users } from 'lucide-react';
+import { ArrowLeft, Mail, BookOpen, ClipboardList, CheckCircle2, Clock, Package, Briefcase, Users, PackageCheck } from 'lucide-react';
 import {
   BarChart, Bar, XAxis, YAxis, Tooltip, CartesianGrid, Legend,
   PieChart, Pie, Cell, ResponsiveContainer, LineChart, Line
@@ -14,6 +14,7 @@ import StatCard from '../components/StatCard';
 import EmptyState from '../components/EmptyState';
 import { Member, TrainingReport, WorkReport, OfficeAdminReport, PlacementReport } from '../types';
 import { getCompletionRate, getAttendanceRate } from '../services/dataApi';
+import { getCurrentHoldings, getItemHistory } from '../lib/inventoryAssignments';
 
 interface MemberDetailPageProps {
   members: Member[];
@@ -120,6 +121,22 @@ export default function MemberDetailPage({
     return Object.entries(map).map(([name, value]) => ({ name, value }));
   }, [memberInv]);
 
+  // Items currently assigned to this member
+  const myHoldings = useMemo(
+    () => getCurrentHoldings(decodedName, officeAdminReports),
+    [officeAdminReports, decodedName]
+  );
+
+  // Full assignment history for items this member currently or previously held
+  const myItemHistory = useMemo(() => {
+    const itemNames = Array.from(new Set(
+      officeAdminReports.filter(r => r.assignedTo === decodedName).map(r => r.itemName)
+    ));
+    return itemNames
+      .flatMap(itemName => getItemHistory(itemName, officeAdminReports))
+      .filter(h => h.holder === decodedName);
+  }, [officeAdminReports, decodedName]);
+
   if (!member) {
     return (
       <div className="member-detail">
@@ -177,7 +194,23 @@ export default function MemberDetailPage({
     { key: 'condition', header: 'Condition', width: '90px',
       render: (r: OfficeAdminReport) => <span className={`badge badge--${r.condition.toLowerCase()}`}>{r.condition}</span> },
     { key: 'actionTaken', header: 'Action', width: '110px' },
-    { key: 'location', header: 'Location' }
+    { key: 'location', header: 'Location' },
+    {
+      key: 'assignedTo', header: 'Assigned To', width: '130px',
+      render: (r: OfficeAdminReport) => (
+        r.assignedTo ? <span className="badge badge--assigned">{r.assignedTo}</span> : <span className="text-muted">—</span>
+      )
+    }
+  ];
+
+  const itemHistoryCols = [
+    { key: 'itemName', header: 'Item', sortable: true },
+    { key: 'from', header: 'From', width: '100px', sortable: true },
+    {
+      key: 'to', header: 'To', width: '100px', sortable: true,
+      render: (a: { to: string | null }) => a.to ?? <span className="badge badge--action-added">Present</span>
+    },
+    { key: 'durationDays', header: 'Days Held', width: '100px', sortable: true }
   ];
 
   const placCols = [
@@ -218,6 +251,15 @@ export default function MemberDetailPage({
           <p className="member-detail__email"><Mail size={14} /> {member.email}</p>
         </div>
       </div>
+
+      {myHoldings.map(h => (
+        <div className="assignment-reminder" key={h.itemName}>
+          <PackageCheck size={20} className="assignment-reminder__icon" />
+          <div className="assignment-reminder__text">
+            You are currently holding <strong>{h.itemName}</strong> — for {h.durationDays} day{h.durationDays === 1 ? '' : 's'} (since {h.since}).
+          </div>
+        </div>
+      ))}
 
       {/* Trainer Stats */}
       {isTrainer && (
@@ -345,6 +387,15 @@ export default function MemberDetailPage({
               emptyMessage="No placement logs found" />
           </ChartCard>
         </>
+      )}
+
+      {myItemHistory.length > 0 && (
+        <ChartCard title="My Item Assignment History" subtitle="Inventory items currently or previously assigned to you" className="mt-24">
+          <DataTable columns={itemHistoryCols} data={myItemHistory}
+            rowKey={(h, i) => `myhist-${h.itemName}-${h.from}-${i}`} pageSize={10}
+            exportFilename={`assignment_history_${member.name.replace(' ', '_')}`}
+            emptyMessage="No assignment history found" />
+        </ChartCard>
       )}
     </div>
   );

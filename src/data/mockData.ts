@@ -236,7 +236,8 @@ export function generateOfficeAdminReports(): OfficeAdminReport[] {
           condition: randomItem(conditions),
           actionTaken: randomItem(actions),
           location: randomItem(locations),
-          notes: Math.random() > 0.6 ? 'Needs follow-up in next audit' : ''
+          notes: Math.random() > 0.6 ? 'Needs follow-up in next audit' : '',
+          assignedTo: ''
         });
       }
     }
