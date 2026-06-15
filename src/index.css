@@ -49,7 +49,6 @@
 
 /* ── Ghost buttons / icon buttons in light mode ─────── */
 [data-theme="light"] .btn--ghost { background: rgba(0,0,0,0.04); }
-[data-theme="light"] .sidebar__search { background: rgba(0,0,0,0.05); }
 [data-theme="light"] .notif-bell { background: rgba(0,0,0,0.04); }
 [data-theme="light"] .notif-item__dismiss:hover { background: rgba(0,0,0,0.06); }
 
@@ -636,6 +635,30 @@ input, select { font: inherit; color: inherit; }
 
 [data-theme="light"] .sidebar__username {
   color: #94a3b8;
+}
+
+[data-theme="light"] .sidebar__search {
+  border: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+[data-theme="light"] .sidebar__search-icon {
+  color: #64748b;
+}
+
+[data-theme="light"] .sidebar__search-input {
+  color: #e2e8f0;
+}
+
+[data-theme="light"] .sidebar__search-input::placeholder {
+  color: #64748b;
+}
+
+[data-theme="light"] .sidebar__theme-toggle {
+  color: #94a3b8;
+}
+
+[data-theme="light"] .sidebar__theme-toggle:hover {
+  color: var(--accent-orange);
 }
 
 
