@@ -109,7 +109,7 @@ export default function TrainingReportsPage({ reports }: TrainingReportsPageProp
   return (
     <div className="training-page">
       <div className="page-header">
-        <h2 className="page-title">Training Reports</h2>
+        <h2 className="page-title">Session Reports</h2>
         <p className="page-subtitle">
           {reports.length} reports · Avg attendance: {attendanceRate}%
         </p>
@@ -218,7 +218,7 @@ export default function TrainingReportsPage({ reports }: TrainingReportsPageProp
         </ChartCard>
       </div>
 
-      <ChartCard title="All Training Reports" className="mt-24">
+      <ChartCard title="All Session Reports" className="mt-24">
         <DataTable
           columns={columns}
           data={reports}

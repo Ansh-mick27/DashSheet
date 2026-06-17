@@ -1591,8 +1591,37 @@ input, select { font: inherit; color: inherit; }
 .data-table__toolbar {
   display: flex;
   justify-content: flex-end;
+  gap: 12px;
   padding: 8px 14px 0;
 }
+
+.data-table__toolbar:has(.data-table__search) {
+  justify-content: space-between;
+}
+
+.data-table__search {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 12px;
+  background: rgba(255,255,255,0.04);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-sm);
+  min-width: 220px;
+}
+
+.data-table__search-icon { color: var(--text-muted); flex-shrink: 0; }
+
+.data-table__search-input {
+  background: transparent;
+  border: none;
+  outline: none;
+  color: var(--text-primary);
+  font-size: 0.82rem;
+  width: 100%;
+}
+
+.data-table__search-input::placeholder { color: var(--text-muted); }
 
 
 /* ============================================
@@ -2345,15 +2374,22 @@ input, select { font: inherit; color: inherit; }
 .form-checkbox-group {
   display: flex;
   flex-wrap: wrap;
-  gap: 10px 18px;
-  margin-bottom: 10px;
+  align-items: center;
+  justify-content: flex-start;
+  gap: 14px 24px;
+  padding: 14px 16px;
+  margin: 8px 0 12px;
+  background: rgba(255,255,255,0.03);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-md);
 }
 
 .form-checkbox {
   display: flex;
   align-items: center;
-  gap: 6px;
+  gap: 8px;
   font-size: 0.85rem;
+  line-height: 1.4;
   color: var(--text-primary);
   cursor: pointer;
 }
@@ -2361,12 +2397,133 @@ input, select { font: inherit; color: inherit; }
 .form-checkbox input {
   width: 16px;
   height: 16px;
+  flex-shrink: 0;
   cursor: pointer;
   accent-color: var(--accent-blue);
 }
 
 .form-checkbox-other {
   margin-top: 4px;
+}
+
+.form-radio-group {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 14px 24px;
+  padding: 14px 16px;
+  margin: 8px 0 12px;
+  background: rgba(255,255,255,0.03);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-md);
+}
+
+.form-radio {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 0.85rem;
+  line-height: 1.4;
+  color: var(--text-primary);
+  cursor: pointer;
+}
+
+.form-radio input {
+  width: 16px;
+  height: 16px;
+  flex-shrink: 0;
+  cursor: pointer;
+  accent-color: var(--accent-blue);
+}
+
+.rounds-config {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-bottom: 12px;
+}
+
+.rounds-config__header,
+.rounds-config__row {
+  display: grid;
+  grid-template-columns: 32px 1fr 1fr 100px;
+  gap: 10px;
+  align-items: center;
+}
+
+.rounds-config__header {
+  font-size: 0.72rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--text-muted);
+}
+
+.rounds-config__index {
+  text-align: center;
+  color: var(--text-secondary);
+  font-size: 0.85rem;
+}
+
+.rounds-config__actions {
+  display: flex;
+  gap: 4px;
+}
+
+.rounds-config__btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 26px;
+  height: 26px;
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--border-color);
+  background: transparent;
+  color: var(--text-secondary);
+  cursor: pointer;
+}
+
+.rounds-config__btn:hover:not(:disabled) {
+  background: rgba(255,255,255,0.06);
+  color: var(--text-primary);
+}
+
+.rounds-config__btn:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+.rounds-config__btn--remove:hover:not(:disabled) {
+  color: var(--accent-red);
+}
+
+.rounds-config__add {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  align-self: flex-start;
+  padding: 6px 12px;
+  border-radius: var(--radius-sm);
+  border: 1px dashed var(--border-color);
+  background: transparent;
+  color: var(--accent-blue);
+  font-size: 0.82rem;
+  cursor: pointer;
+}
+
+.rounds-config__add:hover {
+  background: rgba(99,102,241,0.08);
+}
+
+@media (max-width: 700px) {
+  .rounds-config__header { display: none; }
+  .rounds-config__row {
+    grid-template-columns: 1fr;
+    gap: 6px;
+    padding: 10px;
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-sm);
+  }
 }
 
 .time-slot-grid {

@@ -8,7 +8,7 @@ import {
   TIME_SLOTS, TASKS, TASK_STATUSES, INVENTORY_ITEMS, ITEM_CATEGORIES,
   ITEM_CONDITIONS, ACTIONS_TAKEN, INDUSTRY_SECTORS, COMPANY_TYPES,
   SOURCE_CHANNELS, MODES_OF_CONTACT, PLACEMENT_STATUSES, PRIORITIES,
-  ASSIGNED_TO_OPTIONS
+  ASSIGNED_TO_OPTIONS, ACTIVITY_PURPOSES
 } from '../data/constants';
 
 export interface CollegeCourseSpec {
@@ -22,10 +22,10 @@ export const OPTION_CATEGORIES: { key: string; label: string }[] = [
   { key: 'batches', label: 'Batches' },
   { key: 'durations', label: 'Training Durations' },
   { key: 'participationLevels', label: 'Participation Levels' },
-  { key: 'teachingMethods', label: 'Training Report Teaching Methods' },
-  { key: 'timeSlots', label: 'Work Report Time Slots' },
-  { key: 'tasks', label: 'Work Report Tasks' },
-  { key: 'taskStatuses', label: 'Work Report Task Statuses' },
+  { key: 'teachingMethods', label: 'Session Report Teaching Methods' },
+  { key: 'timeSlots', label: 'Daily Work Report Time Slots' },
+  { key: 'tasks', label: 'Daily Work Report Tasks' },
+  { key: 'taskStatuses', label: 'Daily Work Report Task Statuses' },
   { key: 'inventoryItems', label: 'Inventory Items' },
   { key: 'itemCategories', label: 'Inventory Categories' },
   { key: 'itemConditions', label: 'Inventory Conditions' },
@@ -34,9 +34,10 @@ export const OPTION_CATEGORIES: { key: string; label: string }[] = [
   { key: 'companyTypes', label: 'Company Types' },
   { key: 'sourceChannels', label: 'Sourcing Channels' },
   { key: 'modesOfContact', label: 'Modes of Contact' },
-  { key: 'placementStatuses', label: 'Placement Statuses' },
+  { key: 'placementStatuses', label: 'CRP Process Statuses' },
   { key: 'priorities', label: 'Priorities' },
-  { key: 'assignedTo', label: 'Assigned To Options' }
+  { key: 'assignedTo', label: 'Assigned To Options' },
+  { key: 'activityPurposes', label: 'CRP Process Activity Purposes' }
 ];
 
 // Static defaults for each category, keyed the same as OPTION_CATEGORIES[].key.
@@ -59,7 +60,8 @@ export const STATIC_OPTIONS_MAP: Record<string, string[]> = {
   modesOfContact: MODES_OF_CONTACT,
   placementStatuses: PLACEMENT_STATUSES,
   priorities: PRIORITIES,
-  assignedTo: ASSIGNED_TO_OPTIONS
+  assignedTo: ASSIGNED_TO_OPTIONS,
+  activityPurposes: ACTIVITY_PURPOSES
 };
 
 export const COLLEGE_OPTION_CATEGORY = 'collegeCourseSpec';

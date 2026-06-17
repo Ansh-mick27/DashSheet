@@ -13,8 +13,8 @@ export default function PortalHomePage() {
     <div className="portal-page">
       <div className="page-header">
         <div>
-          <h2 className="page-title">Staff Portal</h2>
-          <p className="page-subtitle">Submit your daily reports below</p>
+          <h2 className="page-title">Member Portal</h2>
+          <p className="page-subtitle">Punch Your Daily Report</p>
         </div>
       </div>
 
@@ -28,12 +28,12 @@ export default function PortalHomePage() {
           <>
             <Link to="/portal/training" className="portal-card">
               <div className="portal-card__icon"><BookOpen size={22} /></div>
-              <div className="portal-card__title">Submit Training Report</div>
+              <div className="portal-card__title">Session Report</div>
               <p className="portal-card__desc">Log a training session — topics covered, attendance, and engagement.</p>
             </Link>
             <Link to="/portal/work" className="portal-card">
               <div className="portal-card__icon"><ClipboardList size={22} /></div>
-              <div className="portal-card__title">Submit Work Report</div>
+              <div className="portal-card__title">Daily Work Report</div>
               <p className="portal-card__desc">Record your daily task schedule and accomplishments.</p>
             </Link>
           </>
@@ -42,7 +42,7 @@ export default function PortalHomePage() {
         {role === 'OfficeAdmin' && (
           <Link to="/portal/inventory" className="portal-card">
             <div className="portal-card__icon"><Package size={22} /></div>
-            <div className="portal-card__title">Submit Inventory Report</div>
+            <div className="portal-card__title">Inventory Report</div>
             <p className="portal-card__desc">Log inventory items added, removed, repaired, or audited.</p>
           </Link>
         )}
@@ -50,8 +50,8 @@ export default function PortalHomePage() {
         {role === 'Placement' && (
           <Link to="/portal/placement" className="portal-card">
             <div className="portal-card__icon"><Briefcase size={22} /></div>
-            <div className="portal-card__title">Submit Sourcing Report</div>
-            <p className="portal-card__desc">Log a new company contact and placement drive progress.</p>
+            <div className="portal-card__title">CRP Process Report</div>
+            <p className="portal-card__desc">Log a new company contact and CRP Process update.</p>
           </Link>
         )}
       </div>

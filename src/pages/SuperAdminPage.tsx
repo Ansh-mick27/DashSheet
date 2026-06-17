@@ -1,7 +1,7 @@
 // ==========================================
 // DashSheet — SuperAdmin Customization Page
 // Manage dropdown options, custom form fields,
-// and staff members
+// and members
 // ==========================================
 import { useEffect, useMemo, useState } from 'react';
 import { Plus, Trash2, Pencil, Check, X } from 'lucide-react';
@@ -9,30 +9,31 @@ import {
   fetchFieldOptions, fetchCustomFields, fetchSheetData,
   addFieldOption, updateFieldOption, deleteFieldOption,
   upsertCustomField, deleteCustomField,
-  upsertMember, deleteMember
+  upsertMember, deleteMember,
+  addBranchStudentCount, updateBranchStudentCount, deleteBranchStudentCount
 } from '../services/dataApi';
 import {
   FieldOption, CustomField, CustomFieldType, CustomFieldFormType,
-  Member, MemberRole
+  Member, MemberRole, BranchStudentCount
 } from '../types';
 import {
   OPTION_CATEGORIES, COLLEGE_OPTION_CATEGORY, CollegeCourseSpec, mergeOptions,
-  mergeOptionsDetailed, mergeCollegeCourseSpecsDetailed, hiddenCategory, nextSortOrder,
+  mergeOptionsDetailed, mergeCollegeCourseSpecsDetailed, mergeCollegeCourseSpecs, hiddenCategory, nextSortOrder,
   OptionItem, CollegeCourseSpecItem
 } from '../lib/options';
 import { DEPARTMENTS, BATCHES, COLLEGES_COURSES_SPECIALIZATIONS } from '../data/constants';
 import FormField from '../components/form/FormField';
 import FormSelect from '../components/form/FormSelect';
 
-type Tab = 'options' | 'fields' | 'members';
+type Tab = 'options' | 'fields' | 'members' | 'branchCounts';
 
 const FIELD_TYPES: CustomFieldType[] = ['text', 'number', 'textarea', 'select', 'checkbox', 'date'];
 const FORM_TYPES: CustomFieldFormType[] = ['training', 'work', 'inventory', 'placement'];
 const FORM_TYPE_LABELS: Record<CustomFieldFormType, string> = {
-  training: 'Training Report',
-  work: 'Work Report',
+  training: 'Session Report',
+  work: 'Daily Work Report',
   inventory: 'Inventory Report',
-  placement: 'Placement Sourcing Report'
+  placement: 'CRP Process Report'
 };
 const ROLES: MemberRole[] = ['Trainer', 'Admin', 'OfficeAdmin', 'Placement', 'SuperAdmin'];
 
@@ -57,6 +58,7 @@ export default function SuperAdminPage() {
   const [fieldOptions, setFieldOptions] = useState<FieldOption[]>([]);
   const [customFields, setCustomFields] = useState<CustomField[]>([]);
   const [members, setMembers] = useState<Member[]>([]);
+  const [branchStudentCounts, setBranchStudentCounts] = useState<BranchStudentCount[]>([]);
   const [loading, setLoading] = useState(true);
 
   const reload = async (showLoading = false) => {
@@ -67,6 +69,7 @@ export default function SuperAdminPage() {
     setFieldOptions(opts);
     setCustomFields(fields);
     setMembers(data.members);
+    setBranchStudentCounts(data.branchStudentCounts);
     if (showLoading) setLoading(false);
   };
 
@@ -77,7 +80,7 @@ export default function SuperAdminPage() {
       <div className="page-header">
         <div>
           <h2 className="page-title">SuperAdmin Customization</h2>
-          <p className="page-subtitle">Manage dropdown options, custom form fields, and staff accounts</p>
+          <p className="page-subtitle">Manage dropdown options, custom form fields, and member accounts</p>
         </div>
       </div>
 
@@ -89,7 +92,10 @@ export default function SuperAdminPage() {
           Custom Form Fields
         </button>
         <button className={`admin-tab ${tab === 'members' ? 'admin-tab--active' : ''}`} onClick={() => setTab('members')}>
-          Staff Members
+          Members
+        </button>
+        <button className={`admin-tab ${tab === 'branchCounts' ? 'admin-tab--active' : ''}`} onClick={() => setTab('branchCounts')}>
+          Branch Student Counts
         </button>
       </div>
 
@@ -100,6 +106,7 @@ export default function SuperAdminPage() {
           {tab === 'options' && <OptionsTab fieldOptions={fieldOptions} onChange={reload} />}
           {tab === 'fields' && <FieldsTab customFields={customFields} onChange={reload} />}
           {tab === 'members' && <MembersTab members={members} fieldOptions={fieldOptions} onChange={reload} />}
+          {tab === 'branchCounts' && <BranchCountsTab fieldOptions={fieldOptions} counts={branchStudentCounts} onChange={reload} />}
         </>
       )}
     </div>
@@ -690,7 +697,7 @@ function FieldsTab({ customFields, onChange }: { customFields: CustomField[]; on
 }
 
 // ==========================================
-// Staff Members Tab
+// Members Tab
 // ==========================================
 function MembersTab({ members, fieldOptions, onChange }: { members: Member[]; fieldOptions: FieldOption[]; onChange: () => void }) {
   const [form, setForm] = useState(EMPTY_MEMBER_FORM);
@@ -746,9 +753,9 @@ function MembersTab({ members, fieldOptions, onChange }: { members: Member[]; fi
 
   return (
     <div className="settings-card">
-      <h3>Staff Members</h3>
+      <h3>Members</h3>
       <p className="settings-card__desc">
-        Add, edit, or remove staff accounts. Leave password blank when editing to keep the
+        Add, edit, or remove member accounts. Leave password blank when editing to keep the
         existing password.
       </p>
 
@@ -791,6 +798,114 @@ function MembersTab({ members, fieldOptions, onChange }: { members: Member[]; fi
                 <Pencil size={14} />
               </button>
               <button className="btn btn--ghost btn--sm" onClick={() => handleDelete(m.id)} aria-label="Delete member">
+                <Trash2 size={14} />
+              </button>
+            </div>
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+}
+
+// ==========================================
+// Branch Student Counts Tab
+// ==========================================
+function BranchCountsTab({ fieldOptions, counts, onChange }: { fieldOptions: FieldOption[]; counts: BranchStudentCount[]; onChange: () => void }) {
+  const [college, setCollege] = useState('');
+  const [course, setCourse] = useState('');
+  const [specialization, setSpecialization] = useState('');
+  const [studentCount, setStudentCount] = useState('');
+  const [saving, setSaving] = useState(false);
+  const [error, setError] = useState('');
+
+  const collegeCourseSpecs = useMemo(
+    () => mergeCollegeCourseSpecs(COLLEGES_COURSES_SPECIALIZATIONS, fieldOptions),
+    [fieldOptions]
+  );
+  const colleges = useMemo(() => Array.from(new Set(collegeCourseSpecs.map(c => c.college))), [collegeCourseSpecs]);
+  const courses = useMemo(
+    () => Array.from(new Set(collegeCourseSpecs.filter(c => c.college === college).map(c => c.course))),
+    [collegeCourseSpecs, college]
+  );
+  const specializations = useMemo(
+    () => collegeCourseSpecs.filter(c => c.college === college && c.course === course && c.specialization).map(c => c.specialization),
+    [collegeCourseSpecs, college, course]
+  );
+
+  const handleCollegeChange = (v: string) => { setCollege(v); setCourse(''); setSpecialization(''); };
+  const handleCourseChange = (v: string) => { setCourse(v); setSpecialization(''); };
+
+  const handleSave = async () => {
+    setError('');
+    if (!college || !course) {
+      setError('Select a College and Course.');
+      return;
+    }
+    const count = Number(studentCount);
+    if (!studentCount || count < 0) {
+      setError('Enter a valid student count.');
+      return;
+    }
+    setSaving(true);
+    try {
+      const existing = counts.find(c =>
+        c.college === college && c.course === course && c.specialization === specialization
+      );
+      if (existing) {
+        await updateBranchStudentCount(existing.id, count);
+      } else {
+        await addBranchStudentCount(college, course, specialization, count);
+      }
+      setCollege(''); setCourse(''); setSpecialization(''); setStudentCount('');
+      onChange();
+    } finally {
+      setSaving(false);
+    }
+  };
+
+  const handleDelete = async (id: string) => {
+    await deleteBranchStudentCount(id);
+    onChange();
+  };
+
+  return (
+    <div className="settings-card">
+      <h3>Branch Student Counts</h3>
+      <p className="settings-card__desc">
+        Set the total enrolled students for each College / Course / Specialization. This count auto-fills
+        the "Total Students Enrolled" field on the Session Report form once that exact branch is selected.
+      </p>
+
+      <div className="form-grid form-grid--3" style={{ marginTop: 12 }}>
+        <FormSelect label="College" name="bcCollege" value={college} onChange={handleCollegeChange} options={colleges} />
+        <FormSelect label="Course" name="bcCourse" value={course} onChange={handleCourseChange} options={courses} />
+        {specializations.length > 0 && (
+          <FormSelect label="Specialization" name="bcSpecialization" value={specialization} onChange={setSpecialization} options={specializations} />
+        )}
+      </div>
+      <div className="form-grid" style={{ marginBottom: 12 }}>
+        <FormField label="Student Count" name="bcCount" type="number" value={studentCount} onChange={setStudentCount} min={0} />
+      </div>
+
+      {error && <p className="settings-form__status settings-form__status--error" style={{ marginBottom: 12 }}>{error}</p>}
+
+      <div className="settings-form__actions" style={{ marginBottom: 16 }}>
+        <button className="btn btn--primary" onClick={handleSave} disabled={saving}>
+          <Plus size={14} /> Save
+        </button>
+      </div>
+
+      <div className="admin-list">
+        {counts.length === 0 && <p className="settings-card__desc" style={{ marginTop: 16 }}>No branch student counts configured yet.</p>}
+        {counts.map(c => (
+          <div className="admin-list__row" key={c.id}>
+            <span>
+              {c.college} — {c.course}{c.specialization ? ` (${c.specialization})` : ''}
+              <span className="admin-list__meta"> — {c.studentCount} students</span>
+            </span>
+            <div className="admin-list__actions">
+              <button className="btn btn--ghost btn--sm" onClick={() => handleDelete(c.id)} aria-label="Delete branch count">
                 <Trash2 size={14} />
               </button>
             </div>

@@ -27,7 +27,6 @@ export default function WorkReportFormPage() {
   const [challengesSolutions, setChallengesSolutions] = useState('');
   const [pendingWork, setPendingWork] = useState('');
   const [additionalNotes, setAdditionalNotes] = useState('');
-  const [reviewedBy, setReviewedBy] = useState('');
   const [extraFields, setExtraFields] = useState<ExtraFields>({});
   const [status, setStatus] = useState<'idle' | 'saving' | 'success' | 'error'>('idle');
 
@@ -53,7 +52,7 @@ export default function WorkReportFormPage() {
     setDate(todayISO());
     setTimeSlots(emptyTimeSlots(timeSlotLabels));
     setKeyAccomplishments(''); setChallengesSolutions(''); setPendingWork('');
-    setAdditionalNotes(''); setReviewedBy('');
+    setAdditionalNotes('');
     setExtraFields({});
   };
 
@@ -73,7 +72,6 @@ export default function WorkReportFormPage() {
         challengesSolutions,
         pendingWork,
         additionalNotes,
-        reviewedBy,
         extraFields
       };
       await submitWorkReport(report);
@@ -90,7 +88,7 @@ export default function WorkReportFormPage() {
     <div className="settings-page">
       <div className="page-header">
         <div>
-          <h2 className="page-title">Work Report</h2>
+          <h2 className="page-title">Daily Work Report</h2>
           <p className="page-subtitle">Record your daily task schedule</p>
         </div>
       </div>
@@ -111,7 +109,6 @@ export default function WorkReportFormPage() {
           <FormTextarea label="Challenges & Solutions" name="challengesSolutions" value={challengesSolutions} onChange={setChallengesSolutions} rows={2} />
           <FormTextarea label="Pending Work" name="pendingWork" value={pendingWork} onChange={setPendingWork} rows={2} />
           <FormTextarea label="Additional Notes" name="additionalNotes" value={additionalNotes} onChange={setAdditionalNotes} rows={2} />
-          <FormField label="Reviewed By (optional)" name="reviewedBy" value={reviewedBy} onChange={setReviewedBy} />
 
           <CustomFieldsSection fields={customFields} values={extraFields} onChange={handleExtraChange} />
 

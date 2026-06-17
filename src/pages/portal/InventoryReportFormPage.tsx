@@ -23,6 +23,7 @@ export default function InventoryReportFormPage({ members }: InventoryReportForm
   const { member } = useAuth();
   const [date, setDate] = useState(todayISO());
   const [itemName, setItemName] = useState('');
+  const [itemCode, setItemCode] = useState('');
   const [itemCategory, setItemCategory] = useState('');
   const [quantity, setQuantity] = useState('');
   const [condition, setCondition] = useState('');
@@ -46,7 +47,7 @@ export default function InventoryReportFormPage({ members }: InventoryReportForm
 
   const resetForm = () => {
     setDate(todayISO());
-    setItemName(''); setItemCategory(''); setQuantity('');
+    setItemName(''); setItemCode(''); setItemCategory(''); setQuantity('');
     setCondition(''); setActionTaken(''); setLocation(''); setNotes('');
     setAssignedTo('');
     setExtraFields({});
@@ -62,6 +63,7 @@ export default function InventoryReportFormPage({ members }: InventoryReportForm
         staffName: member.name,
         date: isoToDDMMYYYY(date),
         itemName,
+        itemCode,
         itemCategory: itemCategory as OfficeAdminReport['itemCategory'],
         quantity: Number(quantity) || 0,
         condition: condition as OfficeAdminReport['condition'],
@@ -93,12 +95,13 @@ export default function InventoryReportFormPage({ members }: InventoryReportForm
       <div className="settings-card">
         <form onSubmit={handleSubmit} className="settings-form">
           <div className="form-grid">
-            <FormField label="Staff Name" name="staffName" value={member?.name ?? ''} onChange={() => {}} readOnly />
+            <FormField label="Member Name" name="staffName" value={member?.name ?? ''} onChange={() => {}} readOnly />
             <FormField label="Date" name="date" type="date" value={date} onChange={setDate} required />
           </div>
 
-          <div className="form-grid">
+          <div className="form-grid form-grid--3">
             <FormSelect label="Item Name" name="itemName" value={itemName} onChange={setItemName} options={inventoryItems} required />
+            <FormField label="Item Code" name="itemCode" value={itemCode} onChange={setItemCode} />
             <FormSelect label="Item Category" name="itemCategory" value={itemCategory} onChange={setItemCategory} options={itemCategories} required />
           </div>
 

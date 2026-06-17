@@ -204,8 +204,7 @@ export function generateWorkReports(): WorkReport[] {
         keyAccomplishments: `Completed ${randomInt(3, 6)} out of ${TIME_SLOTS.length} scheduled tasks successfully`,
         challengesSolutions: Math.random() > 0.5 ? 'Managed time effectively despite schedule conflicts' : '',
         pendingWork: Math.random() > 0.4 ? 'Grade remaining assignments, prepare next lecture' : '',
-        additionalNotes: '',
-        reviewedBy: Math.random() > 0.4 ? randomItem(TRAINER_NAMES.slice(0, 3)) : ''
+        additionalNotes: ''
       });
     }
   }
@@ -231,6 +230,7 @@ export function generateOfficeAdminReports(): OfficeAdminReport[] {
           staffName,
           date,
           itemName: randomItem(INVENTORY_ITEMS),
+          itemCode: '',
           itemCategory: randomItem(categories),
           quantity: randomInt(1, 10),
           condition: randomItem(conditions),
@@ -318,7 +318,15 @@ export function generatePlacementReports(): PlacementReport[] {
           ? randomItem(ACTIONS_REQUIRED) : '',
         assignedTo: status !== 'Drive Completed' && status !== 'Blacklisted'
           ? randomItem(ASSIGNED_TO) : '',
-        followUpDone: Math.random() > 0.7
+        followUpDone: Math.random() > 0.7,
+        opportunityType: hasOpenings ? randomItem(['Internship', 'Job'] as const) : '',
+        activityStatus: randomItem(['Open', 'Closed', 'On Hold', 'Other'] as const),
+        activityPurpose: hasOpenings ? 'Hiring' : '',
+        hiringMode: hasOpenings ? randomItem(['Online', 'Physical', 'Hybrid'] as const) : '',
+        hiringRounds: hasOpenings ? [
+          { name: 'Online Assessment', mode: 'Virtual' as const },
+          { name: 'Technical Interview', mode: randomItem(['Virtual', 'Physical', 'Hybrid'] as const) }
+        ] : []
       });
     }
   }

@@ -70,6 +70,7 @@ export default function PlacementPage({ reports }: PlacementPageProps) {
   const totalOpenings  = useMemo(() => reports.reduce((s, r) => s + r.numberOfOpenings, 0), [reports]);
   const totalSelected  = useMemo(() => reports.reduce((s, r) => s + r.studentsSelected, 0), [reports]);
   const highPriority   = useMemo(() => reports.filter(r => r.priority === 'High').length, [reports]);
+  const hiringActivities = useMemo(() => reports.filter(r => r.activityPurpose === 'Hiring').length, [reports]);
 
   // ── Status breakdown (table + chart) ──────────────────
   const statusBreakdown = useMemo(() => {
@@ -151,12 +152,31 @@ export default function PlacementPage({ reports }: PlacementPageProps) {
         return <span className={`badge badge--${c}`}>{r.currentStatus}</span>;
       }
     },
+    {
+      key: 'opportunityType', header: 'Activity Type', width: '100px',
+      render: (r: PlacementReport) => r.opportunityType || '—'
+    },
+    {
+      key: 'activityStatus', header: 'Activity Status', width: '110px',
+      render: (r: PlacementReport) => r.activityStatus || '—'
+    },
+    { key: 'activityPurpose', header: 'Purpose', width: '110px' },
     { key: 'rolesOffered', header: 'Role Offered' },
     { key: 'numberOfOpenings', header: 'Openings', width: '80px', sortable: true },
     { key: 'ctcLPA', header: 'CTC (LPA)', width: '90px', sortable: true,
       render: (r: PlacementReport) => r.ctcLPA > 0 ? r.ctcLPA.toFixed(1) : '—' },
     { key: 'driveDate', header: 'Drive Date', width: '90px' },
     { key: 'studentsSelected', header: 'Selected', width: '80px', sortable: true },
+    {
+      key: 'hiringMode', header: 'Hiring Mode', width: '100px',
+      render: (r: PlacementReport) => r.hiringMode || '—'
+    },
+    {
+      key: 'hiringRounds', header: 'Rounds', width: '220px',
+      render: (r: PlacementReport) => r.hiringRounds.length > 0
+        ? r.hiringRounds.map((rd, i) => `${i + 1}. ${rd.name}${rd.mode ? ` (${rd.mode})` : ''}`).join(' → ')
+        : '—'
+    },
     {
       key: 'priority', header: 'Priority', width: '80px',
       render: (r: PlacementReport) => {
@@ -214,7 +234,7 @@ export default function PlacementPage({ reports }: PlacementPageProps) {
     <div className="placement-page">
       {/* ── Header ─────────────────────────────────────── */}
       <div className="page-header">
-        <h2 className="page-title">Placement Sourcing Dashboard</h2>
+        <h2 className="page-title">CRP Process Dashboard</h2>
         <p className="page-subtitle">Auto-Summary from Sourcing Tracker | Academic Year 2024–25</p>
       </div>
 
@@ -228,13 +248,14 @@ export default function PlacementPage({ reports }: PlacementPageProps) {
         <StatCard title="Students Selected"      value={totalSelected}  icon={Users}        color="green"
           trend={totalSelected > 0 ? 'up' : 'neutral'} trendValue="Post drive completion" />
         <StatCard title="High Priority"          value={highPriority}   icon={Star}         color="orange" subtitle="Active / confirmed" />
+        <StatCard title="Hiring Activities"      value={hiringActivities} icon={Building2}  color="cyan"   subtitle="Activity Purpose: Hiring" />
       </div>
 
       {reports.length === 0 ? (
         <EmptyState
           icon={Building2}
           title="No companies tracked yet"
-          description="Placement team entries will appear here once submitted via the Staff Portal."
+          description="CRP Process entries will appear here once submitted via the Member Portal."
         />
       ) : (
         <>
@@ -242,7 +263,7 @@ export default function PlacementPage({ reports }: PlacementPageProps) {
           <div className="sourcing-dashboard">
             {/* Header banner */}
             <div className="sourcing-dashboard__header">
-              <p className="sourcing-dashboard__title">Placement Sourcing Dashboard</p>
+              <p className="sourcing-dashboard__title">CRP Process Dashboard</p>
               <p className="sourcing-dashboard__subtitle">
                 Auto-Summary from Sourcing Tracker &nbsp;|&nbsp; {new Date().toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' })}
               </p>

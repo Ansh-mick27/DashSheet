@@ -189,6 +189,7 @@ export default function MemberDetailPage({
   const invCols = [
     { key: 'date', header: 'Date', sortable: true, width: '90px' },
     { key: 'itemName', header: 'Item', sortable: true },
+    { key: 'itemCode', header: 'Item Code', width: '100px' },
     { key: 'itemCategory', header: 'Category', width: '110px' },
     { key: 'quantity', header: 'Qty', width: '60px' },
     { key: 'condition', header: 'Condition', width: '90px',
@@ -265,8 +266,8 @@ export default function MemberDetailPage({
       {isTrainer && (
         <>
           <div className="stats-grid stats-grid--4">
-            <StatCard title="Training Reports" value={memberTraining.length} icon={BookOpen} color="blue" />
-            <StatCard title="Work Reports" value={memberWork.length} icon={ClipboardList} color="cyan" />
+            <StatCard title="Session Reports" value={memberTraining.length} icon={BookOpen} color="blue" />
+            <StatCard title="Daily Work Reports" value={memberWork.length} icon={ClipboardList} color="cyan" />
             <StatCard title="Completion Rate" value={`${completionRate}%`} icon={CheckCircle2} color="green" />
             <StatCard title="Avg Attendance" value={`${attendanceRate}%`} icon={Clock} color="purple" />
           </div>
@@ -295,13 +296,13 @@ export default function MemberDetailPage({
               </ResponsiveContainer>
             </ChartCard>
           </div>
-          <ChartCard title="Training Report History" className="mt-24">
+          <ChartCard title="Session Report History" className="mt-24">
             <DataTable columns={trainingCols} data={memberTraining}
               rowKey={(r, i) => `t-${r.date}-${i}`} pageSize={8}
               exportFilename={`training_${member.name.replace(' ', '_')}`}
               emptyMessage="No training reports found" />
           </ChartCard>
-          <ChartCard title="Work Report History" className="mt-24">
+          <ChartCard title="Daily Work Report History" className="mt-24">
             <DataTable columns={workCols} data={memberWork}
               rowKey={(r, i) => `w-${r.date}-${i}`} pageSize={8}
               exportFilename={`work_${member.name.replace(' ', '_')}`}
@@ -380,7 +381,7 @@ export default function MemberDetailPage({
               </ResponsiveContainer>
             </ChartCard>
           </div>
-          <ChartCard title="Placement Activity Log" className="mt-24">
+          <ChartCard title="CRP Process Activity Log" className="mt-24">
             <DataTable columns={placCols} data={memberPlacement}
               rowKey={(r, i) => `pl-${r.dateOfFirstContact}-${i}`} pageSize={10}
               exportFilename={`placement_${member.name.replace(' ', '_')}`}

@@ -4,7 +4,7 @@
 import { supabase, isSupabaseConfigured } from '../lib/supabaseClient';
 import {
   Member, MemberRole, TrainingReport, WorkReport, OfficeAdminReport, PlacementReport, Notification,
-  FieldOption, CustomField, CustomFieldFormType, CustomFieldType
+  FieldOption, CustomField, CustomFieldFormType, CustomFieldType, BranchStudentCount
 } from '../types';
 import {
   generateMembers, generateTrainingReports, generateWorkReports,
@@ -19,6 +19,7 @@ interface SheetData {
   placementReports: PlacementReport[];
   fieldOptions: FieldOption[];
   customFields: CustomField[];
+  branchStudentCounts: BranchStudentCount[];
 }
 
 let cachedData: SheetData | null = null;
@@ -72,7 +73,6 @@ function mapWorkReport(row: any): WorkReport {
     challengesSolutions: row.challenges_solutions,
     pendingWork: row.pending_work,
     additionalNotes: row.additional_notes,
-    reviewedBy: row.reviewed_by,
     extraFields: row.extra_fields ?? {}
   };
 }
@@ -83,6 +83,7 @@ function mapOfficeAdminReport(row: any): OfficeAdminReport {
     staffName: row.staff_name,
     date: row.date,
     itemName: row.item_name,
+    itemCode: row.item_code ?? '',
     itemCategory: row.item_category,
     quantity: row.quantity,
     condition: row.condition,
@@ -121,7 +122,22 @@ function mapPlacementReport(row: any): PlacementReport {
     actionRequired: row.action_required,
     assignedTo: row.assigned_to,
     followUpDone: row.follow_up_done,
+    opportunityType: row.opportunity_type ?? '',
+    activityStatus: row.activity_status ?? '',
+    activityPurpose: row.activity_purpose ?? '',
+    hiringMode: row.hiring_mode ?? '',
+    hiringRounds: row.hiring_rounds ?? [],
     extraFields: row.extra_fields ?? {}
+  };
+}
+
+function mapBranchStudentCount(row: any): BranchStudentCount {
+  return {
+    id: row.id,
+    college: row.college,
+    course: row.course,
+    specialization: row.specialization ?? '',
+    studentCount: row.student_count
   };
 }
 
@@ -153,17 +169,18 @@ export async function fetchSheetData(): Promise<SheetData> {
 
   if (isSupabaseConfigured) {
     try {
-      const [membersRes, trainingRes, workRes, officeRes, placementRes, fieldOptionsRes, customFieldsRes] = await Promise.all([
+      const [membersRes, trainingRes, workRes, officeRes, placementRes, fieldOptionsRes, customFieldsRes, branchCountsRes] = await Promise.all([
         supabase.from('members_public').select('*'),
         supabase.from('training_reports').select('*').order('timestamp', { ascending: false }),
         supabase.from('work_reports').select('*').order('timestamp', { ascending: false }),
         supabase.from('office_admin_reports').select('*').order('timestamp', { ascending: false }),
         supabase.from('placement_reports').select('*').order('timestamp', { ascending: false }),
         supabase.from('field_options').select('*').order('sort_order', { ascending: true }),
-        supabase.from('custom_fields').select('*').order('sort_order', { ascending: true })
+        supabase.from('custom_fields').select('*').order('sort_order', { ascending: true }),
+        supabase.from('branch_student_counts').select('*')
       ]);
 
-      const errors = [membersRes.error, trainingRes.error, workRes.error, officeRes.error, placementRes.error, fieldOptionsRes.error, customFieldsRes.error].filter(Boolean);
+      const errors = [membersRes.error, trainingRes.error, workRes.error, officeRes.error, placementRes.error, fieldOptionsRes.error, customFieldsRes.error, branchCountsRes.error].filter(Boolean);
       if (errors.length) throw errors[0];
 
       const hasAnyData = [membersRes, trainingRes, workRes, officeRes, placementRes]
@@ -177,7 +194,8 @@ export async function fetchSheetData(): Promise<SheetData> {
           officeAdminReports: (officeRes.data ?? []).map(mapOfficeAdminReport),
           placementReports: (placementRes.data ?? []).map(mapPlacementReport),
           fieldOptions: (fieldOptionsRes.data ?? []).map(mapFieldOption),
-          customFields: (customFieldsRes.data ?? []).map(mapCustomField)
+          customFields: (customFieldsRes.data ?? []).map(mapCustomField),
+          branchStudentCounts: (branchCountsRes.data ?? []).map(mapBranchStudentCount)
         };
         return cachedData;
       }
@@ -193,10 +211,16 @@ export async function fetchSheetData(): Promise<SheetData> {
     officeAdminReports: generateOfficeAdminReports(),
     placementReports: generatePlacementReports(),
     fieldOptions: [],
-    customFields: []
+    customFields: [],
+    branchStudentCounts: []
   };
 
   return cachedData;
+}
+
+export async function fetchBranchStudentCounts(): Promise<BranchStudentCount[]> {
+  const data = await fetchSheetData();
+  return data.branchStudentCounts;
 }
 
 export async function fetchFieldOptions(): Promise<FieldOption[]> {
@@ -342,7 +366,6 @@ export async function submitWorkReport(report: WorkReport): Promise<void> {
     challenges_solutions: report.challengesSolutions,
     pending_work: report.pendingWork,
     additional_notes: report.additionalNotes,
-    reviewed_by: report.reviewedBy,
     extra_fields: report.extraFields ?? {}
   });
   if (error) throw error;
@@ -354,6 +377,7 @@ export async function submitOfficeAdminReport(report: OfficeAdminReport): Promis
     staff_name: report.staffName,
     date: report.date,
     item_name: report.itemName,
+    item_code: report.itemCode ?? '',
     item_category: report.itemCategory,
     quantity: report.quantity,
     condition: report.condition,
@@ -393,8 +417,33 @@ export async function submitPlacementReport(report: PlacementReport): Promise<vo
     action_required: report.actionRequired,
     assigned_to: report.assignedTo,
     follow_up_done: report.followUpDone,
+    opportunity_type: report.opportunityType ?? '',
+    activity_status: report.activityStatus ?? '',
+    activity_purpose: report.activityPurpose ?? '',
+    hiring_mode: report.hiringMode ?? '',
+    hiring_rounds: report.hiringRounds ?? [],
     extra_fields: report.extraFields ?? {}
   });
+  if (error) throw error;
+  refreshData();
+}
+
+export async function addBranchStudentCount(college: string, course: string, specialization: string, studentCount: number): Promise<void> {
+  const { error } = await supabase.from('branch_student_counts').insert({
+    college, course, specialization, student_count: studentCount
+  });
+  if (error) throw error;
+  refreshData();
+}
+
+export async function updateBranchStudentCount(id: string, studentCount: number): Promise<void> {
+  const { error } = await supabase.from('branch_student_counts').update({ student_count: studentCount }).eq('id', id);
+  if (error) throw error;
+  refreshData();
+}
+
+export async function deleteBranchStudentCount(id: string): Promise<void> {
+  const { error } = await supabase.from('branch_student_counts').delete().eq('id', id);
   if (error) throw error;
   refreshData();
 }
@@ -460,7 +509,7 @@ export async function deleteCustomField(id: string): Promise<void> {
 }
 
 // ==========================================
-// SuperAdmin: staff member management
+// SuperAdmin: member management
 // ==========================================
 
 export async function upsertMember(member: {

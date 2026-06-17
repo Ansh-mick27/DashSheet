@@ -84,7 +84,7 @@ export default function MembersPage({
       <div className="page-header">
         <div>
           <h2 className="page-title">Members</h2>
-          <p className="page-subtitle">{members.length} staff enrolled</p>
+          <p className="page-subtitle">{members.length} members enrolled</p>
         </div>
         <div className="members-search">
           <Search size={16} />

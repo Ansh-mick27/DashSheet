@@ -42,7 +42,7 @@ export default function LoginPage() {
           <div className="login-card__logo">
             <LayoutDashboard size={32} />
           </div>
-          <h1 className="login-card__title">DashSheet</h1>
+          <h1 className="login-card__title">CDC-DASHSHEET</h1>
           <p className="login-card__subtitle">CDC Portal — Sign in to continue</p>
         </div>
 
@@ -105,7 +105,7 @@ export default function LoginPage() {
         </form>
 
         <p className="login-card__footer">
-          Access restricted to authorized staff and trainers only.
+          Access restricted to authorized members only.
         </p>
       </div>
     </div>

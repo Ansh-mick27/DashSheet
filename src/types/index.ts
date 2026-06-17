@@ -83,7 +83,6 @@ export interface WorkReport {
   challengesSolutions: string;
   pendingWork: string;
   additionalNotes: string;
-  reviewedBy: string;
   extraFields?: ExtraFields;
 }
 
@@ -92,6 +91,7 @@ export interface OfficeAdminReport {
   staffName: string;
   date: string;
   itemName: string;
+  itemCode: string;
   itemCategory: 'Electronics' | 'Furniture' | 'Stationery' | 'Equipment' | 'Other';
   quantity: number;
   condition: 'New' | 'Good' | 'Fair' | 'Poor' | 'Damaged';
@@ -100,6 +100,19 @@ export interface OfficeAdminReport {
   notes: string;
   assignedTo: string;
   extraFields?: ExtraFields;
+}
+
+export interface HiringRound {
+  name: string;
+  mode: 'Virtual' | 'Physical' | 'Hybrid' | '';
+}
+
+export interface BranchStudentCount {
+  id: string;
+  college: string;
+  course: string;
+  specialization: string;
+  studentCount: number;
 }
 
 export interface PlacementReport {
@@ -128,6 +141,11 @@ export interface PlacementReport {
   actionRequired: string;
   assignedTo: 'Placement Officer' | 'HOD / Coordinator' | 'Campus Relations Manager' | 'Business Development Associate' | 'Other' | '';
   followUpDone: boolean;
+  opportunityType: 'Internship' | 'Job' | '';
+  activityStatus: 'Open' | 'Closed' | 'On Hold' | 'Other' | '';
+  activityPurpose: string;
+  hiringMode: 'Online' | 'Physical' | 'Hybrid' | '';
+  hiringRounds: HiringRound[];
   extraFields?: ExtraFields;
 }
 

@@ -13,11 +13,11 @@ import { useState } from 'react';
 
 const ADMIN_NAV_ITEMS = [
   { path: '/', icon: LayoutDashboard, label: 'Overview' },
-  { path: '/training', icon: BookOpen, label: 'Training Reports' },
-  { path: '/work', icon: ClipboardList, label: 'Work Reports' },
+  { path: '/training', icon: BookOpen, label: 'Session Reports' },
+  { path: '/work', icon: ClipboardList, label: 'Daily Work Reports' },
   { path: '/members', icon: Users, label: 'Members' },
   { path: '/inventory', icon: Package, label: 'Inventory' },
-  { path: '/placement', icon: Briefcase, label: 'Placement' },
+  { path: '/placement', icon: Briefcase, label: 'CRP Process' },
   { path: '/portal', icon: ClipboardPlus, label: 'Portal' },
   { path: '/settings', icon: Settings, label: 'Settings' },
 ];
@@ -64,7 +64,7 @@ export default function Sidebar({ onSearch }: SidebarProps) {
               <LayoutDashboard size={28} />
             </div>
             <div>
-              <h1 className="sidebar__title">DashSheet</h1>
+              <h1 className="sidebar__title">CDC-DASHSHEET</h1>
               <p className="sidebar__subtitle">CDC Dashboard</p>
             </div>
           </div>

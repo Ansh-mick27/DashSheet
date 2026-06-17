@@ -1,13 +1,13 @@
 // ==========================================
 // DashSheet — Training Report Form Page
 // ==========================================
-import { useState, useMemo, FormEvent } from 'react';
+import { useState, useMemo, useEffect, FormEvent } from 'react';
 import { CheckCircle2, AlertCircle, Send } from 'lucide-react';
 import { useAuth } from '../../contexts/AuthContext';
 import { submitTrainingReport } from '../../services/dataApi';
 import { todayISO, isoToDDMMYYYY } from '../../lib/dateUtils';
 import { COLLEGES_COURSES_SPECIALIZATIONS, DURATIONS, PARTICIPATION_LEVELS, TEACHING_METHODS } from '../../data/constants';
-import { TrainingReport, ExtraFields } from '../../types';
+import { TrainingReport, ExtraFields, BranchStudentCount } from '../../types';
 import { useFormConfig } from '../../lib/useFormConfig';
 import { mergeOptions, mergeCollegeCourseSpecs } from '../../lib/options';
 import FormField from '../../components/form/FormField';
@@ -21,7 +21,11 @@ const EMPTY_METHODS: TrainingReport['methods'] = {
   other: ''
 };
 
-export default function TrainingReportFormPage() {
+interface TrainingReportFormPageProps {
+  branchStudentCounts: BranchStudentCount[];
+}
+
+export default function TrainingReportFormPage({ branchStudentCounts }: TrainingReportFormPageProps) {
   const { member } = useAuth();
   const [date, setDate] = useState(todayISO());
   const [college, setCollege] = useState('');
@@ -67,6 +71,17 @@ export default function TrainingReportFormPage() {
       .map(c => c.specialization),
     [collegeCourseSpecs, college, course]
   );
+
+  const matchedBranchCount = useMemo(
+    () => branchStudentCounts.find(b =>
+      b.college === college && b.course === course && b.specialization === specialization
+    ),
+    [branchStudentCounts, college, course, specialization]
+  );
+
+  useEffect(() => {
+    if (matchedBranchCount) setTotalEnrolled(String(matchedBranchCount.studentCount));
+  }, [matchedBranchCount]);
 
   const handleExtraChange = (key: string, value: string | number | boolean) => {
     setExtraFields(prev => ({ ...prev, [key]: value }));
@@ -135,7 +150,7 @@ export default function TrainingReportFormPage() {
     <div className="settings-page">
       <div className="page-header">
         <div>
-          <h2 className="page-title">Training Report</h2>
+          <h2 className="page-title">Session Report</h2>
           <p className="page-subtitle">Log a training session you conducted</p>
         </div>
       </div>
@@ -144,7 +159,7 @@ export default function TrainingReportFormPage() {
         <form onSubmit={handleSubmit} className="settings-form">
           <div className="form-grid">
             <FormField label="Trainer Name" name="trainerName" value={member?.name ?? ''} onChange={() => {}} readOnly />
-            <FormField label="Date" name="date" type="date" value={date} onChange={setDate} required />
+            <FormField label="Date" name="date" type="date" value={date} onChange={() => {}} readOnly required />
           </div>
 
           <div className="form-grid form-grid--3">
@@ -165,7 +180,14 @@ export default function TrainingReportFormPage() {
           <FormCheckboxGroup label="Teaching Methods Used" value={methods} onChange={setMethods} methods={teachingMethods} />
 
           <div className="form-grid form-grid--3">
-            <FormField label="Total Students Enrolled" name="totalEnrolled" type="number" value={totalEnrolled} onChange={setTotalEnrolled} required min={0} />
+            <div>
+              <FormField
+                label="Total Students Enrolled" name="totalEnrolled" type="number"
+                value={totalEnrolled} onChange={setTotalEnrolled} required min={0}
+                readOnly={!!matchedBranchCount}
+              />
+              {matchedBranchCount && <p className="form-readonly-note">Auto-filled from branch settings</p>}
+            </div>
             <FormField label="Students Present" name="studentsPresent" type="number" value={studentsPresent} onChange={setStudentsPresent} required min={0} />
             <FormSelect label="Participation Level" name="participationLevel" value={participationLevel} onChange={setParticipationLevel} options={participationLevels} required />
           </div>

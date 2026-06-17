@@ -126,7 +126,7 @@ export default function WorkReportsPage({ reports }: WorkReportsPageProps) {
   return (
     <div className="work-page">
       <div className="page-header">
-        <h2 className="page-title">Work & Task Reports</h2>
+        <h2 className="page-title">Daily Work Reports</h2>
         <p className="page-subtitle">
           {reports.length} reports · Overall completion: {completionRate}%
         </p>
@@ -234,7 +234,7 @@ export default function WorkReportsPage({ reports }: WorkReportsPageProps) {
         </ChartCard>
       </div>
 
-      <ChartCard title="All Work Reports" className="mt-24">
+      <ChartCard title="All Daily Work Reports" className="mt-24">
         <DataTable
           columns={columns}
           data={reports}

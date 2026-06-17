@@ -103,8 +103,9 @@ export default function OfficeAdminPage({ reports }: OfficeAdminPageProps) {
 
   const columns = [
     { key: 'date', header: 'Date', sortable: true, width: '90px' },
-    { key: 'staffName', header: 'Staff', sortable: true, width: '130px' },
+    { key: 'staffName', header: 'Member', sortable: true, width: '130px' },
     { key: 'itemName', header: 'Item', sortable: true },
+    { key: 'itemCode', header: 'Item Code', width: '110px', sortable: true },
     { key: 'itemCategory', header: 'Category', width: '110px' },
     { key: 'quantity', header: 'Qty', width: '60px', sortable: true },
     {
@@ -165,14 +166,14 @@ export default function OfficeAdminPage({ reports }: OfficeAdminPageProps) {
         <StatCard title="Unique Item Types" value={uniqueItems} icon={BarChart3} color="cyan" subtitle="Distinct items tracked" />
         <StatCard title="Maintenance / Repairs" value={maintenanceCount} icon={Wrench} color="orange" subtitle="Requiring attention" />
         <StatCard title="Actions This Week" value={recentActions} icon={CheckCircle2} color="green" subtitle="Last 7 days" />
-        <StatCard title="Items Currently Assigned" value={currentAssignments.length} icon={Package} color="purple" subtitle="Held by a staff member" />
+        <StatCard title="Items Currently Assigned" value={currentAssignments.length} icon={Package} color="purple" subtitle="Held by a member" />
       </div>
 
       {reports.length === 0 ? (
         <EmptyState
           icon={Package}
           title="No inventory records yet"
-          description="Office admin reports will appear here once submitted via the Staff Portal."
+          description="Office admin reports will appear here once submitted via the Member Portal."
         />
       ) : (
         <>
@@ -232,7 +233,7 @@ export default function OfficeAdminPage({ reports }: OfficeAdminPageProps) {
           </div>
 
           {currentAssignments.length > 0 && (
-            <ChartCard title="Currently Assigned Items" subtitle="Items presently held by a staff member" className="mt-24">
+            <ChartCard title="Currently Assigned Items" subtitle="Items presently held by a member" className="mt-24">
               <DataTable
                 columns={currentAssignmentColumns}
                 data={currentAssignments}
@@ -264,6 +265,7 @@ export default function OfficeAdminPage({ reports }: OfficeAdminPageProps) {
               pageSize={12}
               exportFilename="inventory_report"
               emptyMessage="No inventory records found"
+              searchKeys={['itemName', 'itemCode']}
             />
           </ChartCard>
         </>

@@ -12,23 +12,24 @@ export const DEPARTMENTS = [
 
 export const BATCHES = ['Batch A', 'Batch B', 'Batch C', 'Batch D', 'Batch E'];
 
+// Fixed order required: AIL, AFMR, AITR, AIPER, AIMSR (abbreviations, not full names)
 export const COLLEGES_COURSES_SPECIALIZATIONS: { college: string; course: string; specialization: string }[] = [
-  { college: 'Acropolis Institute of Technology & Research', course: 'B. Tech.', specialization: 'CSE' },
-  { college: 'Acropolis Institute of Technology & Research', course: 'B. Tech.', specialization: 'IT' },
-  { college: 'Acropolis Institute of Technology & Research', course: 'B. Tech.', specialization: 'CSE-AIML' },
-  { college: 'Acropolis Institute of Technology & Research', course: 'MCA', specialization: '' },
-  { college: 'Acropolis Institute of Management Studies and Research', course: 'BBA', specialization: 'Marketing' },
-  { college: 'Acropolis Institute of Management Studies and Research', course: 'BCA', specialization: 'Computer Applications' },
-  { college: 'Acropolis Faculty of Management & Research', course: 'MBA', specialization: 'Finance' },
-  { college: 'Acropolis Institute of Pharmaceutical Education and Research', course: 'B. Pharma', specialization: '' },
-  { college: 'Acropolis Institute of Law', course: 'BA LLB', specialization: '' }
+  { college: 'AIL', course: 'BA LLB', specialization: '' },
+  { college: 'AFMR', course: 'MBA', specialization: 'Finance' },
+  { college: 'AITR', course: 'B. Tech.', specialization: 'CSE' },
+  { college: 'AITR', course: 'B. Tech.', specialization: 'IT' },
+  { college: 'AITR', course: 'B. Tech.', specialization: 'CSE-AIML' },
+  { college: 'AITR', course: 'MCA', specialization: '' },
+  { college: 'AIPER', course: 'B. Pharma', specialization: '' },
+  { college: 'AIMSR', course: 'BBA', specialization: 'Marketing' },
+  { college: 'AIMSR', course: 'BCA', specialization: 'Computer Applications' }
 ];
 
 export const DURATIONS = ['1 Hour', '2 Hours', '3 Hours', 'Full Day'];
 
 export const PARTICIPATION_LEVELS = ['High', 'Moderate', 'Low'];
 
-export const TEACHING_METHODS = ['Lecture', 'Group Discussion', 'Case Study', 'Role Play', 'Presentation', 'Practical'];
+export const TEACHING_METHODS = ['Orientation', 'Lecture', 'GD', 'Case Study', 'Role Play', 'Presentation', 'Outbound', 'Digital'];
 
 export const TIME_SLOTS = [
   'Slot 1 (8:50-9:05)',
@@ -67,7 +68,8 @@ export const ACTIONS_TAKEN = ['Added', 'Removed', 'Repaired', 'Maintenance', 'Au
 
 export const INDUSTRY_SECTORS = [
   'IT / Software', 'Consulting', 'Manufacturing', 'BFSI', 'EdTech',
-  'Healthcare', 'E-Commerce', 'FMCG', 'Automobile', 'Other'
+  'Healthcare', 'E-Commerce', 'FMCG', 'Automobile', 'Other',
+  'Consumer Durable', 'Consumer Product', 'Banking', 'MSME (Micro, Small & Medium Enterprise)'
 ];
 
 export const COMPANY_TYPES = ['MNC', 'Startup', 'PSU / Large Corp', 'Private Sector', 'Other'];
@@ -90,3 +92,16 @@ export const ASSIGNED_TO_OPTIONS = [
   'Placement Officer', 'HOD / Coordinator', 'Campus Relations Manager',
   'Business Development Associate', 'Other'
 ];
+
+export const OPPORTUNITY_TYPES = ['Internship', 'Job'];
+
+export const ACTIVITY_STATUSES = ['Open', 'Closed', 'On Hold', 'Other'];
+
+export const ACTIVITY_PURPOSES = [
+  'Hiring', 'Internship', 'Expert Session', 'Orientation',
+  'Hackathon', 'Hiring Competition', 'Webinar', 'Guest Lecture'
+];
+
+export const HIRING_MODES = ['Online', 'Physical', 'Hybrid'];
+
+export const ROUND_DELIVERY_MODES = ['Virtual', 'Physical', 'Hybrid'];

@@ -27,7 +27,7 @@ import { useAuth } from './contexts/AuthContext';
 import { fetchSheetData, refreshData, parseDate, generateNotifications } from './services/dataApi';
 import {
   Member, TrainingReport, WorkReport, OfficeAdminReport,
-  PlacementReport, DashboardFilters, Notification
+  PlacementReport, DashboardFilters, Notification, BranchStudentCount
 } from './types';
 
 function DashboardLayout() {
@@ -37,6 +37,7 @@ function DashboardLayout() {
   const [workReports, setWorkReports] = useState<WorkReport[]>([]);
   const [officeAdminReports, setOfficeAdminReports] = useState<OfficeAdminReport[]>([]);
   const [placementReports, setPlacementReports] = useState<PlacementReport[]>([]);
+  const [branchStudentCounts, setBranchStudentCounts] = useState<BranchStudentCount[]>([]);
   const [loading, setLoading] = useState(true);
   const [notifications, setNotifications] = useState<Notification[]>([]);
   const [autoRefreshMins, setAutoRefreshMins] = useState(0);
@@ -55,6 +56,7 @@ function DashboardLayout() {
       setWorkReports(data.workReports);
       setOfficeAdminReports(data.officeAdminReports);
       setPlacementReports(data.placementReports);
+      setBranchStudentCounts(data.branchStudentCounts);
       setNotifications(generateNotifications(data.workReports, data.trainingReports));
     } catch (err) {
       console.error('Failed to load data:', err);
@@ -183,7 +185,7 @@ function DashboardLayout() {
               <ErrorBoundary><PortalHomePage /></ErrorBoundary>
             } />
             <Route path="/portal/training" element={
-              <ErrorBoundary><TrainingReportFormPage /></ErrorBoundary>
+              <ErrorBoundary><TrainingReportFormPage branchStudentCounts={branchStudentCounts} /></ErrorBoundary>
             } />
             <Route path="/portal/work" element={
               <ErrorBoundary><WorkReportFormPage /></ErrorBoundary>

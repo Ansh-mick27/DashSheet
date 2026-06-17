@@ -152,11 +152,11 @@ export default function OverviewPage({
     <div className="overview-page">
       <div className="page-header">
         <h2 className="page-title">Dashboard Overview</h2>
-        <p className="page-subtitle">Real-time insights across all staff and departments</p>
+        <p className="page-subtitle">Real-time insights across all members and departments</p>
       </div>
 
       <div className="stats-grid">
-        <StatCard title="Total Staff" value={members.length} icon={Users} color="blue" subtitle="All roles" />
+        <StatCard title="Total Members" value={members.length} icon={Users} color="blue" subtitle="All roles" />
         <StatCard title="Reports Today" value={reportsToday} icon={BookOpen} color="cyan" subtitle="Combined submissions" />
         <StatCard title="Completion Rate" value={`${completionRate}%`} icon={CheckCircle2} color="green"
           trend={completionRate >= 75 ? 'up' : 'down'} trendValue={completionRate >= 75 ? 'On track' : 'Needs attention'} />
@@ -164,7 +164,7 @@ export default function OverviewPage({
           trend={attendanceRate >= 80 ? 'up' : 'down'} trendValue="Avg across sessions" />
         <StatCard title="Completed Tasks" value={completedTasks} icon={TrendingUp} color="green" subtitle="All time" />
         <StatCard title="Pending Tasks" value={pendingTasks} icon={AlertTriangle} color="orange" subtitle="Awaiting completion" />
-        <StatCard title="Students Placed" value={totalStudentsPlaced} icon={Briefcase} color="cyan" subtitle="Via placement cell" />
+        <StatCard title="Students Placed" value={totalStudentsPlaced} icon={Briefcase} color="cyan" subtitle="Via CRP Process" />
         <StatCard title="Inventory Logs" value={officeAdminReports.length} icon={Package} color="orange" subtitle="Items tracked" />
       </div>
 
@@ -193,7 +193,7 @@ export default function OverviewPage({
               <Legend />
               <Area type="monotone" dataKey="Training" stroke="#6366f1" fill="url(#gradT)" strokeWidth={2} />
               <Area type="monotone" dataKey="Work" stroke="#22d3ee" fill="url(#gradW)" strokeWidth={2} />
-              <Area type="monotone" dataKey="Placement" stroke="#10b981" fill="url(#gradP)" strokeWidth={2} />
+              <Area type="monotone" dataKey="Placement" name="CRP Process" stroke="#10b981" fill="url(#gradP)" strokeWidth={2} />
             </AreaChart>
           </ResponsiveContainer>
         </ChartCard>
@@ -258,7 +258,7 @@ export default function OverviewPage({
           </ResponsiveContainer>
         </ChartCard>
 
-        <ChartCard title="Staff by Role" subtitle="Distribution across all roles">
+        <ChartCard title="Members by Role" subtitle="Distribution across all roles">
           <ResponsiveContainer width="100%" height={260}>
             <PieChart>
               <Pie data={roleData} cx="50%" cy="50%" outerRadius={90} dataKey="value"

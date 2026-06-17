@@ -14,7 +14,7 @@ export default function SettingsPage() {
         <div>
           <strong>Internal use authentication</strong>
           <p>
-            Each staff member signs in with their own username and password, verified against the
+            Each member signs in with their own username and password, verified against the
             <code> members</code> table via the <code>login_member</code> RPC in Supabase. This is
             suitable for trusted internal use only — do not expose this dashboard publicly without
             adding stronger server-side session management.
@@ -25,8 +25,8 @@ export default function SettingsPage() {
       <div className="settings-card">
         <h3>Data Storage</h3>
         <p className="settings-card__desc">
-          All training reports, work reports, inventory logs, and placement sourcing data are
-          stored in Supabase and submitted directly from the Staff Portal — no Google Forms or
+          All session reports, daily work reports, inventory logs, and CRP Process data are
+          stored in Supabase and submitted directly from the Member Portal — no Google Forms or
           Sheets are used. Dashboard charts and tables read live from these tables.
         </p>
       </div>

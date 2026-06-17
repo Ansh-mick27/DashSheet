@@ -2,7 +2,7 @@
 // DashSheet — Data Table Component
 // ==========================================
 import { useState, useMemo } from 'react';
-import { ChevronUp, ChevronDown, Download } from 'lucide-react';
+import { ChevronUp, ChevronDown, Download, Search } from 'lucide-react';
 
 interface Column<T> {
   key: string;
@@ -20,25 +20,35 @@ interface DataTableProps<T> {
   pageSize?: number;
   emptyMessage?: string;
   exportFilename?: string;
+  searchKeys?: (keyof T)[];
 }
 
 export default function DataTable<T>({
   columns, data, rowKey, pageSize = 10,
-  emptyMessage = 'No data found', exportFilename
+  emptyMessage = 'No data found', exportFilename, searchKeys
 }: DataTableProps<T>) {
   const [sortCol, setSortCol] = useState<string>('');
   const [sortDir, setSortDir] = useState<'asc' | 'desc'>('asc');
   const [page, setPage] = useState(0);
+  const [search, setSearch] = useState('');
+
+  const searchedData = useMemo(() => {
+    if (!searchKeys || !search.trim()) return data;
+    const q = search.trim().toLowerCase();
+    return data.filter(item =>
+      searchKeys.some(key => String((item as Record<string, unknown>)[key as string] ?? '').toLowerCase().includes(q))
+    );
+  }, [data, searchKeys, search]);
 
   const sortedData = useMemo(() => {
-    if (!sortCol) return data;
-    return [...data].sort((a, b) => {
+    if (!sortCol) return searchedData;
+    return [...searchedData].sort((a, b) => {
       const aVal = (a as Record<string, unknown>)[sortCol];
       const bVal = (b as Record<string, unknown>)[sortCol];
       const cmp = String(aVal ?? '').localeCompare(String(bVal ?? ''), undefined, { numeric: true });
       return sortDir === 'asc' ? cmp : -cmp;
     });
-  }, [data, sortCol, sortDir]);
+  }, [searchedData, sortCol, sortDir]);
 
   const totalPages = Math.ceil(sortedData.length / pageSize);
   const pagedData = sortedData.slice(page * pageSize, (page + 1) * pageSize);
@@ -74,11 +84,25 @@ export default function DataTable<T>({
 
   return (
     <div className="data-table-wrapper">
-      {exportFilename && (
+      {(searchKeys || exportFilename) && (
         <div className="data-table__toolbar">
-          <button className="btn btn--ghost btn--sm" onClick={exportCSV} title="Export to CSV">
-            <Download size={14} /> Export CSV
-          </button>
+          {searchKeys && (
+            <div className="data-table__search">
+              <Search size={14} className="data-table__search-icon" />
+              <input
+                type="text"
+                value={search}
+                onChange={e => { setSearch(e.target.value); setPage(0); }}
+                placeholder="Search..."
+                className="data-table__search-input"
+              />
+            </div>
+          )}
+          {exportFilename && (
+            <button className="btn btn--ghost btn--sm" onClick={exportCSV} title="Export to CSV">
+              <Download size={14} /> Export CSV
+            </button>
+          )}
         </div>
       )}
       <div className="data-table-scroll">
