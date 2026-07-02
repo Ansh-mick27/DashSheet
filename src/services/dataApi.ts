@@ -45,6 +45,8 @@ function mapTrainingReport(row: any): TrainingReport {
     course: row.course,
     specialization: row.specialization,
     section: row.section ?? '',
+    year: row.year ?? '',
+    semester: row.semester ?? '',
     topicCovered: row.topic_covered,
     learningObjectives: row.learning_objectives,
     duration: row.duration,
@@ -128,6 +130,7 @@ function mapPlacementReport(row: any): PlacementReport {
     activityPurpose: row.activity_purpose ?? '',
     hiringMode: row.hiring_mode ?? '',
     hiringRounds: row.hiring_rounds ?? [],
+    driveYear: row.drive_year ?? '',
     extraFields: row.extra_fields ?? {}
   };
 }
@@ -339,6 +342,8 @@ export async function submitTrainingReport(report: TrainingReport): Promise<void
     course: report.course,
     specialization: report.specialization,
     section: report.section,
+    year: report.year,
+    semester: report.semester,
     topic_covered: report.topicCovered,
     learning_objectives: report.learningObjectives,
     duration: report.duration,
@@ -425,6 +430,7 @@ export async function submitPlacementReport(report: PlacementReport): Promise<vo
     activity_purpose: report.activityPurpose ?? '',
     hiring_mode: report.hiringMode ?? '',
     hiring_rounds: report.hiringRounds ?? [],
+    drive_year: report.driveYear ?? '',
     extra_fields: report.extraFields ?? {}
   });
   if (error) throw error;

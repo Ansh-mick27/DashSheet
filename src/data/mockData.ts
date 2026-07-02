@@ -155,6 +155,8 @@ export function generateTrainingReports(): TrainingReport[] {
         course: ccs.course,
         specialization: ccs.specialization,
         section: '',
+        year: '',
+        semester: '',
         topicCovered: randomItem(TOPICS),
         duration: randomItem(DURATIONS),
         learningObjectives: `Understand ${randomItem(TOPICS).toLowerCase()} concepts and apply them practically`,
@@ -327,7 +329,8 @@ export function generatePlacementReports(): PlacementReport[] {
         hiringRounds: hasOpenings ? [
           { name: 'Online Assessment', mode: 'Virtual' as const },
           { name: 'Technical Interview', mode: randomItem(['Virtual', 'Physical', 'Hybrid'] as const) }
-        ] : []
+        ] : [],
+        driveYear: hasOpenings ? randomItem(['2026', '2027']) : ''
       });
     }
   }

@@ -9,7 +9,7 @@ import { todayISO, isoToDDMMYYYY } from '../../lib/dateUtils';
 import {
   INDUSTRY_SECTORS, COMPANY_TYPES, SOURCE_CHANNELS, MODES_OF_CONTACT,
   PLACEMENT_STATUSES, PRIORITIES, ASSIGNED_TO_OPTIONS,
-  OPPORTUNITY_TYPES, ACTIVITY_STATUSES, ACTIVITY_PURPOSES, HIRING_MODES
+  OPPORTUNITY_TYPES, ACTIVITY_STATUSES, ACTIVITY_PURPOSES, HIRING_MODES, DRIVE_YEARS
 } from '../../data/constants';
 import { PlacementReport, ExtraFields, HiringRound } from '../../types';
 import { useFormConfig } from '../../lib/useFormConfig';
@@ -51,6 +51,7 @@ export default function PlacementReportFormPage() {
   const [activityPurpose, setActivityPurpose] = useState('');
   const [hiringMode, setHiringMode] = useState('');
   const [hiringRounds, setHiringRounds] = useState<HiringRound[]>([]);
+  const [driveYear, setDriveYear] = useState('');
   const [extraFields, setExtraFields] = useState<ExtraFields>({});
   const [status, setStatus] = useState<'idle' | 'saving' | 'success' | 'error'>('idle');
   const [hiringModeError, setHiringModeError] = useState('');
@@ -77,7 +78,7 @@ export default function PlacementReportFormPage() {
     setDriveDate(''); setStudentsSelected(''); setRemarks(''); setPriority('');
     setNextFollowUpDate(''); setActionRequired(''); setAssignedTo(''); setFollowUpDone(false);
     setOpportunityType(''); setActivityStatus(''); setActivityPurpose('');
-    setHiringMode(''); setHiringRounds([]); setHiringModeError('');
+    setHiringMode(''); setHiringRounds([]); setDriveYear(''); setHiringModeError('');
     setExtraFields({});
   };
 
@@ -122,6 +123,7 @@ export default function PlacementReportFormPage() {
         activityPurpose,
         hiringMode: hiringMode as PlacementReport['hiringMode'],
         hiringRounds,
+        driveYear,
         extraFields
       };
       await submitPlacementReport(report);
@@ -188,7 +190,10 @@ export default function PlacementReportFormPage() {
             <FormField label="CTC (LPA)" name="ctcLPA" type="number" value={ctcLPA} onChange={setCtcLPA} min={0} step="0.1" />
             <FormField label="Students Selected" name="studentsSelected" type="number" value={studentsSelected} onChange={setStudentsSelected} min={0} />
           </div>
-          <FormField label="Drive Date" name="driveDate" type="date" value={driveDate} onChange={setDriveDate} />
+          <div className="form-grid">
+            <FormField label="Drive Date" name="driveDate" type="date" value={driveDate} onChange={setDriveDate} />
+            <FormSelect label="Drive Year" name="driveYear" value={driveYear} onChange={setDriveYear} options={DRIVE_YEARS} />
+          </div>
 
           <div className="form-section-title">Hiring Process Configuration</div>
           <p className="form-readonly-note">Capture this once the company agrees for hiring.</p>

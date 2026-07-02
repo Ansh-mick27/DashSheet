@@ -6,7 +6,7 @@ import { CheckCircle2, AlertCircle, Send } from 'lucide-react';
 import { useAuth } from '../../contexts/AuthContext';
 import { submitTrainingReport } from '../../services/dataApi';
 import { todayISO, isoToDDMMYYYY } from '../../lib/dateUtils';
-import { COLLEGES_COURSES_SPECIALIZATIONS, DURATIONS, PARTICIPATION_LEVELS, TEACHING_METHODS, SECTIONS } from '../../data/constants';
+import { COLLEGES_COURSES_SPECIALIZATIONS, DURATIONS, PARTICIPATION_LEVELS, TEACHING_METHODS, SECTIONS, ACADEMIC_YEARS, SEMESTERS } from '../../data/constants';
 import { TrainingReport, ExtraFields, BranchStudentCount } from '../../types';
 import { useFormConfig } from '../../lib/useFormConfig';
 import { mergeOptions, mergeCollegeCourseSpecs } from '../../lib/options';
@@ -32,6 +32,8 @@ export default function TrainingReportFormPage({ branchStudentCounts }: Training
   const [course, setCourse] = useState('');
   const [specialization, setSpecialization] = useState('');
   const [section, setSection] = useState('');
+  const [year, setYear] = useState('');
+  const [semester, setSemester] = useState('');
   const [topicCovered, setTopicCovered] = useState('');
   const [learningObjectives, setLearningObjectives] = useState('');
   const [duration, setDuration] = useState('');
@@ -109,6 +111,7 @@ export default function TrainingReportFormPage({ branchStudentCounts }: Training
   const resetForm = () => {
     setDate(todayISO());
     setCollege(''); setCourse(''); setSpecialization(''); setSection('');
+    setYear(''); setSemester('');
     setTopicCovered(''); setLearningObjectives(''); setDuration('');
     setMethods(EMPTY_METHODS);
     setStudentsPresent(''); setTotalEnrolled(''); setParticipationLevel('');
@@ -130,6 +133,8 @@ export default function TrainingReportFormPage({ branchStudentCounts }: Training
         course,
         specialization,
         section,
+        year,
+        semester,
         topicCovered,
         learningObjectives,
         duration,
@@ -179,8 +184,10 @@ export default function TrainingReportFormPage({ branchStudentCounts }: Training
             )}
           </div>
 
-          <div className="form-grid">
+          <div className="form-grid form-grid--3">
             <FormSelect label="Section" name="section" value={section} onChange={setSection} options={SECTIONS} required />
+            <FormSelect label="Year" name="year" value={year} onChange={setYear} options={ACADEMIC_YEARS} required />
+            <FormSelect label="Semester" name="semester" value={semester} onChange={setSemester} options={SEMESTERS} required />
           </div>
 
           <div className="form-grid">

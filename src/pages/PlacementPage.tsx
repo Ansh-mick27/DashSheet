@@ -166,6 +166,8 @@ export default function PlacementPage({ reports }: PlacementPageProps) {
     { key: 'ctcLPA', header: 'CTC (LPA)', width: '90px', sortable: true,
       render: (r: PlacementReport) => r.ctcLPA > 0 ? r.ctcLPA.toFixed(1) : '—' },
     { key: 'driveDate', header: 'Drive Date', width: '90px' },
+    { key: 'driveYear', header: 'Drive Year', width: '90px', sortable: true,
+      render: (r: PlacementReport) => r.driveYear || '—' },
     { key: 'studentsSelected', header: 'Selected', width: '80px', sortable: true },
     {
       key: 'hiringMode', header: 'Hiring Mode', width: '100px',

@@ -155,15 +155,17 @@ function DashboardLayout() {
     <div className="dashboard-layout">
       <Sidebar />
       <main className="dashboard-main">
-        <FilterBar
-          filters={filters}
-          onFilterChange={setFilters}
-          members={members}
-          onRefresh={handleRefresh}
-          notifications={notifications}
-          autoRefreshInterval={autoRefreshMins}
-          onAutoRefreshChange={setAutoRefreshMins}
-        />
+        {(member?.role === 'Admin' || member?.role === 'SuperAdmin') && (
+          <FilterBar
+            filters={filters}
+            onFilterChange={setFilters}
+            members={members}
+            onRefresh={handleRefresh}
+            notifications={notifications}
+            autoRefreshInterval={autoRefreshMins}
+            onAutoRefreshChange={setAutoRefreshMins}
+          />
+        )}
         <div className="dashboard-content">
           <Routes>
             <Route path="/" element={

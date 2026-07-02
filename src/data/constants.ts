@@ -27,6 +27,12 @@ export const COLLEGES_COURSES_SPECIALIZATIONS: { college: string; course: string
 
 export const SECTIONS = ['1', '2', '3', '4', '5', '6', '7', '8', '9', '10'];
 
+export const ACADEMIC_YEARS = ['1', '2', '3', '4', '5', '6', '7', '8', '9', '10'];
+
+export const SEMESTERS = ['1', '2', '3', '4', '5', '6', '7', '8', '9', '10', '11', '12', '13', '14', '15'];
+
+export const DRIVE_YEARS = ['2026', '2027', '2028', '2029', '2030', '2031', '2032'];
+
 export const DURATIONS = ['1 Hour', '2 Hours', '3 Hours', 'Full Day'];
 
 export const PARTICIPATION_LEVELS = ['High', 'Moderate', 'Low'];
@@ -51,7 +57,9 @@ export const TASKS = [
   'Review homework submissions', 'One-on-one mentoring', 'Update course content',
   'Team meeting', 'Practical lab session', 'Create quiz questions',
   'Grade assignments', 'Curriculum planning', 'Industry interaction session',
-  'Documentation update', 'Research new topics', 'Other'
+  'Documentation update', 'Research new topics',
+  'Mock Process', 'Placement Activity', 'FDP', 'Events', 'Invigilation',
+  'Other'
 ];
 
 export const TASK_STATUSES = ['Completed', 'Pending'];

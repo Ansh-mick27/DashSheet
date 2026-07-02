@@ -47,6 +47,8 @@ export interface TrainingReport {
   course: string;
   specialization: string;
   section: string;
+  year: string;
+  semester: string;
   topicCovered: string;
   learningObjectives: string;
   duration: string;
@@ -148,6 +150,7 @@ export interface PlacementReport {
   activityPurpose: string;
   hiringMode: 'Online' | 'Physical' | 'Hybrid' | '';
   hiringRounds: HiringRound[];
+  driveYear: string;
   extraFields?: ExtraFields;
 }
 
