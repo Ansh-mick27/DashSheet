@@ -25,6 +25,8 @@ export const COLLEGES_COURSES_SPECIALIZATIONS: { college: string; course: string
   { college: 'AIMSR', course: 'BCA', specialization: 'Computer Applications' }
 ];
 
+export const SECTIONS = ['1', '2', '3', '4', '5', '6', '7', '8', '9', '10'];
+
 export const DURATIONS = ['1 Hour', '2 Hours', '3 Hours', 'Full Day'];
 
 export const PARTICIPATION_LEVELS = ['High', 'Moderate', 'Low'];

@@ -6,7 +6,7 @@ import { CheckCircle2, AlertCircle, Send } from 'lucide-react';
 import { useAuth } from '../../contexts/AuthContext';
 import { submitTrainingReport } from '../../services/dataApi';
 import { todayISO, isoToDDMMYYYY } from '../../lib/dateUtils';
-import { COLLEGES_COURSES_SPECIALIZATIONS, DURATIONS, PARTICIPATION_LEVELS, TEACHING_METHODS } from '../../data/constants';
+import { COLLEGES_COURSES_SPECIALIZATIONS, DURATIONS, PARTICIPATION_LEVELS, TEACHING_METHODS, SECTIONS } from '../../data/constants';
 import { TrainingReport, ExtraFields, BranchStudentCount } from '../../types';
 import { useFormConfig } from '../../lib/useFormConfig';
 import { mergeOptions, mergeCollegeCourseSpecs } from '../../lib/options';
@@ -180,7 +180,7 @@ export default function TrainingReportFormPage({ branchStudentCounts }: Training
           </div>
 
           <div className="form-grid">
-            <FormField label="Section" name="section" value={section} onChange={setSection} placeholder="e.g. A, B, C" required />
+            <FormSelect label="Section" name="section" value={section} onChange={setSection} options={SECTIONS} required />
           </div>
 
           <div className="form-grid">

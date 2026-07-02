@@ -21,7 +21,7 @@ import {
   mergeOptionsDetailed, mergeCollegeCourseSpecsDetailed, mergeCollegeCourseSpecs, hiddenCategory, nextSortOrder,
   OptionItem, CollegeCourseSpecItem
 } from '../lib/options';
-import { DEPARTMENTS, BATCHES, COLLEGES_COURSES_SPECIALIZATIONS } from '../data/constants';
+import { DEPARTMENTS, BATCHES, COLLEGES_COURSES_SPECIALIZATIONS, SECTIONS } from '../data/constants';
 import FormField from '../components/form/FormField';
 import FormSelect from '../components/form/FormSelect';
 
@@ -886,7 +886,7 @@ function BranchCountsTab({ fieldOptions, counts, onChange }: { fieldOptions: Fie
         )}
       </div>
       <div className="form-grid form-grid--2" style={{ marginBottom: 12 }}>
-        <FormField label="Section" name="bcSection" value={section} onChange={setSection} placeholder="e.g. A, B, C" />
+        <FormSelect label="Section" name="bcSection" value={section} onChange={setSection} options={SECTIONS} />
         <FormField label="Student Count" name="bcCount" type="number" value={studentCount} onChange={setStudentCount} min={0} />
       </div>
 
