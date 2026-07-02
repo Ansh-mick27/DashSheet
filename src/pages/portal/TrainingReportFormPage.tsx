@@ -31,6 +31,7 @@ export default function TrainingReportFormPage({ branchStudentCounts }: Training
   const [college, setCollege] = useState('');
   const [course, setCourse] = useState('');
   const [specialization, setSpecialization] = useState('');
+  const [section, setSection] = useState('');
   const [topicCovered, setTopicCovered] = useState('');
   const [learningObjectives, setLearningObjectives] = useState('');
   const [duration, setDuration] = useState('');
@@ -74,9 +75,9 @@ export default function TrainingReportFormPage({ branchStudentCounts }: Training
 
   const matchedBranchCount = useMemo(
     () => branchStudentCounts.find(b =>
-      b.college === college && b.course === course && b.specialization === specialization
+      b.college === college && b.course === course && b.specialization === specialization && b.section === section
     ),
-    [branchStudentCounts, college, course, specialization]
+    [branchStudentCounts, college, course, specialization, section]
   );
 
   useEffect(() => {
@@ -91,16 +92,23 @@ export default function TrainingReportFormPage({ branchStudentCounts }: Training
     setCollege(value);
     setCourse('');
     setSpecialization('');
+    setSection('');
   };
 
   const handleCourseChange = (value: string) => {
     setCourse(value);
     setSpecialization('');
+    setSection('');
+  };
+
+  const handleSpecializationChange = (value: string) => {
+    setSpecialization(value);
+    setSection('');
   };
 
   const resetForm = () => {
     setDate(todayISO());
-    setCollege(''); setCourse(''); setSpecialization('');
+    setCollege(''); setCourse(''); setSpecialization(''); setSection('');
     setTopicCovered(''); setLearningObjectives(''); setDuration('');
     setMethods(EMPTY_METHODS);
     setStudentsPresent(''); setTotalEnrolled(''); setParticipationLevel('');
@@ -121,6 +129,7 @@ export default function TrainingReportFormPage({ branchStudentCounts }: Training
         college,
         course,
         specialization,
+        section,
         topicCovered,
         learningObjectives,
         duration,
@@ -166,8 +175,12 @@ export default function TrainingReportFormPage({ branchStudentCounts }: Training
             <FormSelect label="College" name="college" value={college} onChange={handleCollegeChange} options={colleges} required />
             <FormSelect label="Course" name="course" value={course} onChange={handleCourseChange} options={courses} required />
             {specializations.length > 0 && (
-              <FormSelect label="Specialization" name="specialization" value={specialization} onChange={setSpecialization} options={specializations} required />
+              <FormSelect label="Specialization" name="specialization" value={specialization} onChange={handleSpecializationChange} options={specializations} required />
             )}
+          </div>
+
+          <div className="form-grid">
+            <FormField label="Section" name="section" value={section} onChange={setSection} placeholder="e.g. A, B, C" required />
           </div>
 
           <div className="form-grid">
@@ -186,7 +199,7 @@ export default function TrainingReportFormPage({ branchStudentCounts }: Training
                 value={totalEnrolled} onChange={setTotalEnrolled} required min={0}
                 readOnly={!!matchedBranchCount}
               />
-              {matchedBranchCount && <p className="form-readonly-note">Auto-filled from branch settings</p>}
+              {matchedBranchCount && <p className="form-readonly-note">Auto-filled from section settings</p>}
             </div>
             <FormField label="Students Present" name="studentsPresent" type="number" value={studentsPresent} onChange={setStudentsPresent} required min={0} />
             <FormSelect label="Participation Level" name="participationLevel" value={participationLevel} onChange={setParticipationLevel} options={participationLevels} required />

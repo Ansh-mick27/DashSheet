@@ -154,6 +154,7 @@ export function generateTrainingReports(): TrainingReport[] {
         college: ccs.college,
         course: ccs.course,
         specialization: ccs.specialization,
+        section: '',
         topicCovered: randomItem(TOPICS),
         duration: randomItem(DURATIONS),
         learningObjectives: `Understand ${randomItem(TOPICS).toLowerCase()} concepts and apply them practically`,

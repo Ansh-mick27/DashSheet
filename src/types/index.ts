@@ -46,6 +46,7 @@ export interface TrainingReport {
   college: string;
   course: string;
   specialization: string;
+  section: string;
   topicCovered: string;
   learningObjectives: string;
   duration: string;
@@ -112,6 +113,7 @@ export interface BranchStudentCount {
   college: string;
   course: string;
   specialization: string;
+  section: string;
   studentCount: number;
 }
 
@@ -141,7 +143,7 @@ export interface PlacementReport {
   actionRequired: string;
   assignedTo: 'Placement Officer' | 'HOD / Coordinator' | 'Campus Relations Manager' | 'Business Development Associate' | 'Other' | '';
   followUpDone: boolean;
-  opportunityType: 'Internship' | 'Job' | '';
+  opportunityType: 'Internship' | 'Job' | 'Internship Cum Placement Drive' | 'Apprentice' | '';
   activityStatus: 'Open' | 'Closed' | 'On Hold' | 'Other' | '';
   activityPurpose: string;
   hiringMode: 'Online' | 'Physical' | 'Hybrid' | '';

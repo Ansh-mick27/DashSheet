@@ -93,7 +93,7 @@ export const ASSIGNED_TO_OPTIONS = [
   'Business Development Associate', 'Other'
 ];
 
-export const OPPORTUNITY_TYPES = ['Internship', 'Job'];
+export const OPPORTUNITY_TYPES = ['Internship', 'Job', 'Internship Cum Placement Drive', 'Apprentice'];
 
 export const ACTIVITY_STATUSES = ['Open', 'Closed', 'On Hold', 'Other'];
 

@@ -91,6 +91,7 @@ export default function TrainingReportsPage({ reports }: TrainingReportsPageProp
     { key: 'college', header: 'College', sortable: true },
     { key: 'course', header: 'Course', sortable: true, width: '110px' },
     { key: 'specialization', header: 'Specialization', sortable: true, width: '120px' },
+    { key: 'section', header: 'Section', sortable: true, width: '80px' },
     { key: 'topicCovered', header: 'Topic' },
     {
       key: 'attendance', header: 'Attendance', width: '100px',

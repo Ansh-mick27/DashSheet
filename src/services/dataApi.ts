@@ -44,6 +44,7 @@ function mapTrainingReport(row: any): TrainingReport {
     college: row.college,
     course: row.course,
     specialization: row.specialization,
+    section: row.section ?? '',
     topicCovered: row.topic_covered,
     learningObjectives: row.learning_objectives,
     duration: row.duration,
@@ -137,6 +138,7 @@ function mapBranchStudentCount(row: any): BranchStudentCount {
     college: row.college,
     course: row.course,
     specialization: row.specialization ?? '',
+    section: row.section ?? '',
     studentCount: row.student_count
   };
 }
@@ -336,6 +338,7 @@ export async function submitTrainingReport(report: TrainingReport): Promise<void
     college: report.college,
     course: report.course,
     specialization: report.specialization,
+    section: report.section,
     topic_covered: report.topicCovered,
     learning_objectives: report.learningObjectives,
     duration: report.duration,
@@ -428,9 +431,9 @@ export async function submitPlacementReport(report: PlacementReport): Promise<vo
   refreshData();
 }
 
-export async function addBranchStudentCount(college: string, course: string, specialization: string, studentCount: number): Promise<void> {
+export async function addBranchStudentCount(college: string, course: string, specialization: string, section: string, studentCount: number): Promise<void> {
   const { error } = await supabase.from('branch_student_counts').insert({
-    college, course, specialization, student_count: studentCount
+    college, course, specialization, section, student_count: studentCount
   });
   if (error) throw error;
   refreshData();

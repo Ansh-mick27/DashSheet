@@ -815,6 +815,7 @@ function BranchCountsTab({ fieldOptions, counts, onChange }: { fieldOptions: Fie
   const [college, setCollege] = useState('');
   const [course, setCourse] = useState('');
   const [specialization, setSpecialization] = useState('');
+  const [section, setSection] = useState('');
   const [studentCount, setStudentCount] = useState('');
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState('');
@@ -833,8 +834,8 @@ function BranchCountsTab({ fieldOptions, counts, onChange }: { fieldOptions: Fie
     [collegeCourseSpecs, college, course]
   );
 
-  const handleCollegeChange = (v: string) => { setCollege(v); setCourse(''); setSpecialization(''); };
-  const handleCourseChange = (v: string) => { setCourse(v); setSpecialization(''); };
+  const handleCollegeChange = (v: string) => { setCollege(v); setCourse(''); setSpecialization(''); setSection(''); };
+  const handleCourseChange = (v: string) => { setCourse(v); setSpecialization(''); setSection(''); };
 
   const handleSave = async () => {
     setError('');
@@ -850,14 +851,14 @@ function BranchCountsTab({ fieldOptions, counts, onChange }: { fieldOptions: Fie
     setSaving(true);
     try {
       const existing = counts.find(c =>
-        c.college === college && c.course === course && c.specialization === specialization
+        c.college === college && c.course === course && c.specialization === specialization && c.section === section
       );
       if (existing) {
         await updateBranchStudentCount(existing.id, count);
       } else {
-        await addBranchStudentCount(college, course, specialization, count);
+        await addBranchStudentCount(college, course, specialization, section, count);
       }
-      setCollege(''); setCourse(''); setSpecialization(''); setStudentCount('');
+      setCollege(''); setCourse(''); setSpecialization(''); setSection(''); setStudentCount('');
       onChange();
     } finally {
       setSaving(false);
@@ -884,7 +885,8 @@ function BranchCountsTab({ fieldOptions, counts, onChange }: { fieldOptions: Fie
           <FormSelect label="Specialization" name="bcSpecialization" value={specialization} onChange={setSpecialization} options={specializations} />
         )}
       </div>
-      <div className="form-grid" style={{ marginBottom: 12 }}>
+      <div className="form-grid form-grid--2" style={{ marginBottom: 12 }}>
+        <FormField label="Section" name="bcSection" value={section} onChange={setSection} placeholder="e.g. A, B, C" />
         <FormField label="Student Count" name="bcCount" type="number" value={studentCount} onChange={setStudentCount} min={0} />
       </div>
 
@@ -901,7 +903,7 @@ function BranchCountsTab({ fieldOptions, counts, onChange }: { fieldOptions: Fie
         {counts.map(c => (
           <div className="admin-list__row" key={c.id}>
             <span>
-              {c.college} — {c.course}{c.specialization ? ` (${c.specialization})` : ''}
+              {c.college} — {c.course}{c.specialization ? ` (${c.specialization})` : ''}{c.section ? ` / Section ${c.section}` : ''}
               <span className="admin-list__meta"> — {c.studentCount} students</span>
             </span>
             <div className="admin-list__actions">
