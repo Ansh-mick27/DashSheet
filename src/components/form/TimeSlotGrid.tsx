@@ -30,7 +30,9 @@ export default function TimeSlotGrid({ value, onChange, tasks = TASKS, statuses 
   const handleTaskSelect = (index: number, selected: string) => {
     if (selected === 'Other') {
       setOtherRows(prev => new Set([...prev, index]));
-      updateRow(index, { task: '' }); // clear until user types
+      // Don't call updateRow here — doing so changes `value`, triggers the reset
+      // useEffect, and immediately clears otherRows before the UI can show the input.
+      // The text input's onChange handler will write to the row when the user types.
     } else {
       setOtherRows(prev => { const s = new Set(prev); s.delete(index); return s; });
       updateRow(index, { task: selected });
