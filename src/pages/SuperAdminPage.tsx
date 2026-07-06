@@ -21,7 +21,7 @@ import {
   mergeOptionsDetailed, mergeCollegeCourseSpecsDetailed, mergeCollegeCourseSpecs, hiddenCategory, nextSortOrder,
   OptionItem, CollegeCourseSpecItem
 } from '../lib/options';
-import { DEPARTMENTS, BATCHES, COLLEGES_COURSES_SPECIALIZATIONS, SECTIONS } from '../data/constants';
+import { DEPARTMENTS, BATCHES, COLLEGES_COURSES_SPECIALIZATIONS, SECTIONS, ACADEMIC_YEARS, SEMESTERS } from '../data/constants';
 import FormField from '../components/form/FormField';
 import FormSelect from '../components/form/FormSelect';
 
@@ -816,6 +816,8 @@ function BranchCountsTab({ fieldOptions, counts, onChange }: { fieldOptions: Fie
   const [course, setCourse] = useState('');
   const [specialization, setSpecialization] = useState('');
   const [section, setSection] = useState('');
+  const [year, setYear] = useState('');
+  const [semester, setSemester] = useState('');
   const [studentCount, setStudentCount] = useState('');
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState('');
@@ -834,13 +836,17 @@ function BranchCountsTab({ fieldOptions, counts, onChange }: { fieldOptions: Fie
     [collegeCourseSpecs, college, course]
   );
 
-  const handleCollegeChange = (v: string) => { setCollege(v); setCourse(''); setSpecialization(''); setSection(''); };
-  const handleCourseChange = (v: string) => { setCourse(v); setSpecialization(''); setSection(''); };
+  const handleCollegeChange = (v: string) => { setCollege(v); setCourse(''); setSpecialization(''); setSection(''); setYear(''); setSemester(''); };
+  const handleCourseChange = (v: string) => { setCourse(v); setSpecialization(''); setSection(''); setYear(''); setSemester(''); };
 
   const handleSave = async () => {
     setError('');
     if (!college || !course) {
       setError('Select a College and Course.');
+      return;
+    }
+    if (!year || !semester) {
+      setError('Select a Year and Semester.');
       return;
     }
     const count = Number(studentCount);
@@ -851,14 +857,15 @@ function BranchCountsTab({ fieldOptions, counts, onChange }: { fieldOptions: Fie
     setSaving(true);
     try {
       const existing = counts.find(c =>
-        c.college === college && c.course === course && c.specialization === specialization && c.section === section
+        c.college === college && c.course === course && c.specialization === specialization &&
+        c.section === section && c.year === year && c.semester === semester
       );
       if (existing) {
         await updateBranchStudentCount(existing.id, count);
       } else {
-        await addBranchStudentCount(college, course, specialization, section, count);
+        await addBranchStudentCount(college, course, specialization, section, year, semester, count);
       }
-      setCollege(''); setCourse(''); setSpecialization(''); setSection(''); setStudentCount('');
+      setCollege(''); setCourse(''); setSpecialization(''); setSection(''); setYear(''); setSemester(''); setStudentCount('');
       onChange();
     } finally {
       setSaving(false);
@@ -874,8 +881,8 @@ function BranchCountsTab({ fieldOptions, counts, onChange }: { fieldOptions: Fie
     <div className="settings-card">
       <h3>Branch Student Counts</h3>
       <p className="settings-card__desc">
-        Set the total enrolled students for each College / Course / Specialization. This count auto-fills
-        the "Total Students Enrolled" field on the Session Report form once that exact branch is selected.
+        Set the total enrolled students per College / Course / Specialization / Section / Year / Semester.
+        This count auto-fills "Total Students Enrolled" on the Session Report once the exact combination is selected.
       </p>
 
       <div className="form-grid form-grid--3" style={{ marginTop: 12 }}>
@@ -885,8 +892,12 @@ function BranchCountsTab({ fieldOptions, counts, onChange }: { fieldOptions: Fie
           <FormSelect label="Specialization" name="bcSpecialization" value={specialization} onChange={setSpecialization} options={specializations} />
         )}
       </div>
-      <div className="form-grid form-grid--2" style={{ marginBottom: 12 }}>
+      <div className="form-grid form-grid--3" style={{ marginBottom: 4 }}>
         <FormSelect label="Section" name="bcSection" value={section} onChange={setSection} options={SECTIONS} />
+        <FormSelect label="Year" name="bcYear" value={year} onChange={setYear} options={ACADEMIC_YEARS} required />
+        <FormSelect label="Semester" name="bcSemester" value={semester} onChange={setSemester} options={SEMESTERS} required />
+      </div>
+      <div className="form-grid form-grid--2" style={{ marginBottom: 12 }}>
         <FormField label="Student Count" name="bcCount" type="number" value={studentCount} onChange={setStudentCount} min={0} />
       </div>
 
@@ -903,7 +914,8 @@ function BranchCountsTab({ fieldOptions, counts, onChange }: { fieldOptions: Fie
         {counts.map(c => (
           <div className="admin-list__row" key={c.id}>
             <span>
-              {c.college} — {c.course}{c.specialization ? ` (${c.specialization})` : ''}{c.section ? ` / Section ${c.section}` : ''}
+              {c.college} — {c.course}{c.specialization ? ` (${c.specialization})` : ''}{c.section ? ` / Sec ${c.section}` : ''}
+              {c.year ? ` / Yr ${c.year}` : ''}{c.semester ? ` / Sem ${c.semester}` : ''}
               <span className="admin-list__meta"> — {c.studentCount} students</span>
             </span>
             <div className="admin-list__actions">

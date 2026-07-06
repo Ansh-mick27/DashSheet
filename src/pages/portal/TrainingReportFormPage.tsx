@@ -77,9 +77,10 @@ export default function TrainingReportFormPage({ branchStudentCounts }: Training
 
   const matchedBranchCount = useMemo(
     () => branchStudentCounts.find(b =>
-      b.college === college && b.course === course && b.specialization === specialization && b.section === section
+      b.college === college && b.course === course && b.specialization === specialization &&
+      b.section === section && b.year === year && b.semester === semester
     ),
-    [branchStudentCounts, college, course, specialization, section]
+    [branchStudentCounts, college, course, specialization, section, year, semester]
   );
 
   useEffect(() => {

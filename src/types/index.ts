@@ -116,6 +116,8 @@ export interface BranchStudentCount {
   course: string;
   specialization: string;
   section: string;
+  year: string;
+  semester: string;
   studentCount: number;
 }
 

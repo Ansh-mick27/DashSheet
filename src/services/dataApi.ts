@@ -142,6 +142,8 @@ function mapBranchStudentCount(row: any): BranchStudentCount {
     course: row.course,
     specialization: row.specialization ?? '',
     section: row.section ?? '',
+    year: row.year ?? '',
+    semester: row.semester ?? '',
     studentCount: row.student_count
   };
 }
@@ -267,10 +269,12 @@ export function getCompletionRate(reports: WorkReport[]): number {
 
 export function getAttendanceRate(reports: TrainingReport[]): number {
   if (reports.length === 0) return 0;
-  const totalRate = reports.reduce((acc, r) => {
-    return acc + (r.totalEnrolled > 0 ? (r.studentsPresent / r.totalEnrolled) * 100 : 0);
+  const valid = reports.filter(r => r.totalEnrolled > 0);
+  if (valid.length === 0) return 0;
+  const totalRate = valid.reduce((acc, r) => {
+    return acc + Math.min((r.studentsPresent / r.totalEnrolled) * 100, 100);
   }, 0);
-  return Math.round(totalRate / reports.length);
+  return Math.round(totalRate / valid.length);
 }
 
 export function generateNotifications(
@@ -437,9 +441,9 @@ export async function submitPlacementReport(report: PlacementReport): Promise<vo
   refreshData();
 }
 
-export async function addBranchStudentCount(college: string, course: string, specialization: string, section: string, studentCount: number): Promise<void> {
+export async function addBranchStudentCount(college: string, course: string, specialization: string, section: string, year: string, semester: string, studentCount: number): Promise<void> {
   const { error } = await supabase.from('branch_student_counts').insert({
-    college, course, specialization, section, student_count: studentCount
+    college, course, specialization, section, year, semester, student_count: studentCount
   });
   if (error) throw error;
   refreshData();
