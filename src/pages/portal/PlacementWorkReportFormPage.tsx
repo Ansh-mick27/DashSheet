@@ -212,7 +212,7 @@ export default function PlacementWorkReportFormPage() {
         {/* Section 1: Time-Wise Daily Work Log */}
         <div className="settings-card">
           <div className="form-section-title">1. Time-Wise Daily Work Log</div>
-          <div style={{ overflowX: 'auto' }}>
+          <div className="tbl-scroll">
             <table style={{ borderCollapse: 'collapse', fontSize: 13, minWidth: 780 }}>
               <thead>
                 <tr>
@@ -259,7 +259,7 @@ export default function PlacementWorkReportFormPage() {
         {/* Section 2: Company / Recruiter Engagement */}
         <div className="settings-card">
           <div className="form-section-title">2. Company / Recruiter Engagement</div>
-          <div style={{ overflowX: 'auto' }}>
+          <div className="tbl-scroll">
             <table style={{ borderCollapse: 'collapse', fontSize: 13, minWidth: 900 }}>
               <thead>
                 <tr>
@@ -334,7 +334,7 @@ export default function PlacementWorkReportFormPage() {
         {/* Section 3: Student Engagement / Counselling */}
         <div className="settings-card">
           <div className="form-section-title">3. Student Engagement / Counselling</div>
-          <div style={{ overflowX: 'auto' }}>
+          <div className="tbl-scroll">
             <table style={{ borderCollapse: 'collapse', fontSize: 13, minWidth: 700 }}>
               <thead>
                 <tr>
@@ -401,7 +401,7 @@ export default function PlacementWorkReportFormPage() {
         {/* Section 4: Placement Drive / Hiring Process Update */}
         <div className="settings-card">
           <div className="form-section-title">4. Placement Drive / Hiring Process Update</div>
-          <div style={{ overflowX: 'auto' }}>
+          <div className="tbl-scroll">
             <table style={{ borderCollapse: 'collapse', fontSize: 13, minWidth: 1000 }}>
               <thead>
                 <tr>
@@ -481,7 +481,7 @@ export default function PlacementWorkReportFormPage() {
         {/* Section 5: Internship / Training / Skill Development Coordination */}
         <div className="settings-card">
           <div className="form-section-title">5. Internship / Training / Skill Development Coordination</div>
-          <div style={{ overflowX: 'auto' }}>
+          <div className="tbl-scroll">
             <table style={{ borderCollapse: 'collapse', fontSize: 13, minWidth: 800 }}>
               <thead>
                 <tr>
@@ -528,7 +528,7 @@ export default function PlacementWorkReportFormPage() {
         {/* Section 6: MIS / Documentation Work */}
         <div className="settings-card">
           <div className="form-section-title">6. MIS / Documentation Work</div>
-          <div style={{ overflowX: 'auto' }}>
+          <div className="tbl-scroll">
             <table style={{ borderCollapse: 'collapse', fontSize: 13, minWidth: 560 }}>
               <thead>
                 <tr>
@@ -571,7 +571,7 @@ export default function PlacementWorkReportFormPage() {
         {/* Section 8: Pending Work / Follow-up Required */}
         <div className="settings-card">
           <div className="form-section-title">8. Pending Work / Follow-up Required</div>
-          <div style={{ overflowX: 'auto' }}>
+          <div className="tbl-scroll">
             <table style={{ borderCollapse: 'collapse', fontSize: 13, minWidth: 620 }}>
               <thead>
                 <tr>
@@ -625,7 +625,7 @@ export default function PlacementWorkReportFormPage() {
         {/* Section 9: Issues / Support Required */}
         <div className="settings-card">
           <div className="form-section-title">9. Issues / Support Required</div>
-          <div style={{ overflowX: 'auto' }}>
+          <div className="tbl-scroll">
             <table style={{ borderCollapse: 'collapse', fontSize: 13, minWidth: 580 }}>
               <thead>
                 <tr>

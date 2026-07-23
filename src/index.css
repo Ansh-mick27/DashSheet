@@ -965,6 +965,28 @@ input, select { font: inherit; color: inherit; }
   overflow-x: auto;
 }
 
+/* Scrollable table wrapper with always-visible horizontal scrollbar */
+.tbl-scroll {
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: thin;
+  scrollbar-color: rgba(99,102,241,0.35) transparent;
+  padding-bottom: 4px;
+}
+.tbl-scroll::-webkit-scrollbar {
+  height: 6px;
+}
+.tbl-scroll::-webkit-scrollbar-track {
+  background: transparent;
+}
+.tbl-scroll::-webkit-scrollbar-thumb {
+  background: rgba(99,102,241,0.35);
+  border-radius: 3px;
+}
+.tbl-scroll::-webkit-scrollbar-thumb:hover {
+  background: rgba(99,102,241,0.6);
+}
+
 .data-table {
   width: 100%;
   border-collapse: collapse;
