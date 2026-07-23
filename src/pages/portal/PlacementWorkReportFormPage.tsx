@@ -230,13 +230,13 @@ export default function PlacementWorkReportFormPage() {
                       <td style={{ ...TD, minWidth: 220 }}><span style={{ fontSize: 12 }}>{row.activity}</span></td>
                       <td style={{ ...TD, minWidth: 160 }}>
                         {isLunch ? <span style={{ opacity: 0.4 }}>—</span> : (
-                          <input className="settings-form__input" value={row.involved}
+                          <input className="settings-form__input" style={{ minWidth: 140 }} value={row.involved}
                             onChange={e => updateWorkLog(i, { involved: e.target.value })} placeholder="Enter details" />
                         )}
                       </td>
                       <td style={{ ...TD, minWidth: 120 }}>
                         {isLunch ? <span style={{ opacity: 0.4 }}>—</span> : (
-                          <select className="settings-form__input" value={row.status}
+                          <select className="settings-form__input" style={{ minWidth: 108 }} value={row.status}
                             onChange={e => updateWorkLog(i, { status: e.target.value as PlacementWorkLogEntry['status'] })}>
                             <option value="">Select...</option>
                             <option>Completed</option>
@@ -245,7 +245,7 @@ export default function PlacementWorkReportFormPage() {
                         )}
                       </td>
                       <td style={{ ...TD, minWidth: 160 }}>
-                        <input className="settings-form__input" value={row.remarks}
+                        <input className="settings-form__input" style={{ minWidth: 140 }} value={row.remarks}
                           onChange={e => updateWorkLog(i, { remarks: e.target.value })} placeholder="Remarks" />
                       </td>
                     </tr>
@@ -273,37 +273,37 @@ export default function PlacementWorkReportFormPage() {
                   <tr key={i}>
                     <td style={{ ...TD, width: 36, textAlign: 'center' }}><span style={STATIC_CELL}>{i + 1}</span></td>
                     <td style={{ ...TD, minWidth: 130 }}>
-                      <input className="settings-form__input" value={row.companyName}
+                      <input className="settings-form__input" style={{ minWidth: 118 }} value={row.companyName}
                         onChange={e => updateCompany(i, { companyName: e.target.value })} placeholder="Company" />
                     </td>
                     <td style={{ ...TD, minWidth: 120 }}>
-                      <input className="settings-form__input" value={row.hrContact}
+                      <input className="settings-form__input" style={{ minWidth: 108 }} value={row.hrContact}
                         onChange={e => updateCompany(i, { hrContact: e.target.value })} placeholder="HR Name" />
                     </td>
                     <td style={{ ...TD, minWidth: 100 }}>
-                      <input className="settings-form__input" value={row.location}
+                      <input className="settings-form__input" style={{ minWidth: 88 }} value={row.location}
                         onChange={e => updateCompany(i, { location: e.target.value })} placeholder="City" />
                     </td>
                     <td style={{ ...TD, minWidth: 110 }}>
-                      <select className="settings-form__input" value={row.purpose}
+                      <select className="settings-form__input" style={{ minWidth: 98 }} value={row.purpose}
                         onChange={e => updateCompany(i, { purpose: e.target.value })}>
                         <option value="">Select...</option>
                         {PLACEMENT_ENGAGEMENT_PURPOSES.map(o => <option key={o}>{o}</option>)}
                       </select>
                     </td>
                     <td style={{ ...TD, minWidth: 100 }}>
-                      <select className="settings-form__input" value={row.mode}
+                      <select className="settings-form__input" style={{ minWidth: 88 }} value={row.mode}
                         onChange={e => updateCompany(i, { mode: e.target.value })}>
                         <option value="">Select...</option>
                         {PLACEMENT_ENGAGEMENT_MODES.map(o => <option key={o}>{o}</option>)}
                       </select>
                     </td>
                     <td style={{ ...TD, minWidth: 150 }}>
-                      <input className="settings-form__input" value={row.outcome}
+                      <input className="settings-form__input" style={{ minWidth: 138 }} value={row.outcome}
                         onChange={e => updateCompany(i, { outcome: e.target.value })} placeholder="Outcome / next step" />
                     </td>
                     <td style={{ ...TD, minWidth: 120 }}>
-                      <input className="settings-form__input" value={row.remark}
+                      <input className="settings-form__input" style={{ minWidth: 108 }} value={row.remark}
                         onChange={e => updateCompany(i, { remark: e.target.value })} placeholder="Remark" />
                     </td>
                     <td style={{ ...TD, width: 36 }}>
@@ -348,26 +348,26 @@ export default function PlacementWorkReportFormPage() {
                   <tr key={i}>
                     <td style={{ ...TD, width: 36, textAlign: 'center' }}><span style={STATIC_CELL}>{i + 1}</span></td>
                     <td style={{ ...TD, minWidth: 140 }}>
-                      <input className="settings-form__input" value={row.studentName}
+                      <input className="settings-form__input" style={{ minWidth: 128 }} value={row.studentName}
                         onChange={e => updateStudent(i, { studentName: e.target.value })} placeholder="Name / Batch" />
                     </td>
                     <td style={{ ...TD, minWidth: 110 }}>
-                      <select className="settings-form__input" value={row.purpose}
+                      <select className="settings-form__input" style={{ minWidth: 98 }} value={row.purpose}
                         onChange={e => updateStudent(i, { purpose: e.target.value })}>
                         <option value="">Select...</option>
                         {STUDENT_ENGAGEMENT_PURPOSES.map(o => <option key={o}>{o}</option>)}
                       </select>
                     </td>
                     <td style={{ ...TD, minWidth: 140 }}>
-                      <input className="settings-form__input" value={row.issueIdentified}
+                      <input className="settings-form__input" style={{ minWidth: 128 }} value={row.issueIdentified}
                         onChange={e => updateStudent(i, { issueIdentified: e.target.value })} placeholder="Issue" />
                     </td>
                     <td style={{ ...TD, minWidth: 140 }}>
-                      <input className="settings-form__input" value={row.actionTaken}
+                      <input className="settings-form__input" style={{ minWidth: 128 }} value={row.actionTaken}
                         onChange={e => updateStudent(i, { actionTaken: e.target.value })} placeholder="Action" />
                     </td>
                     <td style={{ ...TD, minWidth: 100 }}>
-                      <select className="settings-form__input" value={row.status}
+                      <select className="settings-form__input" style={{ minWidth: 88 }} value={row.status}
                         onChange={e => updateStudent(i, { status: e.target.value as PlacementStudentEngagementEntry['status'] })}>
                         <option value="">Select...</option>
                         {STUDENT_ENGAGEMENT_STATUSES.map(o => <option key={o}>{o}</option>)}
@@ -414,49 +414,49 @@ export default function PlacementWorkReportFormPage() {
                 {placementDriveUpdate.map((row, i) => (
                   <tr key={i}>
                     <td style={{ ...TD, minWidth: 120 }}>
-                      <input className="settings-form__input" value={row.companyName}
+                      <input className="settings-form__input" style={{ minWidth: 108 }} value={row.companyName}
                         onChange={e => updateDrive(i, { companyName: e.target.value })} placeholder="Company" />
                     </td>
                     <td style={{ ...TD, minWidth: 100 }}>
-                      <input className="settings-form__input" value={row.profile}
+                      <input className="settings-form__input" style={{ minWidth: 88 }} value={row.profile}
                         onChange={e => updateDrive(i, { profile: e.target.value })} placeholder="Role" />
                     </td>
                     <td style={{ ...TD, minWidth: 80 }}>
-                      <input className="settings-form__input" value={row.ctc}
+                      <input className="settings-form__input" style={{ minWidth: 68 }} value={row.ctc}
                         onChange={e => updateDrive(i, { ctc: e.target.value })} placeholder="LPA" />
                     </td>
                     <td style={{ ...TD, minWidth: 90 }}>
-                      <input className="settings-form__input" value={row.location}
+                      <input className="settings-form__input" style={{ minWidth: 78 }} value={row.location}
                         onChange={e => updateDrive(i, { location: e.target.value })} placeholder="City" />
                     </td>
                     <td style={{ ...TD, minWidth: 80 }}>
-                      <input className="settings-form__input" type="number" value={row.eligibleStudents}
+                      <input className="settings-form__input" style={{ minWidth: 68 }} type="number" value={row.eligibleStudents}
                         onChange={e => updateDrive(i, { eligibleStudents: e.target.value })} placeholder="0" min={0} />
                     </td>
                     <td style={{ ...TD, minWidth: 80 }}>
-                      <input className="settings-form__input" type="number" value={row.applied}
+                      <input className="settings-form__input" style={{ minWidth: 68 }} type="number" value={row.applied}
                         onChange={e => updateDrive(i, { applied: e.target.value })} placeholder="0" min={0} />
                     </td>
                     <td style={{ ...TD, minWidth: 80 }}>
-                      <input className="settings-form__input" type="number" value={row.appear}
+                      <input className="settings-form__input" style={{ minWidth: 68 }} type="number" value={row.appear}
                         onChange={e => updateDrive(i, { appear: e.target.value })} placeholder="0" min={0} />
                     </td>
                     <td style={{ ...TD, minWidth: 110 }}>
-                      <select className="settings-form__input" value={row.testStatus}
+                      <select className="settings-form__input" style={{ minWidth: 98 }} value={row.testStatus}
                         onChange={e => updateDrive(i, { testStatus: e.target.value })}>
                         <option value="">Select...</option>
                         {DRIVE_TEST_STATUSES.map(o => <option key={o}>{o}</option>)}
                       </select>
                     </td>
                     <td style={{ ...TD, minWidth: 110 }}>
-                      <select className="settings-form__input" value={row.interviewStatus}
+                      <select className="settings-form__input" style={{ minWidth: 98 }} value={row.interviewStatus}
                         onChange={e => updateDrive(i, { interviewStatus: e.target.value })}>
                         <option value="">Select...</option>
                         {DRIVE_TEST_STATUSES.map(o => <option key={o}>{o}</option>)}
                       </select>
                     </td>
                     <td style={{ ...TD, minWidth: 110 }}>
-                      <input className="settings-form__input" value={row.remark}
+                      <input className="settings-form__input" style={{ minWidth: 98 }} value={row.remark}
                         onChange={e => updateDrive(i, { remark: e.target.value })} placeholder="Remark" />
                     </td>
                     <td style={{ ...TD, width: 36 }}>
@@ -495,19 +495,19 @@ export default function PlacementWorkReportFormPage() {
                   <tr key={i}>
                     <td style={{ ...TD, minWidth: 200 }}><span style={{ fontSize: 12 }}>{row.activity}</span></td>
                     <td style={{ ...TD, minWidth: 130 }}>
-                      <input className="settings-form__input" value={row.batchDept}
+                      <input className="settings-form__input" style={{ minWidth: 118 }} value={row.batchDept}
                         onChange={e => updateInternship(i, { batchDept: e.target.value })} placeholder="Batch / Dept." />
                     </td>
                     <td style={{ ...TD, minWidth: 90 }}>
-                      <input className="settings-form__input" type="number" value={row.noStudents}
+                      <input className="settings-form__input" style={{ minWidth: 78 }} type="number" value={row.noStudents}
                         onChange={e => updateInternship(i, { noStudents: e.target.value })} placeholder="0" min={0} />
                     </td>
                     <td style={{ ...TD, minWidth: 130 }}>
-                      <input className="settings-form__input" value={row.trainerCompany}
+                      <input className="settings-form__input" style={{ minWidth: 118 }} value={row.trainerCompany}
                         onChange={e => updateInternship(i, { trainerCompany: e.target.value })} placeholder="Trainer / Company" />
                     </td>
                     <td style={{ ...TD, minWidth: 110 }}>
-                      <select className="settings-form__input" value={row.status}
+                      <select className="settings-form__input" style={{ minWidth: 98 }} value={row.status}
                         onChange={e => updateInternship(i, { status: e.target.value as PlacementInternshipEntry['status'] })}>
                         <option value="">Select...</option>
                         <option>Completed</option>
@@ -515,7 +515,7 @@ export default function PlacementWorkReportFormPage() {
                       </select>
                     </td>
                     <td style={{ ...TD, minWidth: 140 }}>
-                      <input className="settings-form__input" value={row.remarks}
+                      <input className="settings-form__input" style={{ minWidth: 128 }} value={row.remarks}
                         onChange={e => updateInternship(i, { remarks: e.target.value })} placeholder="Remarks" />
                     </td>
                   </tr>
@@ -542,7 +542,7 @@ export default function PlacementWorkReportFormPage() {
                   <tr key={i}>
                     <td style={{ ...TD, minWidth: 220 }}><span style={{ fontSize: 12 }}>{row.task}</span></td>
                     <td style={{ ...TD, minWidth: 120 }}>
-                      <select className="settings-form__input" value={row.status}
+                      <select className="settings-form__input" style={{ minWidth: 108 }} value={row.status}
                         onChange={e => updateMIS(i, { status: e.target.value as PlacementMISEntry['status'] })}>
                         <option value="">Select...</option>
                         <option>Completed</option>
@@ -550,7 +550,7 @@ export default function PlacementWorkReportFormPage() {
                       </select>
                     </td>
                     <td style={{ ...TD, minWidth: 200 }}>
-                      <input className="settings-form__input" value={row.remarks}
+                      <input className="settings-form__input" style={{ minWidth: 188 }} value={row.remarks}
                         onChange={e => updateMIS(i, { remarks: e.target.value })} placeholder="Remarks" />
                     </td>
                   </tr>
@@ -585,19 +585,19 @@ export default function PlacementWorkReportFormPage() {
                   <tr key={i}>
                     <td style={{ ...TD, width: 36, textAlign: 'center' }}><span style={STATIC_CELL}>{i + 1}</span></td>
                     <td style={{ ...TD, minWidth: 160 }}>
-                      <input className="settings-form__input" value={row.pendingTask}
+                      <input className="settings-form__input" style={{ minWidth: 148 }} value={row.pendingTask}
                         onChange={e => updatePending(i, { pendingTask: e.target.value })} placeholder="Task description" />
                     </td>
                     <td style={{ ...TD, minWidth: 160 }}>
-                      <input className="settings-form__input" value={row.personConcerned}
+                      <input className="settings-form__input" style={{ minWidth: 148 }} value={row.personConcerned}
                         onChange={e => updatePending(i, { personConcerned: e.target.value })} placeholder="Person / Company" />
                     </td>
                     <td style={{ ...TD, minWidth: 130 }}>
-                      <input className="settings-form__input" type="date" value={row.targetDate}
+                      <input className="settings-form__input" style={{ minWidth: 118 }} type="date" value={row.targetDate}
                         onChange={e => updatePending(i, { targetDate: e.target.value })} />
                     </td>
                     <td style={{ ...TD, minWidth: 100 }}>
-                      <select className="settings-form__input" value={row.priority}
+                      <select className="settings-form__input" style={{ minWidth: 88 }} value={row.priority}
                         onChange={e => updatePending(i, { priority: e.target.value as PlacementPendingWorkEntry['priority'] })}>
                         <option value="">Select...</option>
                         {PRIORITIES.map(o => <option key={o}>{o}</option>)}
@@ -638,22 +638,22 @@ export default function PlacementWorkReportFormPage() {
                 {issuesSupport.map((row, i) => (
                   <tr key={i}>
                     <td style={{ ...TD, minWidth: 160 }}>
-                      <input className="settings-form__input" value={row.issue}
+                      <input className="settings-form__input" style={{ minWidth: 148 }} value={row.issue}
                         onChange={e => updateIssue(i, { issue: e.target.value })} placeholder="Describe issue" />
                     </td>
                     <td style={{ ...TD, minWidth: 120 }}>
-                      <select className="settings-form__input" value={row.relatedTo}
+                      <select className="settings-form__input" style={{ minWidth: 108 }} value={row.relatedTo}
                         onChange={e => updateIssue(i, { relatedTo: e.target.value })}>
                         <option value="">Select...</option>
                         {RELATED_TO_OPTIONS.map(o => <option key={o}>{o}</option>)}
                       </select>
                     </td>
                     <td style={{ ...TD, minWidth: 160 }}>
-                      <input className="settings-form__input" value={row.supportRequired}
+                      <input className="settings-form__input" style={{ minWidth: 148 }} value={row.supportRequired}
                         onChange={e => updateIssue(i, { supportRequired: e.target.value })} placeholder="Support needed from" />
                     </td>
                     <td style={{ ...TD, minWidth: 100 }}>
-                      <select className="settings-form__input" value={row.urgency}
+                      <select className="settings-form__input" style={{ minWidth: 88 }} value={row.urgency}
                         onChange={e => updateIssue(i, { urgency: e.target.value as PlacementIssueSupportEntry['urgency'] })}>
                         <option value="">Select...</option>
                         {PRIORITIES.map(o => <option key={o}>{o}</option>)}
