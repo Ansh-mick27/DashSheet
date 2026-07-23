@@ -213,7 +213,7 @@ export default function PlacementWorkReportFormPage() {
         <div className="settings-card">
           <div className="form-section-title">1. Time-Wise Daily Work Log</div>
           <div className="tbl-scroll">
-            <table style={{ borderCollapse: 'collapse', fontSize: 13, minWidth: 780 }}>
+            <table style={{ borderCollapse: 'collapse', fontSize: 13, minWidth: 660 }}>
               <thead>
                 <tr>
                   {['Time Slot', 'Activity / Task Performed', 'Company / Student / Dept. Involved', 'Status', 'Remarks'].map(h => (
@@ -260,7 +260,7 @@ export default function PlacementWorkReportFormPage() {
         <div className="settings-card">
           <div className="form-section-title">2. Company / Recruiter Engagement</div>
           <div className="tbl-scroll">
-            <table style={{ borderCollapse: 'collapse', fontSize: 13, minWidth: 900 }}>
+            <table style={{ borderCollapse: 'collapse', fontSize: 13, minWidth: 720 }}>
               <thead>
                 <tr>
                   {['Sr.', 'Company Name', 'HR Contact Person', 'Location', 'Purpose', 'Mode', 'Outcome / Next Follow-up', 'Remark', ''].map(h => (
@@ -335,7 +335,7 @@ export default function PlacementWorkReportFormPage() {
         <div className="settings-card">
           <div className="form-section-title">3. Student Engagement / Counselling</div>
           <div className="tbl-scroll">
-            <table style={{ borderCollapse: 'collapse', fontSize: 13, minWidth: 700 }}>
+            <table style={{ borderCollapse: 'collapse', fontSize: 13, minWidth: 600 }}>
               <thead>
                 <tr>
                   {['Sr.', 'Student Name / Batch', 'Purpose', 'Issue Identified', 'Action Taken', 'Status', ''].map(h => (
@@ -402,7 +402,7 @@ export default function PlacementWorkReportFormPage() {
         <div className="settings-card">
           <div className="form-section-title">4. Placement Drive / Hiring Process Update</div>
           <div className="tbl-scroll">
-            <table style={{ borderCollapse: 'collapse', fontSize: 13, minWidth: 1000 }}>
+            <table style={{ borderCollapse: 'collapse', fontSize: 13, minWidth: 820 }}>
               <thead>
                 <tr>
                   {['Company Name', 'Profile', 'CTC', 'Location', 'No. Eligible', 'No. Applied', 'Appear', 'Test Status', 'Interview Status', 'Remark', ''].map(h => (
@@ -413,50 +413,50 @@ export default function PlacementWorkReportFormPage() {
               <tbody>
                 {placementDriveUpdate.map((row, i) => (
                   <tr key={i}>
-                    <td style={{ ...TD, minWidth: 120 }}>
-                      <input className="settings-form__input" style={{ minWidth: 108 }} value={row.companyName}
+                    <td style={{ ...TD, minWidth: 90 }}>
+                      <input className="settings-form__input" style={{ minWidth: 78 }} value={row.companyName}
                         onChange={e => updateDrive(i, { companyName: e.target.value })} placeholder="Company" />
                     </td>
-                    <td style={{ ...TD, minWidth: 100 }}>
-                      <input className="settings-form__input" style={{ minWidth: 88 }} value={row.profile}
+                    <td style={{ ...TD, minWidth: 75 }}>
+                      <input className="settings-form__input" style={{ minWidth: 63 }} value={row.profile}
                         onChange={e => updateDrive(i, { profile: e.target.value })} placeholder="Role" />
                     </td>
-                    <td style={{ ...TD, minWidth: 80 }}>
-                      <input className="settings-form__input" style={{ minWidth: 68 }} value={row.ctc}
+                    <td style={{ ...TD, minWidth: 60 }}>
+                      <input className="settings-form__input" style={{ minWidth: 48 }} value={row.ctc}
                         onChange={e => updateDrive(i, { ctc: e.target.value })} placeholder="LPA" />
                     </td>
-                    <td style={{ ...TD, minWidth: 90 }}>
-                      <input className="settings-form__input" style={{ minWidth: 78 }} value={row.location}
+                    <td style={{ ...TD, minWidth: 70 }}>
+                      <input className="settings-form__input" style={{ minWidth: 58 }} value={row.location}
                         onChange={e => updateDrive(i, { location: e.target.value })} placeholder="City" />
                     </td>
-                    <td style={{ ...TD, minWidth: 80 }}>
-                      <input className="settings-form__input" style={{ minWidth: 68 }} type="number" value={row.eligibleStudents}
+                    <td style={{ ...TD, minWidth: 60 }}>
+                      <input className="settings-form__input" style={{ minWidth: 48 }} type="number" value={row.eligibleStudents}
                         onChange={e => updateDrive(i, { eligibleStudents: e.target.value })} placeholder="0" min={0} />
                     </td>
-                    <td style={{ ...TD, minWidth: 80 }}>
-                      <input className="settings-form__input" style={{ minWidth: 68 }} type="number" value={row.applied}
+                    <td style={{ ...TD, minWidth: 60 }}>
+                      <input className="settings-form__input" style={{ minWidth: 48 }} type="number" value={row.applied}
                         onChange={e => updateDrive(i, { applied: e.target.value })} placeholder="0" min={0} />
                     </td>
-                    <td style={{ ...TD, minWidth: 80 }}>
-                      <input className="settings-form__input" style={{ minWidth: 68 }} type="number" value={row.appear}
+                    <td style={{ ...TD, minWidth: 60 }}>
+                      <input className="settings-form__input" style={{ minWidth: 48 }} type="number" value={row.appear}
                         onChange={e => updateDrive(i, { appear: e.target.value })} placeholder="0" min={0} />
                     </td>
-                    <td style={{ ...TD, minWidth: 110 }}>
-                      <select className="settings-form__input" style={{ minWidth: 98 }} value={row.testStatus}
+                    <td style={{ ...TD, minWidth: 85 }}>
+                      <select className="settings-form__input" style={{ minWidth: 73 }} value={row.testStatus}
                         onChange={e => updateDrive(i, { testStatus: e.target.value })}>
                         <option value="">Select...</option>
                         {DRIVE_TEST_STATUSES.map(o => <option key={o}>{o}</option>)}
                       </select>
                     </td>
-                    <td style={{ ...TD, minWidth: 110 }}>
-                      <select className="settings-form__input" style={{ minWidth: 98 }} value={row.interviewStatus}
+                    <td style={{ ...TD, minWidth: 85 }}>
+                      <select className="settings-form__input" style={{ minWidth: 73 }} value={row.interviewStatus}
                         onChange={e => updateDrive(i, { interviewStatus: e.target.value })}>
                         <option value="">Select...</option>
                         {DRIVE_TEST_STATUSES.map(o => <option key={o}>{o}</option>)}
                       </select>
                     </td>
-                    <td style={{ ...TD, minWidth: 110 }}>
-                      <input className="settings-form__input" style={{ minWidth: 98 }} value={row.remark}
+                    <td style={{ ...TD, minWidth: 85 }}>
+                      <input className="settings-form__input" style={{ minWidth: 73 }} value={row.remark}
                         onChange={e => updateDrive(i, { remark: e.target.value })} placeholder="Remark" />
                     </td>
                     <td style={{ ...TD, width: 36 }}>
@@ -482,7 +482,7 @@ export default function PlacementWorkReportFormPage() {
         <div className="settings-card">
           <div className="form-section-title">5. Internship / Training / Skill Development Coordination</div>
           <div className="tbl-scroll">
-            <table style={{ borderCollapse: 'collapse', fontSize: 13, minWidth: 800 }}>
+            <table style={{ borderCollapse: 'collapse', fontSize: 13, minWidth: 660 }}>
               <thead>
                 <tr>
                   {['Activity', 'Batch / Department', 'No. of Students', 'Trainer / Company', 'Status', 'Remarks'].map(h => (
@@ -529,7 +529,7 @@ export default function PlacementWorkReportFormPage() {
         <div className="settings-card">
           <div className="form-section-title">6. MIS / Documentation Work</div>
           <div className="tbl-scroll">
-            <table style={{ borderCollapse: 'collapse', fontSize: 13, minWidth: 560 }}>
+            <table style={{ borderCollapse: 'collapse', fontSize: 13, minWidth: 480 }}>
               <thead>
                 <tr>
                   {['Task', 'Status', 'Remarks'].map(h => (
@@ -572,7 +572,7 @@ export default function PlacementWorkReportFormPage() {
         <div className="settings-card">
           <div className="form-section-title">8. Pending Work / Follow-up Required</div>
           <div className="tbl-scroll">
-            <table style={{ borderCollapse: 'collapse', fontSize: 13, minWidth: 620 }}>
+            <table style={{ borderCollapse: 'collapse', fontSize: 13, minWidth: 540 }}>
               <thead>
                 <tr>
                   {['Sr.', 'Pending Task', 'Person / Company Concerned', 'Target Date', 'Priority', ''].map(h => (
@@ -626,7 +626,7 @@ export default function PlacementWorkReportFormPage() {
         <div className="settings-card">
           <div className="form-section-title">9. Issues / Support Required</div>
           <div className="tbl-scroll">
-            <table style={{ borderCollapse: 'collapse', fontSize: 13, minWidth: 580 }}>
+            <table style={{ borderCollapse: 'collapse', fontSize: 13, minWidth: 490 }}>
               <thead>
                 <tr>
                   {['Issue', 'Related To', 'Support Required From', 'Urgency', ''].map(h => (
