@@ -413,6 +413,7 @@ input, select { font: inherit; color: inherit; }
 
 .dashboard-main {
   flex: 1;
+  min-width: 0;
   margin-left: var(--sidebar-width);
   display: flex;
   flex-direction: column;
@@ -426,6 +427,7 @@ input, select { font: inherit; color: inherit; }
 
 .dashboard-content {
   flex: 1;
+  min-width: 0;
   padding: 24px;
   overflow-y: auto;
 }
