@@ -967,7 +967,8 @@ input, select { font: inherit; color: inherit; }
 
 /* Scrollable table wrapper with always-visible horizontal scrollbar */
 .tbl-scroll {
-  overflow-x: auto;
+  width: 100%;
+  overflow-x: scroll;
   -webkit-overflow-scrolling: touch;
   scrollbar-width: thin;
   scrollbar-color: rgba(99,102,241,0.35) transparent;

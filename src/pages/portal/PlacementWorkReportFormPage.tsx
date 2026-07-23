@@ -188,7 +188,7 @@ export default function PlacementWorkReportFormPage() {
     setIssuesSupport(prev => prev.map((r, idx) => idx === i ? { ...r, ...patch } : r));
 
   return (
-    <div className="settings-page">
+    <div style={{ maxWidth: 1200, margin: '0 auto' }}>
       <div className="page-header">
         <div>
           <h2 className="page-title">Placement Officer – Daily Task Report</h2>
