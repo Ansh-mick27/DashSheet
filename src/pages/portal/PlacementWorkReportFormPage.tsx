@@ -213,7 +213,7 @@ export default function PlacementWorkReportFormPage() {
         <div className="settings-card">
           <div className="form-section-title">1. Time-Wise Daily Work Log</div>
           <div style={{ overflowX: 'auto' }}>
-            <table style={{ borderCollapse: 'collapse', fontSize: 13 }}>
+            <table style={{ borderCollapse: 'collapse', fontSize: 13, minWidth: 780 }}>
               <thead>
                 <tr>
                   {['Time Slot', 'Activity / Task Performed', 'Company / Student / Dept. Involved', 'Status', 'Remarks'].map(h => (
@@ -260,7 +260,7 @@ export default function PlacementWorkReportFormPage() {
         <div className="settings-card">
           <div className="form-section-title">2. Company / Recruiter Engagement</div>
           <div style={{ overflowX: 'auto' }}>
-            <table style={{ borderCollapse: 'collapse', fontSize: 13 }}>
+            <table style={{ borderCollapse: 'collapse', fontSize: 13, minWidth: 900 }}>
               <thead>
                 <tr>
                   {['Sr.', 'Company Name', 'HR Contact Person', 'Location', 'Purpose', 'Mode', 'Outcome / Next Follow-up', 'Remark', ''].map(h => (
@@ -335,7 +335,7 @@ export default function PlacementWorkReportFormPage() {
         <div className="settings-card">
           <div className="form-section-title">3. Student Engagement / Counselling</div>
           <div style={{ overflowX: 'auto' }}>
-            <table style={{ borderCollapse: 'collapse', fontSize: 13 }}>
+            <table style={{ borderCollapse: 'collapse', fontSize: 13, minWidth: 700 }}>
               <thead>
                 <tr>
                   {['Sr.', 'Student Name / Batch', 'Purpose', 'Issue Identified', 'Action Taken', 'Status', ''].map(h => (
@@ -402,7 +402,7 @@ export default function PlacementWorkReportFormPage() {
         <div className="settings-card">
           <div className="form-section-title">4. Placement Drive / Hiring Process Update</div>
           <div style={{ overflowX: 'auto' }}>
-            <table style={{ borderCollapse: 'collapse', fontSize: 13 }}>
+            <table style={{ borderCollapse: 'collapse', fontSize: 13, minWidth: 1000 }}>
               <thead>
                 <tr>
                   {['Company Name', 'Profile', 'CTC', 'Location', 'No. Eligible', 'No. Applied', 'Appear', 'Test Status', 'Interview Status', 'Remark', ''].map(h => (
@@ -482,7 +482,7 @@ export default function PlacementWorkReportFormPage() {
         <div className="settings-card">
           <div className="form-section-title">5. Internship / Training / Skill Development Coordination</div>
           <div style={{ overflowX: 'auto' }}>
-            <table style={{ borderCollapse: 'collapse', fontSize: 13 }}>
+            <table style={{ borderCollapse: 'collapse', fontSize: 13, minWidth: 800 }}>
               <thead>
                 <tr>
                   {['Activity', 'Batch / Department', 'No. of Students', 'Trainer / Company', 'Status', 'Remarks'].map(h => (
@@ -529,7 +529,7 @@ export default function PlacementWorkReportFormPage() {
         <div className="settings-card">
           <div className="form-section-title">6. MIS / Documentation Work</div>
           <div style={{ overflowX: 'auto' }}>
-            <table style={{ borderCollapse: 'collapse', fontSize: 13 }}>
+            <table style={{ borderCollapse: 'collapse', fontSize: 13, minWidth: 560 }}>
               <thead>
                 <tr>
                   {['Task', 'Status', 'Remarks'].map(h => (
@@ -572,7 +572,7 @@ export default function PlacementWorkReportFormPage() {
         <div className="settings-card">
           <div className="form-section-title">8. Pending Work / Follow-up Required</div>
           <div style={{ overflowX: 'auto' }}>
-            <table style={{ borderCollapse: 'collapse', fontSize: 13 }}>
+            <table style={{ borderCollapse: 'collapse', fontSize: 13, minWidth: 620 }}>
               <thead>
                 <tr>
                   {['Sr.', 'Pending Task', 'Person / Company Concerned', 'Target Date', 'Priority', ''].map(h => (
@@ -626,7 +626,7 @@ export default function PlacementWorkReportFormPage() {
         <div className="settings-card">
           <div className="form-section-title">9. Issues / Support Required</div>
           <div style={{ overflowX: 'auto' }}>
-            <table style={{ borderCollapse: 'collapse', fontSize: 13 }}>
+            <table style={{ borderCollapse: 'collapse', fontSize: 13, minWidth: 580 }}>
               <thead>
                 <tr>
                   {['Issue', 'Related To', 'Support Required From', 'Urgency', ''].map(h => (
