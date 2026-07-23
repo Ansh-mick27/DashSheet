@@ -2,7 +2,7 @@
 // DashSheet — Portal Home Page
 // ==========================================
 import { Link } from 'react-router-dom';
-import { BookOpen, ClipboardList, Package, Briefcase } from 'lucide-react';
+import { BookOpen, ClipboardList, Package, Briefcase, FileText } from 'lucide-react';
 import { useAuth } from '../../contexts/AuthContext';
 
 export default function PortalHomePage() {
@@ -48,11 +48,18 @@ export default function PortalHomePage() {
         )}
 
         {role === 'Placement' && (
-          <Link to="/portal/placement" className="portal-card">
-            <div className="portal-card__icon"><Briefcase size={22} /></div>
-            <div className="portal-card__title">CRP Process Report</div>
-            <p className="portal-card__desc">Log a new company contact and CRP Process update.</p>
-          </Link>
+          <>
+            <Link to="/portal/placement" className="portal-card">
+              <div className="portal-card__icon"><Briefcase size={22} /></div>
+              <div className="portal-card__title">CRP Process Report</div>
+              <p className="portal-card__desc">Log a new company contact and CRP Process update.</p>
+            </Link>
+            <Link to="/portal/placement-work" className="portal-card">
+              <div className="portal-card__icon"><FileText size={22} /></div>
+              <div className="portal-card__title">Daily Task Report</div>
+              <p className="portal-card__desc">Submit your daily placement activities, company engagement, and student counselling log.</p>
+            </Link>
+          </>
         )}
       </div>
     </div>

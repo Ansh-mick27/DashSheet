@@ -16,7 +16,7 @@ export interface Member {
 
 export type CustomFieldType = 'text' | 'number' | 'textarea' | 'select' | 'checkbox' | 'date';
 
-export type CustomFieldFormType = 'training' | 'work' | 'inventory' | 'placement';
+export type CustomFieldFormType = 'training' | 'work' | 'inventory' | 'placement' | 'placement_work';
 
 export interface FieldOption {
   id: string;
@@ -153,6 +153,103 @@ export interface PlacementReport {
   hiringMode: 'Online' | 'Physical' | 'Hybrid' | '';
   hiringRounds: HiringRound[];
   driveYear: string;
+  extraFields?: ExtraFields;
+}
+
+export interface PlacementWorkLogEntry {
+  timeSlot: string;
+  activity: string;
+  involved: string;
+  status: 'Completed' | 'Pending' | '';
+  remarks: string;
+}
+
+export interface PlacementCompanyEngagementEntry {
+  companyName: string;
+  hrContact: string;
+  location: string;
+  purpose: string;
+  mode: string;
+  outcome: string;
+  remark: string;
+}
+
+export interface PlacementStudentEngagementEntry {
+  studentName: string;
+  purpose: string;
+  issueIdentified: string;
+  actionTaken: string;
+  status: 'Open' | 'Closed' | '';
+}
+
+export interface PlacementDriveEntry {
+  companyName: string;
+  profile: string;
+  ctc: string;
+  location: string;
+  eligibleStudents: string;
+  applied: string;
+  appear: string;
+  testStatus: string;
+  interviewStatus: string;
+  remark: string;
+}
+
+export interface PlacementInternshipEntry {
+  activity: string;
+  batchDept: string;
+  noStudents: string;
+  trainerCompany: string;
+  status: 'Completed' | 'Pending' | '';
+  remarks: string;
+}
+
+export interface PlacementMISEntry {
+  task: string;
+  status: 'Completed' | 'Pending' | '';
+  remarks: string;
+}
+
+export interface PlacementPendingWorkEntry {
+  pendingTask: string;
+  personConcerned: string;
+  targetDate: string;
+  priority: 'High' | 'Medium' | 'Low' | '';
+}
+
+export interface PlacementIssueSupportEntry {
+  issue: string;
+  relatedTo: string;
+  supportRequired: string;
+  urgency: 'High' | 'Medium' | 'Low' | '';
+}
+
+export interface PlacementWorkReport {
+  id?: string;
+  timestamp: string;
+  staffName: string;
+  date: string;
+  department: string;
+  reportingTo: string;
+  workLog: PlacementWorkLogEntry[];
+  companyEngagement: PlacementCompanyEngagementEntry[];
+  totalCompaniesContacted: number;
+  newCompaniesApproached: number;
+  followUpCompanies: number;
+  confirmedOpportunities: number;
+  studentEngagement: PlacementStudentEngagementEntry[];
+  totalStudentsInteracted: number;
+  resumeReviewsDone: number;
+  mockInterviewsSupport: number;
+  studentsGuidedApplications: number;
+  placementDriveUpdate: PlacementDriveEntry[];
+  internshipCoordination: PlacementInternshipEntry[];
+  misDocumentation: PlacementMISEntry[];
+  achievement1: string;
+  achievement2: string;
+  achievement3: string;
+  pendingWork: PlacementPendingWorkEntry[];
+  issuesSupport: PlacementIssueSupportEntry[];
   extraFields?: ExtraFields;
 }
 

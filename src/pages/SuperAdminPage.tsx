@@ -28,12 +28,13 @@ import FormSelect from '../components/form/FormSelect';
 type Tab = 'options' | 'fields' | 'members' | 'branchCounts';
 
 const FIELD_TYPES: CustomFieldType[] = ['text', 'number', 'textarea', 'select', 'checkbox', 'date'];
-const FORM_TYPES: CustomFieldFormType[] = ['training', 'work', 'inventory', 'placement'];
+const FORM_TYPES: CustomFieldFormType[] = ['training', 'work', 'inventory', 'placement', 'placement_work'];
 const FORM_TYPE_LABELS: Record<CustomFieldFormType, string> = {
   training: 'Session Report',
   work: 'Daily Work Report',
   inventory: 'Inventory Report',
-  placement: 'CRP Process Report'
+  placement: 'CRP Process Report',
+  placement_work: 'Placement Daily Task Report',
 };
 const ROLES: MemberRole[] = ['Trainer', 'Admin', 'OfficeAdmin', 'Placement', 'SuperAdmin'];
 

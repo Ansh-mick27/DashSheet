@@ -23,11 +23,13 @@ import TrainingReportFormPage from './pages/portal/TrainingReportFormPage';
 import WorkReportFormPage from './pages/portal/WorkReportFormPage';
 import InventoryReportFormPage from './pages/portal/InventoryReportFormPage';
 import PlacementReportFormPage from './pages/portal/PlacementReportFormPage';
+import PlacementWorkReportFormPage from './pages/portal/PlacementWorkReportFormPage';
+import PlacementWorkReportsPage from './pages/PlacementWorkReportsPage';
 import { useAuth } from './contexts/AuthContext';
 import { fetchSheetData, refreshData, parseDate, generateNotifications } from './services/dataApi';
 import {
   Member, TrainingReport, WorkReport, OfficeAdminReport,
-  PlacementReport, DashboardFilters, Notification, BranchStudentCount
+  PlacementReport, PlacementWorkReport, DashboardFilters, Notification, BranchStudentCount
 } from './types';
 
 function DashboardLayout() {
@@ -37,6 +39,7 @@ function DashboardLayout() {
   const [workReports, setWorkReports] = useState<WorkReport[]>([]);
   const [officeAdminReports, setOfficeAdminReports] = useState<OfficeAdminReport[]>([]);
   const [placementReports, setPlacementReports] = useState<PlacementReport[]>([]);
+  const [placementWorkReports, setPlacementWorkReports] = useState<PlacementWorkReport[]>([]);
   const [branchStudentCounts, setBranchStudentCounts] = useState<BranchStudentCount[]>([]);
   const [loading, setLoading] = useState(true);
   const [notifications, setNotifications] = useState<Notification[]>([]);
@@ -56,6 +59,7 @@ function DashboardLayout() {
       setWorkReports(data.workReports);
       setOfficeAdminReports(data.officeAdminReports);
       setPlacementReports(data.placementReports);
+      setPlacementWorkReports(data.placementWorkReports);
       setBranchStudentCounts(data.branchStudentCounts);
       setNotifications(generateNotifications(data.workReports, data.trainingReports));
     } catch (err) {
@@ -198,6 +202,9 @@ function DashboardLayout() {
             <Route path="/portal/placement" element={
               <ErrorBoundary><PlacementReportFormPage /></ErrorBoundary>
             } />
+            <Route path="/portal/placement-work" element={
+              <ErrorBoundary><PlacementWorkReportFormPage /></ErrorBoundary>
+            } />
             <Route path="/training" element={
               <ErrorBoundary><TrainingReportsPage reports={filteredTraining} /></ErrorBoundary>
             } />
@@ -231,6 +238,9 @@ function DashboardLayout() {
             } />
             <Route path="/placement" element={
               <ErrorBoundary><PlacementPage reports={filteredPlacement} /></ErrorBoundary>
+            } />
+            <Route path="/placement-work" element={
+              <ErrorBoundary><PlacementWorkReportsPage reports={placementWorkReports} /></ErrorBoundary>
             } />
             <Route path="/settings" element={
               <ErrorBoundary><SettingsPage /></ErrorBoundary>

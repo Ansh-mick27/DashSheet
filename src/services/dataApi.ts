@@ -4,7 +4,7 @@
 import { supabase, isSupabaseConfigured } from '../lib/supabaseClient';
 import {
   Member, MemberRole, TrainingReport, WorkReport, OfficeAdminReport, PlacementReport, Notification,
-  FieldOption, CustomField, CustomFieldFormType, CustomFieldType, BranchStudentCount
+  FieldOption, CustomField, CustomFieldFormType, CustomFieldType, BranchStudentCount, PlacementWorkReport
 } from '../types';
 import {
   generateMembers, generateTrainingReports, generateWorkReports,
@@ -17,6 +17,7 @@ interface SheetData {
   workReports: WorkReport[];
   officeAdminReports: OfficeAdminReport[];
   placementReports: PlacementReport[];
+  placementWorkReports: PlacementWorkReport[];
   fieldOptions: FieldOption[];
   customFields: CustomField[];
   branchStudentCounts: BranchStudentCount[];
@@ -135,6 +136,37 @@ function mapPlacementReport(row: any): PlacementReport {
   };
 }
 
+function mapPlacementWorkReport(row: any): PlacementWorkReport {
+  return {
+    id: row.id,
+    timestamp: row.created_at,
+    staffName: row.staff_name,
+    date: row.date,
+    department: row.department,
+    reportingTo: row.reporting_to,
+    workLog: row.work_log ?? [],
+    companyEngagement: row.company_engagement ?? [],
+    totalCompaniesContacted: row.total_companies_contacted ?? 0,
+    newCompaniesApproached: row.new_companies_approached ?? 0,
+    followUpCompanies: row.follow_up_companies ?? 0,
+    confirmedOpportunities: row.confirmed_opportunities ?? 0,
+    studentEngagement: row.student_engagement ?? [],
+    totalStudentsInteracted: row.total_students_interacted ?? 0,
+    resumeReviewsDone: row.resume_reviews_done ?? 0,
+    mockInterviewsSupport: row.mock_interviews_support ?? 0,
+    studentsGuidedApplications: row.students_guided_applications ?? 0,
+    placementDriveUpdate: row.placement_drive_update ?? [],
+    internshipCoordination: row.internship_coordination ?? [],
+    misDocumentation: row.mis_documentation ?? [],
+    achievement1: row.achievement1 ?? '',
+    achievement2: row.achievement2 ?? '',
+    achievement3: row.achievement3 ?? '',
+    pendingWork: row.pending_work ?? [],
+    issuesSupport: row.issues_support ?? [],
+    extraFields: row.extra_fields ?? {},
+  };
+}
+
 function mapBranchStudentCount(row: any): BranchStudentCount {
   return {
     id: row.id,
@@ -176,18 +208,19 @@ export async function fetchSheetData(): Promise<SheetData> {
 
   if (isSupabaseConfigured) {
     try {
-      const [membersRes, trainingRes, workRes, officeRes, placementRes, fieldOptionsRes, customFieldsRes, branchCountsRes] = await Promise.all([
+      const [membersRes, trainingRes, workRes, officeRes, placementRes, placementWorkRes, fieldOptionsRes, customFieldsRes, branchCountsRes] = await Promise.all([
         supabase.from('members_public').select('*'),
         supabase.from('training_reports').select('*').order('timestamp', { ascending: false }),
         supabase.from('work_reports').select('*').order('timestamp', { ascending: false }),
         supabase.from('office_admin_reports').select('*').order('timestamp', { ascending: false }),
         supabase.from('placement_reports').select('*').order('timestamp', { ascending: false }),
+        supabase.from('placement_work_reports').select('*').order('created_at', { ascending: false }),
         supabase.from('field_options').select('*').order('sort_order', { ascending: true }),
         supabase.from('custom_fields').select('*').order('sort_order', { ascending: true }),
         supabase.from('branch_student_counts').select('*')
       ]);
 
-      const errors = [membersRes.error, trainingRes.error, workRes.error, officeRes.error, placementRes.error, fieldOptionsRes.error, customFieldsRes.error, branchCountsRes.error].filter(Boolean);
+      const errors = [membersRes.error, trainingRes.error, workRes.error, officeRes.error, placementRes.error, placementWorkRes.error, fieldOptionsRes.error, customFieldsRes.error, branchCountsRes.error].filter(Boolean);
       if (errors.length) throw errors[0];
 
       const hasAnyData = [membersRes, trainingRes, workRes, officeRes, placementRes]
@@ -200,6 +233,7 @@ export async function fetchSheetData(): Promise<SheetData> {
           workReports: (workRes.data ?? []).map(mapWorkReport),
           officeAdminReports: (officeRes.data ?? []).map(mapOfficeAdminReport),
           placementReports: (placementRes.data ?? []).map(mapPlacementReport),
+          placementWorkReports: (placementWorkRes.data ?? []).map(mapPlacementWorkReport),
           fieldOptions: (fieldOptionsRes.data ?? []).map(mapFieldOption),
           customFields: (customFieldsRes.data ?? []).map(mapCustomField),
           branchStudentCounts: (branchCountsRes.data ?? []).map(mapBranchStudentCount)
@@ -217,6 +251,7 @@ export async function fetchSheetData(): Promise<SheetData> {
     workReports: generateWorkReports(),
     officeAdminReports: generateOfficeAdminReports(),
     placementReports: generatePlacementReports(),
+    placementWorkReports: [],
     fieldOptions: [],
     customFields: [],
     branchStudentCounts: []
@@ -436,6 +471,37 @@ export async function submitPlacementReport(report: PlacementReport): Promise<vo
     hiring_rounds: report.hiringRounds ?? [],
     drive_year: report.driveYear ?? '',
     extra_fields: report.extraFields ?? {}
+  });
+  if (error) throw error;
+  refreshData();
+}
+
+export async function submitPlacementWorkReport(report: PlacementWorkReport): Promise<void> {
+  const { error } = await supabase.from('placement_work_reports').insert({
+    staff_name: report.staffName,
+    date: report.date,
+    department: report.department,
+    reporting_to: report.reportingTo,
+    work_log: report.workLog,
+    company_engagement: report.companyEngagement,
+    total_companies_contacted: report.totalCompaniesContacted,
+    new_companies_approached: report.newCompaniesApproached,
+    follow_up_companies: report.followUpCompanies,
+    confirmed_opportunities: report.confirmedOpportunities,
+    student_engagement: report.studentEngagement,
+    total_students_interacted: report.totalStudentsInteracted,
+    resume_reviews_done: report.resumeReviewsDone,
+    mock_interviews_support: report.mockInterviewsSupport,
+    students_guided_applications: report.studentsGuidedApplications,
+    placement_drive_update: report.placementDriveUpdate,
+    internship_coordination: report.internshipCoordination,
+    mis_documentation: report.misDocumentation,
+    achievement1: report.achievement1,
+    achievement2: report.achievement2,
+    achievement3: report.achievement3,
+    pending_work: report.pendingWork,
+    issues_support: report.issuesSupport,
+    extra_fields: report.extraFields ?? {},
   });
   if (error) throw error;
   refreshData();

@@ -115,3 +115,42 @@ export const ACTIVITY_PURPOSES = [
 export const HIRING_MODES = ['Online', 'Physical', 'Hybrid'];
 
 export const ROUND_DELIVERY_MODES = ['Virtual', 'Physical', 'Hybrid'];
+
+// Placement Officer Daily Task Report
+export const PLACEMENT_WORK_LOG_SLOTS: { timeSlot: string; activity: string }[] = [
+  { timeSlot: '08:30 – 09:00', activity: 'Attendance, Email Checking, Daily Planning' },
+  { timeSlot: '09:00 – 10:00', activity: 'Company Follow-up / New Recruiter Outreach' },
+  { timeSlot: '10:00 – 11:00', activity: 'Student Data Verification / Eligibility Checking' },
+  { timeSlot: '11:00 – 12:00', activity: 'Placement Drive Coordination / Interview Scheduling' },
+  { timeSlot: '12:00 – 12:30', activity: 'Communication with Departments / Faculty Coordinators' },
+  { timeSlot: '12:30 – 01:30', activity: 'Lunch Break' },
+  { timeSlot: '01:30 – 02:30', activity: 'Student Counselling / Resume Review / GD-PI Support' },
+  { timeSlot: '02:30 – 03:30', activity: 'Internship / Placement Opportunity Sharing & Tracking' },
+  { timeSlot: '03:30 – 04:30', activity: 'MIS Update / Placement Database / Offer Tracking' },
+  { timeSlot: '04:30 – 05:15', activity: 'Reports, Follow-up Calls, Next-Day Planning' },
+  { timeSlot: '05:15 – 05:30', activity: 'Daily Report Submission' },
+];
+
+export const PLACEMENT_ENGAGEMENT_PURPOSES = ['New Hiring', 'Follow-up', 'JD', 'Drive', 'Other'];
+export const PLACEMENT_ENGAGEMENT_MODES = ['Call', 'Email', 'Meeting', 'Other'];
+export const STUDENT_ENGAGEMENT_PURPOSES = ['Resume', 'Interview', 'Eligibility', 'Attendance', 'Other'];
+export const STUDENT_ENGAGEMENT_STATUSES = ['Open', 'Closed'];
+export const DRIVE_TEST_STATUSES = ['Completed', 'Pending', 'Other'];
+
+export const INTERNSHIP_ACTIVITIES = [
+  'Internship Opportunity Shared',
+  'Training Session Coordinated',
+  'Assessment / Mock Test Conducted',
+  'Orientation & Assignments',
+];
+
+export const MIS_TASKS = [
+  'Student Master Data Updated',
+  'Eligibility List Verified',
+  'Company Name Database Updated',
+  'Offer / Selection Data Updated',
+  'Drive Attendance Uploaded',
+];
+
+export const PLACEMENT_WORK_STATUSES = ['Completed', 'Pending'];
+export const RELATED_TO_OPTIONS = ['Company', 'Student', 'Department', 'Data', 'Infrastructure', 'Other'];
