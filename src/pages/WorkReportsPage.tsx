@@ -94,6 +94,14 @@ export default function WorkReportsPage({ reports }: WorkReportsPageProps) {
       }));
   }, [reports]);
 
+  const sortedReports = useMemo(() => {
+    return [...reports].sort((a, b) => {
+      const [da, ma, ya] = a.date.split('/').map(Number);
+      const [db, mb, yb] = b.date.split('/').map(Number);
+      return new Date(yb, mb - 1, db).getTime() - new Date(ya, ma - 1, da).getTime();
+    });
+  }, [reports]);
+
   const columns = [
     { key: 'date', header: 'Date', sortable: true, width: '90px' },
     { key: 'trainerName', header: 'Trainer', sortable: true, width: '140px' },
@@ -237,7 +245,7 @@ export default function WorkReportsPage({ reports }: WorkReportsPageProps) {
       <ChartCard title="All Daily Work Reports" className="mt-24">
         <DataTable
           columns={columns}
-          data={reports}
+          data={sortedReports}
           rowKey={(r, i) => `${r.trainerName}-${r.date}-${i}`}
           pageSize={12}
         />
