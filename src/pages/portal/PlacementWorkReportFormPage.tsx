@@ -7,7 +7,7 @@ import { useAuth } from '../../contexts/AuthContext';
 import { submitPlacementWorkReport } from '../../services/dataApi';
 import { todayISO, isoToDDMMYYYY } from '../../lib/dateUtils';
 import {
-  PLACEMENT_WORK_LOG_SLOTS, PLACEMENT_WORK_ACTIVITIES, PLACEMENT_ENGAGEMENT_PURPOSES, PLACEMENT_ENGAGEMENT_MODES,
+  PLACEMENT_WORK_LOG_SLOTS, PLACEMENT_WORK_ACTIVITY_OPTIONS, PLACEMENT_ENGAGEMENT_PURPOSES, PLACEMENT_ENGAGEMENT_MODES,
   STUDENT_ENGAGEMENT_PURPOSES, STUDENT_ENGAGEMENT_STATUSES, DRIVE_TEST_STATUSES,
   INTERNSHIP_ACTIVITIES, MIS_TASKS, PRIORITIES, RELATED_TO_OPTIONS,
 } from '../../data/constants';
@@ -49,7 +49,7 @@ const emptyIssueRow = (): PlacementIssueSupportEntry =>
   ({ issue: '', relatedTo: '', supportRequired: '', urgency: '' });
 
 function initWorkLog(): PlacementWorkLogEntry[] {
-  return PLACEMENT_WORK_LOG_SLOTS.map(s => ({ timeSlot: s.timeSlot, activity: s.activity, status: '', remarks: '' }));
+  return PLACEMENT_WORK_LOG_SLOTS.map(s => ({ timeSlot: s.timeSlot, activity: '', status: '', remarks: '' }));
 }
 
 function initInternship(): PlacementInternshipEntry[] {
@@ -70,7 +70,7 @@ export default function PlacementWorkReportFormPage() {
   const [otherWorkLogRows, setOtherWorkLogRows] = useState<Set<number>>(new Set());
 
   useEffect(() => {
-    if (workLog.every(r => !r.activity || PLACEMENT_WORK_ACTIVITIES.includes(r.activity))) {
+    if (workLog.every(r => !r.activity || PLACEMENT_WORK_ACTIVITY_OPTIONS.includes(r.activity))) {
       setOtherWorkLogRows(new Set());
     }
   }, [workLog]);
@@ -249,7 +249,8 @@ export default function PlacementWorkReportFormPage() {
                             <select className="settings-form__input" style={{ minWidth: 200 }}
                               value={isOther ? 'Other' : row.activity}
                               onChange={e => handleActivitySelect(e.target.value)}>
-                              {PLACEMENT_WORK_ACTIVITIES.filter(a => a !== 'Lunch Break').map(a => (
+                              <option value="">Select activity...</option>
+                              {PLACEMENT_WORK_ACTIVITY_OPTIONS.map(a => (
                                 <option key={a} value={a}>{a}</option>
                               ))}
                               <option value="Other">Other</option>

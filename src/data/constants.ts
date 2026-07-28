@@ -133,6 +133,14 @@ export const PLACEMENT_WORK_LOG_SLOTS: { timeSlot: string; activity: string }[] 
 
 export const PLACEMENT_WORK_ACTIVITIES = PLACEMENT_WORK_LOG_SLOTS.map(s => s.activity);
 
+export const PLACEMENT_WORK_ACTIVITY_OPTIONS: string[] = [
+  ...new Set(
+    PLACEMENT_WORK_LOG_SLOTS
+      .filter(s => s.activity !== 'Lunch Break')
+      .flatMap(s => s.activity.split(/[,/]/).map(a => a.trim()).filter(Boolean))
+  )
+];
+
 export const PLACEMENT_ENGAGEMENT_PURPOSES = ['New Hiring', 'Follow-up', 'JD', 'Drive', 'Other'];
 export const PLACEMENT_ENGAGEMENT_MODES = ['Call', 'Email', 'Meeting', 'Other'];
 export const STUDENT_ENGAGEMENT_PURPOSES = ['Resume', 'Interview', 'Eligibility', 'Attendance', 'Other'];
