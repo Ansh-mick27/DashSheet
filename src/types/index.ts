@@ -229,7 +229,6 @@ export interface PlacementWorkReport {
   staffName: string;
   date: string;
   department: string;
-  reportingTo: string;
   workLog: PlacementWorkLogEntry[];
   companyEngagement: PlacementCompanyEngagementEntry[];
   totalCompaniesContacted: number;

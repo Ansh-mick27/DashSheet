@@ -64,7 +64,6 @@ export default function PlacementWorkReportFormPage() {
   const { member } = useAuth();
   const [date, setDate] = useState(todayISO());
   const [department, setDepartment] = useState(member?.department ?? '');
-  const [reportingTo, setReportingTo] = useState('');
 
   const [workLog, setWorkLog] = useState<PlacementWorkLogEntry[]>(initWorkLog);
   const [otherWorkLogRows, setOtherWorkLogRows] = useState<Set<number>>(new Set());
@@ -115,7 +114,7 @@ export default function PlacementWorkReportFormPage() {
   const { customFields } = useFormConfig('placement_work');
 
   const resetForm = () => {
-    setDate(todayISO()); setDepartment(member?.department ?? ''); setReportingTo('');
+    setDate(todayISO()); setDepartment(member?.department ?? '');
     setWorkLog(initWorkLog()); setOtherWorkLogRows(new Set());
     setCompanyEngagement([emptyCompanyRow(), emptyCompanyRow(), emptyCompanyRow()]);
     setTotalCompaniesContacted(''); setNewCompaniesApproached(''); setFollowUpCompanies(''); setConfirmedOpportunities('');
@@ -139,7 +138,6 @@ export default function PlacementWorkReportFormPage() {
         staffName: member.name,
         date: isoToDDMMYYYY(date),
         department,
-        reportingTo,
         workLog,
         companyEngagement: companyEngagement.filter(r => r.companyName),
         totalCompaniesContacted: Number(totalCompaniesContacted) || 0,
@@ -209,7 +207,6 @@ export default function PlacementWorkReportFormPage() {
           <div className="form-grid form-grid--3">
             <FormField label="Name of Placement Officer" name="staffName" value={member?.name ?? ''} onChange={() => {}} readOnly />
             <FormField label="Date" name="date" type="date" value={date} onChange={setDate} required />
-            <FormField label="Reporting To" name="reportingTo" value={reportingTo} onChange={setReportingTo} required />
           </div>
           <div className="form-grid">
             <FormField label="Department / Institute" name="department" value={department} onChange={setDepartment} required />
