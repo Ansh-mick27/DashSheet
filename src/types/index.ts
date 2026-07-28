@@ -159,7 +159,6 @@ export interface PlacementReport {
 export interface PlacementWorkLogEntry {
   timeSlot: string;
   activity: string;
-  involved: string;
   status: 'Completed' | 'Pending' | '';
   remarks: string;
 }

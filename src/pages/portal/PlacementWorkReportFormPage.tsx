@@ -1,13 +1,13 @@
 // ==========================================
 // DashSheet — Placement Officer Daily Task Report Form
 // ==========================================
-import { useState, FormEvent } from 'react';
+import { useState, useEffect, FormEvent } from 'react';
 import { CheckCircle2, AlertCircle, Send, Plus, Trash2 } from 'lucide-react';
 import { useAuth } from '../../contexts/AuthContext';
 import { submitPlacementWorkReport } from '../../services/dataApi';
 import { todayISO, isoToDDMMYYYY } from '../../lib/dateUtils';
 import {
-  PLACEMENT_WORK_LOG_SLOTS, PLACEMENT_ENGAGEMENT_PURPOSES, PLACEMENT_ENGAGEMENT_MODES,
+  PLACEMENT_WORK_LOG_SLOTS, PLACEMENT_WORK_ACTIVITIES, PLACEMENT_ENGAGEMENT_PURPOSES, PLACEMENT_ENGAGEMENT_MODES,
   STUDENT_ENGAGEMENT_PURPOSES, STUDENT_ENGAGEMENT_STATUSES, DRIVE_TEST_STATUSES,
   INTERNSHIP_ACTIVITIES, MIS_TASKS, PRIORITIES, RELATED_TO_OPTIONS,
 } from '../../data/constants';
@@ -49,7 +49,7 @@ const emptyIssueRow = (): PlacementIssueSupportEntry =>
   ({ issue: '', relatedTo: '', supportRequired: '', urgency: '' });
 
 function initWorkLog(): PlacementWorkLogEntry[] {
-  return PLACEMENT_WORK_LOG_SLOTS.map(s => ({ timeSlot: s.timeSlot, activity: s.activity, involved: '', status: '', remarks: '' }));
+  return PLACEMENT_WORK_LOG_SLOTS.map(s => ({ timeSlot: s.timeSlot, activity: s.activity, status: '', remarks: '' }));
 }
 
 function initInternship(): PlacementInternshipEntry[] {
@@ -67,6 +67,13 @@ export default function PlacementWorkReportFormPage() {
   const [reportingTo, setReportingTo] = useState('');
 
   const [workLog, setWorkLog] = useState<PlacementWorkLogEntry[]>(initWorkLog);
+  const [otherWorkLogRows, setOtherWorkLogRows] = useState<Set<number>>(new Set());
+
+  useEffect(() => {
+    if (workLog.every(r => !r.activity || PLACEMENT_WORK_ACTIVITIES.includes(r.activity))) {
+      setOtherWorkLogRows(new Set());
+    }
+  }, [workLog]);
 
   const [companyEngagement, setCompanyEngagement] = useState<PlacementCompanyEngagementEntry[]>(
     [emptyCompanyRow(), emptyCompanyRow(), emptyCompanyRow()]
@@ -109,7 +116,7 @@ export default function PlacementWorkReportFormPage() {
 
   const resetForm = () => {
     setDate(todayISO()); setDepartment(member?.department ?? ''); setReportingTo('');
-    setWorkLog(initWorkLog());
+    setWorkLog(initWorkLog()); setOtherWorkLogRows(new Set());
     setCompanyEngagement([emptyCompanyRow(), emptyCompanyRow(), emptyCompanyRow()]);
     setTotalCompaniesContacted(''); setNewCompaniesApproached(''); setFollowUpCompanies(''); setConfirmedOpportunities('');
     setStudentEngagement([emptyStudentRow(), emptyStudentRow(), emptyStudentRow()]);
@@ -213,10 +220,10 @@ export default function PlacementWorkReportFormPage() {
         <div className="settings-card">
           <div className="form-section-title">1. Time-Wise Daily Work Log</div>
           <div className="tbl-scroll">
-            <table style={{ borderCollapse: 'collapse', fontSize: 13, width: '100%', minWidth: 660 }}>
+            <table style={{ borderCollapse: 'collapse', fontSize: 13, width: '100%', minWidth: 580 }}>
               <thead>
                 <tr>
-                  {['Time Slot', 'Activity / Task Performed', 'Company / Student / Dept. Involved', 'Status', 'Remarks'].map(h => (
+                  {['Time Slot', 'Activity / Task Performed', 'Status', 'Remarks'].map(h => (
                     <th key={h} style={TH}>{h}</th>
                   ))}
                 </tr>
@@ -224,14 +231,36 @@ export default function PlacementWorkReportFormPage() {
               <tbody>
                 {workLog.map((row, i) => {
                   const isLunch = row.timeSlot === '12:30 – 01:30';
+                  const isOther = otherWorkLogRows.has(i);
+                  const handleActivitySelect = (val: string) => {
+                    if (val === 'Other') {
+                      setOtherWorkLogRows(prev => new Set([...prev, i]));
+                    } else {
+                      setOtherWorkLogRows(prev => { const s = new Set(prev); s.delete(i); return s; });
+                      updateWorkLog(i, { activity: val });
+                    }
+                  };
                   return (
                     <tr key={i} style={isLunch ? { opacity: 0.65 } : {}}>
                       <td style={TD}><span style={STATIC_CELL}>{row.timeSlot}</span></td>
-                      <td style={{ ...TD, minWidth: 220 }}><span style={{ fontSize: 12 }}>{row.activity}</span></td>
-                      <td style={{ ...TD, minWidth: 160 }}>
-                        {isLunch ? <span style={{ opacity: 0.4 }}>—</span> : (
-                          <input className="settings-form__input" style={{ minWidth: 140 }} value={row.involved}
-                            onChange={e => updateWorkLog(i, { involved: e.target.value })} placeholder="Enter details" />
+                      <td style={{ ...TD, minWidth: 220 }}>
+                        {isLunch ? <span style={{ fontSize: 12, opacity: 0.8 }}>{row.activity}</span> : (
+                          <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
+                            <select className="settings-form__input" style={{ minWidth: 200 }}
+                              value={isOther ? 'Other' : row.activity}
+                              onChange={e => handleActivitySelect(e.target.value)}>
+                              {PLACEMENT_WORK_ACTIVITIES.filter(a => a !== 'Lunch Break').map(a => (
+                                <option key={a} value={a}>{a}</option>
+                              ))}
+                              <option value="Other">Other</option>
+                            </select>
+                            {isOther && (
+                              <input className="settings-form__input" style={{ minWidth: 200 }}
+                                value={row.activity}
+                                onChange={e => updateWorkLog(i, { activity: e.target.value })}
+                                placeholder="Specify activity…" />
+                            )}
+                          </div>
                         )}
                       </td>
                       <td style={{ ...TD, minWidth: 120 }}>
@@ -245,8 +274,10 @@ export default function PlacementWorkReportFormPage() {
                         )}
                       </td>
                       <td style={{ ...TD, minWidth: 160 }}>
-                        <input className="settings-form__input" style={{ minWidth: 140 }} value={row.remarks}
-                          onChange={e => updateWorkLog(i, { remarks: e.target.value })} placeholder="Remarks" />
+                        {isLunch ? <span style={{ opacity: 0.4 }}>—</span> : (
+                          <input className="settings-form__input" style={{ minWidth: 140 }} value={row.remarks}
+                            onChange={e => updateWorkLog(i, { remarks: e.target.value })} placeholder="Remarks" />
+                        )}
                       </td>
                     </tr>
                   );
