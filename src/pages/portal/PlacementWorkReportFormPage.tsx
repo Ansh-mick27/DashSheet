@@ -221,7 +221,7 @@ export default function PlacementWorkReportFormPage({ adminMembers }: PlacementW
         <div className="settings-card">
           <div className="form-grid form-grid--3">
             <FormField label="Name of Placement Officer" name="staffName" value={activeMember?.name ?? ''} onChange={() => {}} readOnly />
-            <FormField label="Date" name="date" type="date" value={date} onChange={setDate} required />
+            <FormField label="Date" name="date" type="date" value={date} onChange={isAdminMode ? setDate : () => {}} readOnly={!isAdminMode} required />
           </div>
           <div className="form-grid">
             <FormField label="Department / Institute" name="department" value={department} onChange={setDepartment} required />
@@ -611,8 +611,18 @@ export default function PlacementWorkReportFormPage({ adminMembers }: PlacementW
         <div className="settings-card">
           <div className="form-section-title">6. Key Achievements of the Day</div>
           {achievements.map((ach, i) => (
-            <FormTextarea key={i} label={`Achievement ${i + 1}`} name={`achievement-${i}`}
-              value={ach} onChange={v => setAchievements(prev => prev.map((a, j) => j === i ? v : a))} rows={2} />
+            <div key={i} style={{ display: 'flex', gap: 8, alignItems: 'flex-end' }}>
+              <div style={{ flex: 1 }}>
+                <FormTextarea label={`Achievement ${i + 1}`} name={`achievement-${i}`}
+                  value={ach} onChange={v => setAchievements(prev => prev.map((a, j) => j === i ? v : a))} rows={2} />
+              </div>
+              {achievements.length > 1 && (
+                <button type="button" className="btn btn--ghost btn--sm" style={{ marginBottom: 4 }}
+                  onClick={() => setAchievements(prev => prev.filter((_, j) => j !== i))}>
+                  <Trash2 size={13} />
+                </button>
+              )}
+            </div>
           ))}
           <button type="button" className="btn btn--ghost btn--sm" style={{ marginTop: 8 }}
             onClick={() => setAchievements(prev => [...prev, ''])}>

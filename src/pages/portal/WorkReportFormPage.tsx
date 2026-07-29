@@ -151,7 +151,7 @@ export default function WorkReportFormPage({ adminMembers }: WorkReportFormPageP
           <div className="form-grid form-grid--3">
             <FormField label="Trainer Name" name="trainerName" value={activeMember?.name ?? ''} onChange={() => {}} readOnly />
             <FormField label="Department" name="department" value={activeMember?.department ?? ''} onChange={() => {}} readOnly />
-            <FormField label="Date" name="date" type="date" value={date} onChange={setDate} required />
+            <FormField label="Date" name="date" type="date" value={date} onChange={isAdminMode ? setDate : () => {}} readOnly={!isAdminMode} required />
           </div>
 
           <div className="form-section-title">Daily Schedule</div>
