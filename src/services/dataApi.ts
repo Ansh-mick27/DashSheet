@@ -77,6 +77,8 @@ function mapWorkReport(row: any): WorkReport {
     challengesSolutions: row.challenges_solutions,
     pendingWork: row.pending_work,
     additionalNotes: row.additional_notes,
+    placementDriveUpdate: row.placement_drive_update ?? [],
+    internshipCoordination: row.internship_coordination ?? [],
     extraFields: row.extra_fields ?? {}
   };
 }
@@ -156,12 +158,8 @@ function mapPlacementWorkReport(row: any): PlacementWorkReport {
     studentsGuidedApplications: row.students_guided_applications ?? 0,
     placementDriveUpdate: row.placement_drive_update ?? [],
     internshipCoordination: row.internship_coordination ?? [],
-    misDocumentation: row.mis_documentation ?? [],
-    achievement1: row.achievement1 ?? '',
-    achievement2: row.achievement2 ?? '',
-    achievement3: row.achievement3 ?? '',
+    achievements: row.achievements ?? [row.achievement1, row.achievement2, row.achievement3].filter(Boolean),
     pendingWork: row.pending_work ?? [],
-    issuesSupport: row.issues_support ?? [],
     extraFields: row.extra_fields ?? {},
   };
 }
@@ -412,6 +410,8 @@ export async function submitWorkReport(report: WorkReport): Promise<void> {
     challenges_solutions: report.challengesSolutions,
     pending_work: report.pendingWork,
     additional_notes: report.additionalNotes,
+    placement_drive_update: report.placementDriveUpdate ?? [],
+    internship_coordination: report.internshipCoordination ?? [],
     extra_fields: report.extraFields ?? {}
   });
   if (error) throw error;
@@ -493,12 +493,8 @@ export async function submitPlacementWorkReport(report: PlacementWorkReport): Pr
     students_guided_applications: report.studentsGuidedApplications,
     placement_drive_update: report.placementDriveUpdate,
     internship_coordination: report.internshipCoordination,
-    mis_documentation: report.misDocumentation,
-    achievement1: report.achievement1,
-    achievement2: report.achievement2,
-    achievement3: report.achievement3,
+    achievements: report.achievements,
     pending_work: report.pendingWork,
-    issues_support: report.issuesSupport,
     extra_fields: report.extraFields ?? {},
   });
   if (error) throw error;

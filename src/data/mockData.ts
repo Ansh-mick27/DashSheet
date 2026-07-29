@@ -207,7 +207,9 @@ export function generateWorkReports(): WorkReport[] {
         keyAccomplishments: `Completed ${randomInt(3, 6)} out of ${TIME_SLOTS.length} scheduled tasks successfully`,
         challengesSolutions: Math.random() > 0.5 ? 'Managed time effectively despite schedule conflicts' : '',
         pendingWork: Math.random() > 0.4 ? 'Grade remaining assignments, prepare next lecture' : '',
-        additionalNotes: ''
+        additionalNotes: '',
+        placementDriveUpdate: [],
+        internshipCoordination: []
       });
     }
   }

@@ -4,7 +4,8 @@
 // and members
 // ==========================================
 import { useEffect, useMemo, useState } from 'react';
-import { Plus, Trash2, Pencil, Check, X } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
+import { Plus, Trash2, Pencil, Check, X, ClipboardList, FileText } from 'lucide-react';
 import {
   fetchFieldOptions, fetchCustomFields, fetchSheetData,
   addFieldOption, updateFieldOption, deleteFieldOption,
@@ -25,7 +26,7 @@ import { DEPARTMENTS, BATCHES, COLLEGES_COURSES_SPECIALIZATIONS, SECTIONS, ACADE
 import FormField from '../components/form/FormField';
 import FormSelect from '../components/form/FormSelect';
 
-type Tab = 'options' | 'fields' | 'members' | 'branchCounts';
+type Tab = 'options' | 'fields' | 'members' | 'branchCounts' | 'submitReports';
 
 const FIELD_TYPES: CustomFieldType[] = ['text', 'number', 'textarea', 'select', 'checkbox', 'date'];
 const FORM_TYPES: CustomFieldFormType[] = ['training', 'work', 'inventory', 'placement', 'placement_work'];
@@ -98,6 +99,9 @@ export default function SuperAdminPage() {
         <button className={`admin-tab ${tab === 'branchCounts' ? 'admin-tab--active' : ''}`} onClick={() => setTab('branchCounts')}>
           Branch Student Counts
         </button>
+        <button className={`admin-tab ${tab === 'submitReports' ? 'admin-tab--active' : ''}`} onClick={() => setTab('submitReports')}>
+          Submit Reports
+        </button>
       </div>
 
       {loading ? (
@@ -108,6 +112,7 @@ export default function SuperAdminPage() {
           {tab === 'fields' && <FieldsTab customFields={customFields} onChange={reload} />}
           {tab === 'members' && <MembersTab members={members} fieldOptions={fieldOptions} onChange={reload} />}
           {tab === 'branchCounts' && <BranchCountsTab fieldOptions={fieldOptions} counts={branchStudentCounts} onChange={reload} />}
+          {tab === 'submitReports' && <SubmitReportsTab />}
         </>
       )}
     </div>
@@ -804,6 +809,30 @@ function MembersTab({ members, fieldOptions, onChange }: { members: Member[]; fi
             </div>
           </div>
         ))}
+      </div>
+    </div>
+  );
+}
+
+// ==========================================
+// Submit Reports Tab
+// ==========================================
+function SubmitReportsTab() {
+  const navigate = useNavigate();
+  return (
+    <div className="settings-card">
+      <h3>Submit Backdated Reports</h3>
+      <p className="settings-card__desc">
+        Submit daily work reports on behalf of any member for any date. Use the calendar picker
+        and member selector inside each form to override the date and submitter name.
+      </p>
+      <div style={{ display: 'flex', gap: 16, marginTop: 20, flexWrap: 'wrap' }}>
+        <button className="btn btn--primary" style={{ gap: 10, padding: '12px 24px', fontSize: 15 }} onClick={() => navigate('/admin/work-report')}>
+          <FileText size={18} /> Trainer Daily Work Report
+        </button>
+        <button className="btn btn--primary" style={{ gap: 10, padding: '12px 24px', fontSize: 15 }} onClick={() => navigate('/admin/placement-work-report')}>
+          <ClipboardList size={18} /> Placement Daily Task Report
+        </button>
       </div>
     </div>
   );

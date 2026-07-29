@@ -205,6 +205,16 @@ function DashboardLayout() {
             <Route path="/portal/placement-work" element={
               <ErrorBoundary><PlacementWorkReportFormPage /></ErrorBoundary>
             } />
+            <Route path="/admin/work-report" element={
+              member?.role !== 'SuperAdmin' ? <Navigate to="/" replace /> : (
+                <ErrorBoundary><WorkReportFormPage adminMembers={members} /></ErrorBoundary>
+              )
+            } />
+            <Route path="/admin/placement-work-report" element={
+              member?.role !== 'SuperAdmin' ? <Navigate to="/" replace /> : (
+                <ErrorBoundary><PlacementWorkReportFormPage adminMembers={members} /></ErrorBoundary>
+              )
+            } />
             <Route path="/training" element={
               <ErrorBoundary><TrainingReportsPage reports={filteredTraining} /></ErrorBoundary>
             } />

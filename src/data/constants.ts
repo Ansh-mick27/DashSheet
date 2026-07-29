@@ -122,13 +122,14 @@ export const PLACEMENT_WORK_LOG_SLOTS: { timeSlot: string; activity: string }[] 
   { timeSlot: '09:00 – 10:00', activity: 'Company Follow-up / New Recruiter Outreach' },
   { timeSlot: '10:00 – 11:00', activity: 'Student Data Verification / Eligibility Checking' },
   { timeSlot: '11:00 – 12:00', activity: 'Placement Drive Coordination / Interview Scheduling' },
-  { timeSlot: '12:00 – 12:30', activity: 'Communication with Departments / Faculty Coordinators' },
-  { timeSlot: '12:30 – 01:30', activity: 'Lunch Break' },
-  { timeSlot: '01:30 – 02:30', activity: 'Student Counselling / Resume Review / GD-PI Support' },
-  { timeSlot: '02:30 – 03:30', activity: 'Internship / Placement Opportunity Sharing & Tracking' },
-  { timeSlot: '03:30 – 04:30', activity: 'MIS Update / Placement Database / Offer Tracking' },
-  { timeSlot: '04:30 – 05:15', activity: 'Reports, Follow-up Calls, Next-Day Planning' },
+  { timeSlot: '12:00 – 01:00', activity: 'Communication with Departments / Faculty Coordinators' },
+  { timeSlot: '01:00 – 02:00', activity: 'Lunch Break' },
+  { timeSlot: '02:00 – 03:00', activity: 'Student Counselling / Resume Review / GD-PI Support' },
+  { timeSlot: '03:00 – 04:00', activity: 'Internship / Placement Opportunity Sharing & Tracking' },
+  { timeSlot: '04:00 – 05:00', activity: 'MIS Update / Placement Database / Offer Tracking' },
+  { timeSlot: '05:00 – 05:15', activity: 'Reports, Follow-up Calls, Next-Day Planning' },
   { timeSlot: '05:15 – 05:30', activity: 'Daily Report Submission' },
+  { timeSlot: 'Others / After Duty', activity: '' },
 ];
 
 export const PLACEMENT_WORK_ACTIVITIES = PLACEMENT_WORK_LOG_SLOTS.map(s => s.activity);
@@ -136,14 +137,14 @@ export const PLACEMENT_WORK_ACTIVITIES = PLACEMENT_WORK_LOG_SLOTS.map(s => s.act
 export const PLACEMENT_WORK_ACTIVITY_OPTIONS: string[] = [
   ...new Set(
     PLACEMENT_WORK_LOG_SLOTS
-      .filter(s => s.activity !== 'Lunch Break')
+      .filter(s => s.activity !== 'Lunch Break' && s.activity !== '')
       .flatMap(s => s.activity.split(/[,/]/).map(a => a.trim()).filter(Boolean))
   )
 ];
 
 export const PLACEMENT_ENGAGEMENT_PURPOSES = ['New Hiring', 'Follow-up', 'JD', 'Drive', 'Other'];
 export const PLACEMENT_ENGAGEMENT_MODES = ['Call', 'Email', 'Meeting', 'Other'];
-export const STUDENT_ENGAGEMENT_PURPOSES = ['Resume', 'Interview', 'Eligibility', 'Attendance', 'Other'];
+export const STUDENT_ENGAGEMENT_PURPOSES = ['Resume', 'Interview', 'Eligibility', 'Attendance', 'Admission', 'Other'];
 export const STUDENT_ENGAGEMENT_STATUSES = ['Open', 'Closed'];
 export const DRIVE_TEST_STATUSES = ['Completed', 'Pending', 'Other'];
 
@@ -152,6 +153,8 @@ export const INTERNSHIP_ACTIVITIES = [
   'Training Session Coordinated',
   'Assessment / Mock Test Conducted',
   'Orientation & Assignments',
+  'Guest Lecture',
+  'Other',
 ];
 
 export const MIS_TASKS = [

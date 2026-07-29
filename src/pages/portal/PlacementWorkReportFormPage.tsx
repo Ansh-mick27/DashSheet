@@ -9,12 +9,12 @@ import { todayISO, isoToDDMMYYYY } from '../../lib/dateUtils';
 import {
   PLACEMENT_WORK_LOG_SLOTS, PLACEMENT_WORK_ACTIVITY_OPTIONS, PLACEMENT_ENGAGEMENT_PURPOSES, PLACEMENT_ENGAGEMENT_MODES,
   STUDENT_ENGAGEMENT_PURPOSES, STUDENT_ENGAGEMENT_STATUSES, DRIVE_TEST_STATUSES,
-  INTERNSHIP_ACTIVITIES, MIS_TASKS, PRIORITIES, RELATED_TO_OPTIONS,
+  INTERNSHIP_ACTIVITIES, PRIORITIES,
 } from '../../data/constants';
 import {
   PlacementWorkReport, PlacementWorkLogEntry, PlacementCompanyEngagementEntry,
   PlacementStudentEngagementEntry, PlacementDriveEntry, PlacementInternshipEntry,
-  PlacementMISEntry, PlacementPendingWorkEntry, PlacementIssueSupportEntry, ExtraFields,
+  PlacementPendingWorkEntry, ExtraFields, Member,
 } from '../../types';
 import { useFormConfig } from '../../lib/useFormConfig';
 import FormField from '../../components/form/FormField';
@@ -45,25 +45,29 @@ const emptyDriveRow = (): PlacementDriveEntry =>
 const emptyPendingRow = (): PlacementPendingWorkEntry =>
   ({ pendingTask: '', personConcerned: '', targetDate: '', priority: '' });
 
-const emptyIssueRow = (): PlacementIssueSupportEntry =>
-  ({ issue: '', relatedTo: '', supportRequired: '', urgency: '' });
-
 function initWorkLog(): PlacementWorkLogEntry[] {
   return PLACEMENT_WORK_LOG_SLOTS.map(s => ({ timeSlot: s.timeSlot, activity: '', status: '', remarks: '' }));
 }
 
 function initInternship(): PlacementInternshipEntry[] {
-  return INTERNSHIP_ACTIVITIES.map(a => ({ activity: a, batchDept: '', noStudents: '', trainerCompany: '', status: '', remarks: '' }));
+  return [emptyInternshipRow(), emptyInternshipRow(), emptyInternshipRow()];
 }
 
-function initMIS(): PlacementMISEntry[] {
-  return MIS_TASKS.map(t => ({ task: t, status: '', remarks: '' }));
+function emptyInternshipRow(): PlacementInternshipEntry {
+  return { activity: '', batchDept: '', noStudents: '', trainerCompany: '', status: '', remarks: '' };
 }
 
-export default function PlacementWorkReportFormPage() {
+interface PlacementWorkReportFormPageProps {
+  adminMembers?: Member[];
+}
+
+export default function PlacementWorkReportFormPage({ adminMembers }: PlacementWorkReportFormPageProps = {}) {
   const { member } = useAuth();
+  const isAdminMode = Boolean(adminMembers);
+  const [adminSelectedMember, setAdminSelectedMember] = useState<Member | null>(null);
+  const activeMember = isAdminMode ? adminSelectedMember : member;
   const [date, setDate] = useState(todayISO());
-  const [department, setDepartment] = useState(member?.department ?? '');
+  const [department, setDepartment] = useState(activeMember?.department ?? '');
 
   const [workLog, setWorkLog] = useState<PlacementWorkLogEntry[]>(initWorkLog);
   const [otherWorkLogRows, setOtherWorkLogRows] = useState<Set<number>>(new Set());
@@ -95,17 +99,12 @@ export default function PlacementWorkReportFormPage() {
   );
 
   const [internshipCoord, setInternshipCoord] = useState<PlacementInternshipEntry[]>(initInternship);
-  const [misDoc, setMisDoc] = useState<PlacementMISEntry[]>(initMIS);
+  const [otherInternshipRows, setOtherInternshipRows] = useState<Set<number>>(new Set());
 
-  const [achievement1, setAchievement1] = useState('');
-  const [achievement2, setAchievement2] = useState('');
-  const [achievement3, setAchievement3] = useState('');
+  const [achievements, setAchievements] = useState<string[]>(['']);
 
   const [pendingWork, setPendingWork] = useState<PlacementPendingWorkEntry[]>(
     [emptyPendingRow(), emptyPendingRow(), emptyPendingRow()]
-  );
-  const [issuesSupport, setIssuesSupport] = useState<PlacementIssueSupportEntry[]>(
-    [emptyIssueRow(), emptyIssueRow(), emptyIssueRow()]
   );
 
   const [extraFields, setExtraFields] = useState<ExtraFields>({});
@@ -121,21 +120,20 @@ export default function PlacementWorkReportFormPage() {
     setStudentEngagement([emptyStudentRow(), emptyStudentRow(), emptyStudentRow()]);
     setTotalStudentsInteracted(''); setResumeReviewsDone(''); setMockInterviewsSupport(''); setStudentsGuidedApplications('');
     setPlacementDriveUpdate([emptyDriveRow(), emptyDriveRow(), emptyDriveRow()]);
-    setInternshipCoord(initInternship()); setMisDoc(initMIS());
-    setAchievement1(''); setAchievement2(''); setAchievement3('');
+    setInternshipCoord(initInternship()); setOtherInternshipRows(new Set());
+    setAchievements(['']);
     setPendingWork([emptyPendingRow(), emptyPendingRow(), emptyPendingRow()]);
-    setIssuesSupport([emptyIssueRow(), emptyIssueRow(), emptyIssueRow()]);
     setExtraFields({});
   };
 
   const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
-    if (!member) return;
+    if (!activeMember) return;
     setStatus('saving');
     try {
       const report: PlacementWorkReport = {
         timestamp: new Date().toISOString(),
-        staffName: member.name,
+        staffName: activeMember.name,
         date: isoToDDMMYYYY(date),
         department,
         workLog,
@@ -150,11 +148,9 @@ export default function PlacementWorkReportFormPage() {
         mockInterviewsSupport: Number(mockInterviewsSupport) || 0,
         studentsGuidedApplications: Number(studentsGuidedApplications) || 0,
         placementDriveUpdate: placementDriveUpdate.filter(r => r.companyName),
-        internshipCoordination: internshipCoord,
-        misDocumentation: misDoc,
-        achievement1, achievement2, achievement3,
+        internshipCoordination: internshipCoord.filter(r => r.activity),
+        achievements: achievements.filter(a => a.trim()),
         pendingWork: pendingWork.filter(r => r.pendingTask),
-        issuesSupport: issuesSupport.filter(r => r.issue),
         extraFields,
       };
       await submitPlacementWorkReport(report);
@@ -183,29 +179,48 @@ export default function PlacementWorkReportFormPage() {
   const updateInternship = (i: number, patch: Partial<PlacementInternshipEntry>) =>
     setInternshipCoord(prev => prev.map((r, idx) => idx === i ? { ...r, ...patch } : r));
 
-  const updateMIS = (i: number, patch: Partial<PlacementMISEntry>) =>
-    setMisDoc(prev => prev.map((r, idx) => idx === i ? { ...r, ...patch } : r));
-
   const updatePending = (i: number, patch: Partial<PlacementPendingWorkEntry>) =>
     setPendingWork(prev => prev.map((r, idx) => idx === i ? { ...r, ...patch } : r));
-
-  const updateIssue = (i: number, patch: Partial<PlacementIssueSupportEntry>) =>
-    setIssuesSupport(prev => prev.map((r, idx) => idx === i ? { ...r, ...patch } : r));
 
   return (
     <div style={{ maxWidth: 1200, margin: '0 auto' }}>
       <div className="page-header">
         <div>
-          <h2 className="page-title">Placement Officer – Daily Task Report</h2>
+          <h2 className="page-title">Placement Daily Task Report</h2>
           <p className="page-subtitle">Reporting Time: 8:30 AM to 5:30 PM</p>
         </div>
       </div>
 
       <form onSubmit={handleSubmit}>
+        {isAdminMode && (
+          <div className="settings-card">
+            <div className="form-section-title" style={{ marginBottom: 12 }}>Select Placement Officer &amp; Date</div>
+            <div className="form-grid form-grid--2">
+              <div className="settings-form__field">
+                <label className="settings-form__label">Placement Officer</label>
+                <select className="settings-form__input" value={adminSelectedMember?.id ?? ''}
+                  onChange={e => {
+                    const m = adminMembers!.find(m => m.id === e.target.value) ?? null;
+                    setAdminSelectedMember(m);
+                    if (m) setDepartment(m.department);
+                  }}>
+                  <option value="">— Select placement officer —</option>
+                  {adminMembers!.filter(m => m.role === 'Placement' || m.role === 'SuperAdmin').map(m => (
+                    <option key={m.id} value={m.id}>{m.name} ({m.department})</option>
+                  ))}
+                </select>
+              </div>
+              <div className="settings-form__field">
+                <label className="settings-form__label">Date</label>
+                <input type="date" className="settings-form__input" value={date} onChange={e => setDate(e.target.value)} required />
+              </div>
+            </div>
+          </div>
+        )}
         {/* Header Fields */}
         <div className="settings-card">
           <div className="form-grid form-grid--3">
-            <FormField label="Name of Placement Officer" name="staffName" value={member?.name ?? ''} onChange={() => {}} readOnly />
+            <FormField label="Name of Placement Officer" name="staffName" value={activeMember?.name ?? ''} onChange={() => {}} readOnly />
             <FormField label="Date" name="date" type="date" value={date} onChange={setDate} required />
           </div>
           <div className="form-grid">
@@ -227,7 +242,7 @@ export default function PlacementWorkReportFormPage() {
               </thead>
               <tbody>
                 {workLog.map((row, i) => {
-                  const isLunch = row.timeSlot === '12:30 – 01:30';
+                  const isLunch = row.timeSlot === '01:00 – 02:00';
                   const isOther = otherWorkLogRows.has(i);
                   const handleActivitySelect = (val: string) => {
                     if (val === 'Other') {
@@ -285,9 +300,9 @@ export default function PlacementWorkReportFormPage() {
           </div>
         </div>
 
-        {/* Section 2: Company / Recruiter Engagement */}
+        {/* Section 2: Corporate Relation Engagement */}
         <div className="settings-card">
-          <div className="form-section-title">2. Company / Recruiter Engagement</div>
+          <div className="form-section-title">2. Corporate Relation Engagement</div>
           <div className="tbl-scroll">
             <table style={{ borderCollapse: 'collapse', fontSize: 13, width: '100%', minWidth: 720 }}>
               <thead>
@@ -511,95 +526,103 @@ export default function PlacementWorkReportFormPage() {
         <div className="settings-card">
           <div className="form-section-title">5. Internship / Training / Skill Development Coordination</div>
           <div className="tbl-scroll">
-            <table style={{ borderCollapse: 'collapse', fontSize: 13, width: '100%', minWidth: 660 }}>
+            <table style={{ borderCollapse: 'collapse', fontSize: 13, width: '100%', minWidth: 720 }}>
               <thead>
                 <tr>
-                  {['Activity', 'Batch / Department', 'No. of Students', 'Trainer / Company', 'Status', 'Remarks'].map(h => (
+                  {['Activity', 'Batch / Department', 'No. of Students', 'Trainer / Company', 'Status', 'Remarks', ''].map(h => (
                     <th key={h} style={TH}>{h}</th>
                   ))}
                 </tr>
               </thead>
               <tbody>
-                {internshipCoord.map((row, i) => (
-                  <tr key={i}>
-                    <td style={{ ...TD, minWidth: 200 }}><span style={{ fontSize: 12 }}>{row.activity}</span></td>
-                    <td style={{ ...TD, minWidth: 130 }}>
-                      <input className="settings-form__input" style={{ minWidth: 118 }} value={row.batchDept}
-                        onChange={e => updateInternship(i, { batchDept: e.target.value })} placeholder="Batch / Dept." />
-                    </td>
-                    <td style={{ ...TD, minWidth: 90 }}>
-                      <input className="settings-form__input" style={{ minWidth: 78 }} type="number" value={row.noStudents}
-                        onChange={e => updateInternship(i, { noStudents: e.target.value })} placeholder="0" min={0} />
-                    </td>
-                    <td style={{ ...TD, minWidth: 130 }}>
-                      <input className="settings-form__input" style={{ minWidth: 118 }} value={row.trainerCompany}
-                        onChange={e => updateInternship(i, { trainerCompany: e.target.value })} placeholder="Trainer / Company" />
-                    </td>
-                    <td style={{ ...TD, minWidth: 110 }}>
-                      <select className="settings-form__input" style={{ minWidth: 98 }} value={row.status}
-                        onChange={e => updateInternship(i, { status: e.target.value as PlacementInternshipEntry['status'] })}>
-                        <option value="">Select...</option>
-                        <option>Completed</option>
-                        <option>Pending</option>
-                      </select>
-                    </td>
-                    <td style={{ ...TD, minWidth: 140 }}>
-                      <input className="settings-form__input" style={{ minWidth: 128 }} value={row.remarks}
-                        onChange={e => updateInternship(i, { remarks: e.target.value })} placeholder="Remarks" />
-                    </td>
-                  </tr>
-                ))}
+                {internshipCoord.map((row, i) => {
+                  const isOtherI = otherInternshipRows.has(i);
+                  const handleActivitySelect = (val: string) => {
+                    if (val === 'Other') {
+                      setOtherInternshipRows(prev => new Set([...prev, i]));
+                    } else {
+                      setOtherInternshipRows(prev => { const s = new Set(prev); s.delete(i); return s; });
+                      updateInternship(i, { activity: val });
+                    }
+                  };
+                  return (
+                    <tr key={i}>
+                      <td style={{ ...TD, minWidth: 200 }}>
+                        <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
+                          <select className="settings-form__input" style={{ minWidth: 180 }}
+                            value={isOtherI ? 'Other' : row.activity}
+                            onChange={e => handleActivitySelect(e.target.value)}>
+                            <option value="">Select activity...</option>
+                            {INTERNSHIP_ACTIVITIES.map(a => <option key={a} value={a}>{a}</option>)}
+                          </select>
+                          {isOtherI && (
+                            <input className="settings-form__input" style={{ minWidth: 180 }}
+                              value={row.activity}
+                              onChange={e => updateInternship(i, { activity: e.target.value })}
+                              placeholder="Specify activity…" />
+                          )}
+                        </div>
+                      </td>
+                      <td style={{ ...TD, minWidth: 130 }}>
+                        <input className="settings-form__input" style={{ minWidth: 118 }} value={row.batchDept}
+                          onChange={e => updateInternship(i, { batchDept: e.target.value })} placeholder="Batch / Dept." />
+                      </td>
+                      <td style={{ ...TD, minWidth: 90 }}>
+                        <input className="settings-form__input" style={{ minWidth: 78 }} type="number" value={row.noStudents}
+                          onChange={e => updateInternship(i, { noStudents: e.target.value })} placeholder="0" min={0} />
+                      </td>
+                      <td style={{ ...TD, minWidth: 130 }}>
+                        <input className="settings-form__input" style={{ minWidth: 118 }} value={row.trainerCompany}
+                          onChange={e => updateInternship(i, { trainerCompany: e.target.value })} placeholder="Trainer / Company" />
+                      </td>
+                      <td style={{ ...TD, minWidth: 110 }}>
+                        <select className="settings-form__input" style={{ minWidth: 98 }} value={row.status}
+                          onChange={e => updateInternship(i, { status: e.target.value as PlacementInternshipEntry['status'] })}>
+                          <option value="">Select...</option>
+                          <option>Completed</option>
+                          <option>Pending</option>
+                        </select>
+                      </td>
+                      <td style={{ ...TD, minWidth: 140 }}>
+                        <input className="settings-form__input" style={{ minWidth: 128 }} value={row.remarks}
+                          onChange={e => updateInternship(i, { remarks: e.target.value })} placeholder="Remarks" />
+                      </td>
+                      <td style={{ ...TD, width: 36 }}>
+                        {internshipCoord.length > 1 && (
+                          <button type="button" className="btn btn--ghost btn--sm"
+                            onClick={() => { setInternshipCoord(prev => prev.filter((_, idx) => idx !== i)); setOtherInternshipRows(prev => { const s = new Set(prev); s.delete(i); return s; }); }}>
+                            <Trash2 size={13} />
+                          </button>
+                        )}
+                      </td>
+                    </tr>
+                  );
+                })}
               </tbody>
             </table>
           </div>
+          <button type="button" className="btn btn--ghost btn--sm" style={{ marginTop: 8 }}
+            onClick={() => setInternshipCoord(prev => [...prev, emptyInternshipRow()])}>
+            <Plus size={13} /> Add Row
+          </button>
         </div>
 
-        {/* Section 6: MIS / Documentation Work */}
+        {/* Section 6: Key Achievements */}
         <div className="settings-card">
-          <div className="form-section-title">6. MIS / Documentation Work</div>
-          <div className="tbl-scroll">
-            <table style={{ borderCollapse: 'collapse', fontSize: 13, width: '100%', minWidth: 480 }}>
-              <thead>
-                <tr>
-                  {['Task', 'Status', 'Remarks'].map(h => (
-                    <th key={h} style={TH}>{h}</th>
-                  ))}
-                </tr>
-              </thead>
-              <tbody>
-                {misDoc.map((row, i) => (
-                  <tr key={i}>
-                    <td style={{ ...TD, minWidth: 220 }}><span style={{ fontSize: 12 }}>{row.task}</span></td>
-                    <td style={{ ...TD, minWidth: 120 }}>
-                      <select className="settings-form__input" style={{ minWidth: 108 }} value={row.status}
-                        onChange={e => updateMIS(i, { status: e.target.value as PlacementMISEntry['status'] })}>
-                        <option value="">Select...</option>
-                        <option>Completed</option>
-                        <option>Pending</option>
-                      </select>
-                    </td>
-                    <td style={{ ...TD, minWidth: 200 }}>
-                      <input className="settings-form__input" style={{ minWidth: 188 }} value={row.remarks}
-                        onChange={e => updateMIS(i, { remarks: e.target.value })} placeholder="Remarks" />
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
+          <div className="form-section-title">6. Key Achievements of the Day</div>
+          {achievements.map((ach, i) => (
+            <FormTextarea key={i} label={`Achievement ${i + 1}`} name={`achievement-${i}`}
+              value={ach} onChange={v => setAchievements(prev => prev.map((a, j) => j === i ? v : a))} rows={2} />
+          ))}
+          <button type="button" className="btn btn--ghost btn--sm" style={{ marginTop: 8 }}
+            onClick={() => setAchievements(prev => [...prev, ''])}>
+            <Plus size={13} /> Add More
+          </button>
         </div>
 
-        {/* Section 7: Key Achievements */}
+        {/* Section 7: Pending Work / Follow-up Required */}
         <div className="settings-card">
-          <div className="form-section-title">7. Key Achievements of the Day</div>
-          <FormTextarea label="Achievement 1" name="achievement1" value={achievement1} onChange={setAchievement1} rows={2} />
-          <FormTextarea label="Achievement 2" name="achievement2" value={achievement2} onChange={setAchievement2} rows={2} />
-          <FormTextarea label="Achievement 3" name="achievement3" value={achievement3} onChange={setAchievement3} rows={2} />
-        </div>
-
-        {/* Section 8: Pending Work / Follow-up Required */}
-        <div className="settings-card">
-          <div className="form-section-title">8. Pending Work / Follow-up Required</div>
+          <div className="form-section-title">7. Pending Work / Follow-up Required</div>
           <div className="tbl-scroll">
             <table style={{ borderCollapse: 'collapse', fontSize: 13, width: '100%', minWidth: 540 }}>
               <thead>
@@ -647,62 +670,6 @@ export default function PlacementWorkReportFormPage() {
           </div>
           <button type="button" className="btn btn--ghost btn--sm" style={{ marginTop: 8 }}
             onClick={() => setPendingWork(prev => [...prev, emptyPendingRow()])}>
-            <Plus size={13} /> Add Row
-          </button>
-        </div>
-
-        {/* Section 9: Issues / Support Required */}
-        <div className="settings-card">
-          <div className="form-section-title">9. Issues / Support Required</div>
-          <div className="tbl-scroll">
-            <table style={{ borderCollapse: 'collapse', fontSize: 13, width: '100%', minWidth: 490 }}>
-              <thead>
-                <tr>
-                  {['Issue', 'Related To', 'Support Required From', 'Urgency', ''].map(h => (
-                    <th key={h} style={TH}>{h}</th>
-                  ))}
-                </tr>
-              </thead>
-              <tbody>
-                {issuesSupport.map((row, i) => (
-                  <tr key={i}>
-                    <td style={{ ...TD, minWidth: 160 }}>
-                      <input className="settings-form__input" style={{ minWidth: 148 }} value={row.issue}
-                        onChange={e => updateIssue(i, { issue: e.target.value })} placeholder="Describe issue" />
-                    </td>
-                    <td style={{ ...TD, minWidth: 120 }}>
-                      <select className="settings-form__input" style={{ minWidth: 108 }} value={row.relatedTo}
-                        onChange={e => updateIssue(i, { relatedTo: e.target.value })}>
-                        <option value="">Select...</option>
-                        {RELATED_TO_OPTIONS.map(o => <option key={o}>{o}</option>)}
-                      </select>
-                    </td>
-                    <td style={{ ...TD, minWidth: 160 }}>
-                      <input className="settings-form__input" style={{ minWidth: 148 }} value={row.supportRequired}
-                        onChange={e => updateIssue(i, { supportRequired: e.target.value })} placeholder="Support needed from" />
-                    </td>
-                    <td style={{ ...TD, minWidth: 100 }}>
-                      <select className="settings-form__input" style={{ minWidth: 88 }} value={row.urgency}
-                        onChange={e => updateIssue(i, { urgency: e.target.value as PlacementIssueSupportEntry['urgency'] })}>
-                        <option value="">Select...</option>
-                        {PRIORITIES.map(o => <option key={o}>{o}</option>)}
-                      </select>
-                    </td>
-                    <td style={{ ...TD, width: 36 }}>
-                      {issuesSupport.length > 1 && (
-                        <button type="button" className="btn btn--ghost btn--sm"
-                          onClick={() => setIssuesSupport(prev => prev.filter((_, idx) => idx !== i))}>
-                          <Trash2 size={13} />
-                        </button>
-                      )}
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-          <button type="button" className="btn btn--ghost btn--sm" style={{ marginTop: 8 }}
-            onClick={() => setIssuesSupport(prev => [...prev, emptyIssueRow()])}>
             <Plus size={13} /> Add Row
           </button>
         </div>

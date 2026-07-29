@@ -16,7 +16,6 @@ export default function PlacementWorkReportsPage({ reports }: PlacementWorkRepor
     { key: 'staffName', header: 'Staff Name', sortable: true, width: '140px' },
     { key: 'date', header: 'Date', sortable: true, width: '100px' },
     { key: 'department', header: 'Department', sortable: true, width: '140px' },
-    { key: 'reportingTo', header: 'Reporting To', sortable: true, width: '130px' },
     {
       key: 'totalCompaniesContacted',
       header: 'Companies',
@@ -39,12 +38,13 @@ export default function PlacementWorkReportsPage({ reports }: PlacementWorkRepor
       render: (r: PlacementWorkReport) => r.confirmedOpportunities || '—',
     },
     {
-      key: 'achievement1',
+      key: 'achievements',
       header: 'Key Achievement',
       width: '220px',
-      render: (r: PlacementWorkReport) => r.achievement1
-        ? (r.achievement1.length > 60 ? r.achievement1.slice(0, 60) + '…' : r.achievement1)
-        : '—',
+      render: (r: PlacementWorkReport) => {
+        const first = r.achievements?.[0] ?? '';
+        return first ? (first.length > 60 ? first.slice(0, 60) + '…' : first) : '—';
+      },
     },
   ], []);
 

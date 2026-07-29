@@ -86,6 +86,8 @@ export interface WorkReport {
   challengesSolutions: string;
   pendingWork: string;
   additionalNotes: string;
+  placementDriveUpdate: PlacementDriveEntry[];
+  internshipCoordination: PlacementInternshipEntry[];
   extraFields?: ExtraFields;
 }
 
@@ -242,12 +244,8 @@ export interface PlacementWorkReport {
   studentsGuidedApplications: number;
   placementDriveUpdate: PlacementDriveEntry[];
   internshipCoordination: PlacementInternshipEntry[];
-  misDocumentation: PlacementMISEntry[];
-  achievement1: string;
-  achievement2: string;
-  achievement3: string;
+  achievements: string[];
   pendingWork: PlacementPendingWorkEntry[];
-  issuesSupport: PlacementIssueSupportEntry[];
   extraFields?: ExtraFields;
 }
 
