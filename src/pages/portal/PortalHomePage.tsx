@@ -2,7 +2,7 @@
 // DashSheet — Portal Home Page
 // ==========================================
 import { Link } from 'react-router-dom';
-import { BookOpen, ClipboardList, Package, Briefcase, FileText } from 'lucide-react';
+import { BookOpen, ClipboardList, Package, Briefcase, FileText, Settings } from 'lucide-react';
 import { useAuth } from '../../contexts/AuthContext';
 
 export default function PortalHomePage() {
@@ -61,6 +61,11 @@ export default function PortalHomePage() {
             </Link>
           </>
         )}
+        <Link to="/settings" className="portal-card">
+          <div className="portal-card__icon"><Settings size={22} /></div>
+          <div className="portal-card__title">Settings</div>
+          <p className="portal-card__desc">Change your account password and view security information.</p>
+        </Link>
       </div>
     </div>
   );
