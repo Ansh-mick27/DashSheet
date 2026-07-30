@@ -614,3 +614,17 @@ export async function deleteMember(id: string): Promise<void> {
   if (error) throw error;
   refreshData();
 }
+
+export async function changePassword(
+  memberId: string,
+  currentPassword: string,
+  newPassword: string
+): Promise<boolean> {
+  const { data, error } = await supabase.rpc('member_change_password', {
+    p_id: memberId,
+    p_current_password: currentPassword,
+    p_new_password: newPassword,
+  });
+  if (error) throw error;
+  return Boolean(data);
+}
