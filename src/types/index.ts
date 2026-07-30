@@ -275,3 +275,63 @@ export interface Notification {
   trainerName?: string;
   timestamp: Date;
 }
+
+export interface OATimeSlotEntry { timeSlot: string; taskActivity: string; relatedArea: string; status: string; remark: string; }
+export interface OAStudentSupportRow { particular: string; countStatus: string; remarks: string; }
+export interface OACampusProcessRow { process: string; venue: string; supportProvided: string; noOfStudentsGuests: string; status: string; remarks: string; }
+export interface OAHousekeepingRow { area: string; status: string; issueFound: string; actionTaken: string; remarks: string; }
+export interface OAFileDocRow { fileType: string; purpose: string; preparedUpdated: string; physicalFile: string; digitalFolder: string; remarks: string; }
+export interface OAInfrastructureRow { utility: string; location: string; status: string; issueFound: string; actionTaken: string; }
+export interface OAMISRow { recordType: string; updated: string; pending: string; remarks: string; }
+export interface OAIssueRow { issue: string; relatedArea: string; reportedTo: string; actionRequired: string; priority: string; }
+export interface OAPendingWorkRow { pendingTask: string; concernedPerson: string; targetDate: string; priority: string; }
+export interface OAITPeripheralRow { equipment: string; location: string; workingStatus: string; issueReported: string; actionTaken: string; }
+export interface OAReceptionRow { visitorName: string; purposeOfVisit: string; expectedTime: string; receptionInformed: string; gateSecurityInformed: string; parkingRequired: string; remarks: string; }
+export interface OATravelRow { guestName: string; from: string; to: string; pickupTime: string; dropTime: string; vehicleDriverDetails: string; status: string; remarks: string; }
+export interface OATravelDetails { driverName: string; driverMobile: string; vehicleNo: string; vendorInternal: string; securityInformed: string; parkingArranged: string; }
+export interface OAHospitalityRow { guest: string; requirement: string; time: string; arrangedBy: string; status: string; remarks: string; }
+export interface OAPrintingRow { material: string; quantity: string; purpose: string; requestedBy: string; completedTime: string; status: string; remarks: string; }
+export interface OAInstallationRow { item: string; location: string; installedBy: string; timeCompleted: string; status: string; remarks: string; }
+export interface OAVendorRow { vendor: string; serviceRequired: string; contactPerson: string; deliveryTime: string; status: string; remarks: string; }
+export interface OAChecklistRow { point: string; status: string; remarks: string; }
+export interface OAInventoryRow { itemName: string; openingStock: string; usedToday: string; balanceStock: string; reorderRequired: string; remarks: string; }
+
+export interface OfficeAdminDailyReport {
+  id?: string;
+  timestamp: string;
+  staffName: string;
+  date: string;
+  department: string;
+  timeSlotLog: OATimeSlotEntry[];
+  studentSupport: OAStudentSupportRow[];
+  campusProcess: OACampusProcessRow[];
+  housekeeping: OAHousekeepingRow[];
+  fileDocumentation: OAFileDocRow[];
+  infrastructure: OAInfrastructureRow[];
+  misRecords: OAMISRow[];
+  keyWorkCompleted: string[];
+  issues: OAIssueRow[];
+  pendingWork: OAPendingWorkRow[];
+  hasCampusDay: boolean;
+  itPeripherals: OAITPeripheralRow[];
+  receptionNotification: OAReceptionRow[];
+  travelRows: OATravelRow[];
+  travelDetails: OATravelDetails;
+  hospitality: OAHospitalityRow[];
+  printingMaterial: OAPrintingRow[];
+  installationDisplay: OAInstallationRow[];
+  vendorCoordination: OAVendorRow[];
+  preProcessChecklist: OAChecklistRow[];
+  postProcessChecklist: OAChecklistRow[];
+  nextDayReadiness: OAChecklistRow[];
+}
+
+export interface OfficeAdminWeeklyReport {
+  id?: string;
+  timestamp: string;
+  staffName: string;
+  date: string;
+  department: string;
+  inventoryStock: OAInventoryRow[];
+  infrastructure: OAInfrastructureRow[];
+}

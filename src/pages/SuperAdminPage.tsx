@@ -5,7 +5,7 @@
 // ==========================================
 import { useEffect, useMemo, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Plus, Trash2, Pencil, Check, X, ClipboardList, FileText } from 'lucide-react';
+import { Plus, Trash2, Pencil, Check, X, ClipboardList, FileText, ClipboardCheck, CalendarDays } from 'lucide-react';
 import {
   fetchFieldOptions, fetchCustomFields, fetchSheetData,
   addFieldOption, updateFieldOption, deleteFieldOption,
@@ -832,6 +832,12 @@ function SubmitReportsTab() {
         </button>
         <button className="btn btn--primary" style={{ gap: 10, padding: '12px 24px', fontSize: 15 }} onClick={() => navigate('/admin/placement-work-report')}>
           <ClipboardList size={18} /> Placement Daily Task Report
+        </button>
+        <button className="btn btn--primary" style={{ gap: 10, padding: '12px 24px', fontSize: 15 }} onClick={() => navigate('/admin/office-daily-report')}>
+          <ClipboardCheck size={18} /> Office Admin Daily Report
+        </button>
+        <button className="btn btn--primary" style={{ gap: 10, padding: '12px 24px', fontSize: 15 }} onClick={() => navigate('/admin/office-weekly-report')}>
+          <CalendarDays size={18} /> Office Admin Weekly Report
         </button>
       </div>
     </div>

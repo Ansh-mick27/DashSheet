@@ -167,3 +167,33 @@ export const MIS_TASKS = [
 
 export const PLACEMENT_WORK_STATUSES = ['Completed', 'Pending'];
 export const RELATED_TO_OPTIONS = ['Company', 'Student', 'Department', 'Data', 'Infrastructure', 'Other'];
+
+export const OA_TIME_SLOTS = [
+  '08:30 – 09:00','09:00 – 10:00','10:00 – 11:00','11:00 – 12:00',
+  '12:00 – 01:00','01:00 – 02:00','02:00 – 03:00','03:00 – 04:00',
+  '04:00 – 05:00','05:00 – 05:15','05:15 – 05:30','Others / After Duty',
+];
+export const OA_TASK_ACTIVITIES = [
+  'Office opening, email checking, daily planning, process schedule review',
+  'Venue inspection, housekeeping check, room readiness, seating arrangement',
+  'Student data update, attendance preparation, document checking, eligibility list support',
+  'Placement / training / assessment process coordination',
+  'Stationery, stock, printing material, files and registers checking',
+  'Company / trainer / guest / student support during ongoing process',
+  'IT peripherals, projector, printer, scanner, internet, mic, speaker and utility check',
+  'MIS update, attendance filing, stock update, vendor follow-up, bill/document collection',
+  'Pending follow-up, next-day preparation, room booking, logistics and communication planning',
+];
+export const OA_RELATED_AREAS = [
+  'CDC Office / Planning','Infrastructure / Housekeeping','Student Records / Documentation',
+  'Campus Process','Inventory / Stationery','Coordination / Hospitality',
+  'IT / Utilities','MIS / Records / Vendor','Planning / Follow-up','Reporting',
+];
+export const OA_TASK_STATUSES = ['Completed', 'Pending'];
+export const OA_PRIORITIES = ['High', 'Medium', 'Low'];
+export const OA_YES_NO = ['Yes', 'No'];
+export const OA_DONE_PENDING = ['Done', 'Pending'];
+export const OA_COMPLETED_PENDING = ['Completed', 'Pending'];
+export const OA_ISSUE_AREAS = ['Housekeeping','Inventory','IT','Utilities','Infrastructure','Logistics','Hospitality'];
+export const OA_RECEPTION_PURPOSES = ['Placement','Training','Meeting','Guest Session'];
+export const OA_HOSPITALITY_REQUIREMENTS = ['Tea / Coffee','Breakfast','Lunch','Water Bottles','Refreshments','Waiting Lounge / Seating'];
