@@ -4,7 +4,8 @@
 import { supabase, isSupabaseConfigured } from '../lib/supabaseClient';
 import {
   Member, MemberRole, TrainingReport, WorkReport, OfficeAdminReport, PlacementReport, Notification,
-  FieldOption, CustomField, CustomFieldFormType, CustomFieldType, BranchStudentCount, PlacementWorkReport
+  FieldOption, CustomField, CustomFieldFormType, CustomFieldType, BranchStudentCount, PlacementWorkReport,
+  OfficeAdminDailyReport, OfficeAdminWeeklyReport
 } from '../types';
 import {
   generateMembers, generateTrainingReports, generateWorkReports,
@@ -499,6 +500,64 @@ export async function submitPlacementWorkReport(report: PlacementWorkReport): Pr
   });
   if (error) throw error;
   refreshData();
+}
+
+export async function submitOfficeAdminDailyReport(report: OfficeAdminDailyReport): Promise<void> {
+  const { error } = await supabase.from('office_admin_daily_reports').insert({
+    timestamp: report.timestamp, staff_name: report.staffName, date: report.date,
+    department: report.department, time_slot_log: report.timeSlotLog,
+    student_support: report.studentSupport, campus_process: report.campusProcess,
+    housekeeping: report.housekeeping, file_documentation: report.fileDocumentation,
+    infrastructure: report.infrastructure, mis_records: report.misRecords,
+    key_work_completed: report.keyWorkCompleted, issues: report.issues,
+    pending_work: report.pendingWork, has_campus_day: report.hasCampusDay,
+    it_peripherals: report.itPeripherals, reception_notification: report.receptionNotification,
+    travel_rows: report.travelRows, travel_details: report.travelDetails,
+    hospitality: report.hospitality, printing_material: report.printingMaterial,
+    installation_display: report.installationDisplay, vendor_coordination: report.vendorCoordination,
+    pre_process_checklist: report.preProcessChecklist, post_process_checklist: report.postProcessChecklist,
+    next_day_readiness: report.nextDayReadiness,
+  });
+  if (error) throw error;
+}
+
+export async function submitOfficeAdminWeeklyReport(report: OfficeAdminWeeklyReport): Promise<void> {
+  const { error } = await supabase.from('office_admin_weekly_reports').insert({
+    timestamp: report.timestamp, staff_name: report.staffName, date: report.date,
+    department: report.department, inventory_stock: report.inventoryStock,
+    infrastructure: report.infrastructure,
+  });
+  if (error) throw error;
+}
+
+export async function fetchOfficeAdminDailyReports(): Promise<OfficeAdminDailyReport[]> {
+  const { data, error } = await supabase.from('office_admin_daily_reports').select('*').order('timestamp', { ascending: false });
+  if (error) throw error;
+  return (data ?? []).map(row => ({
+    id: row.id, timestamp: row.timestamp, staffName: row.staff_name, date: row.date,
+    department: row.department, timeSlotLog: row.time_slot_log ?? [],
+    studentSupport: row.student_support ?? [], campusProcess: row.campus_process ?? [],
+    housekeeping: row.housekeeping ?? [], fileDocumentation: row.file_documentation ?? [],
+    infrastructure: row.infrastructure ?? [], misRecords: row.mis_records ?? [],
+    keyWorkCompleted: row.key_work_completed ?? [], issues: row.issues ?? [],
+    pendingWork: row.pending_work ?? [], hasCampusDay: row.has_campus_day ?? false,
+    itPeripherals: row.it_peripherals ?? [], receptionNotification: row.reception_notification ?? [],
+    travelRows: row.travel_rows ?? [], travelDetails: row.travel_details ?? {},
+    hospitality: row.hospitality ?? [], printingMaterial: row.printing_material ?? [],
+    installationDisplay: row.installation_display ?? [], vendorCoordination: row.vendor_coordination ?? [],
+    preProcessChecklist: row.pre_process_checklist ?? [], postProcessChecklist: row.post_process_checklist ?? [],
+    nextDayReadiness: row.next_day_readiness ?? [],
+  }));
+}
+
+export async function fetchOfficeAdminWeeklyReports(): Promise<OfficeAdminWeeklyReport[]> {
+  const { data, error } = await supabase.from('office_admin_weekly_reports').select('*').order('timestamp', { ascending: false });
+  if (error) throw error;
+  return (data ?? []).map(row => ({
+    id: row.id, timestamp: row.timestamp, staffName: row.staff_name, date: row.date,
+    department: row.department, inventoryStock: row.inventory_stock ?? [],
+    infrastructure: row.infrastructure ?? [],
+  }));
 }
 
 export async function addBranchStudentCount(college: string, course: string, specialization: string, section: string, year: string, semester: string, studentCount: number): Promise<void> {

@@ -5,7 +5,7 @@ import { NavLink, useNavigate } from 'react-router-dom';
 import {
   LayoutDashboard, BookOpen, ClipboardList, Users,
   LogOut, ChevronLeft, ChevronRight, Settings,
-  Package, Briefcase, Sun, Moon, Search, ClipboardPlus, ShieldCheck, FileText
+  Package, Briefcase, Sun, Moon, Search, ClipboardPlus, ShieldCheck, FileText, ClipboardCheck, CalendarDays
 } from 'lucide-react';
 import { useAuth } from '../contexts/AuthContext';
 import { useTheme } from '../contexts/ThemeContext';
@@ -19,6 +19,8 @@ const ADMIN_NAV_ITEMS = [
   { path: '/inventory', icon: Package, label: 'Inventory' },
   { path: '/placement', icon: Briefcase, label: 'CRP Process' },
   { path: '/placement-work', icon: FileText, label: 'Placement Work' },
+  { path: '/office-daily', icon: ClipboardCheck, label: 'Office Daily' },
+  { path: '/office-weekly', icon: CalendarDays, label: 'Office Weekly' },
   { path: '/portal', icon: ClipboardPlus, label: 'Portal' },
   { path: '/settings', icon: Settings, label: 'Settings' },
 ];

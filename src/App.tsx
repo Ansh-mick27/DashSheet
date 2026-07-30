@@ -25,11 +25,16 @@ import InventoryReportFormPage from './pages/portal/InventoryReportFormPage';
 import PlacementReportFormPage from './pages/portal/PlacementReportFormPage';
 import PlacementWorkReportFormPage from './pages/portal/PlacementWorkReportFormPage';
 import PlacementWorkReportsPage from './pages/PlacementWorkReportsPage';
+import OfficeAdminDailyReportFormPage from './pages/portal/OfficeAdminDailyReportFormPage';
+import OfficeAdminWeeklyReportFormPage from './pages/portal/OfficeAdminWeeklyReportFormPage';
+import OfficeDailyReportsPage from './pages/OfficeDailyReportsPage';
+import OfficeWeeklyReportsPage from './pages/OfficeWeeklyReportsPage';
 import { useAuth } from './contexts/AuthContext';
-import { fetchSheetData, refreshData, parseDate, generateNotifications } from './services/dataApi';
+import { fetchSheetData, refreshData, parseDate, generateNotifications, fetchOfficeAdminDailyReports, fetchOfficeAdminWeeklyReports } from './services/dataApi';
 import {
   Member, TrainingReport, WorkReport, OfficeAdminReport,
-  PlacementReport, PlacementWorkReport, DashboardFilters, Notification, BranchStudentCount
+  PlacementReport, PlacementWorkReport, DashboardFilters, Notification, BranchStudentCount,
+  OfficeAdminDailyReport, OfficeAdminWeeklyReport
 } from './types';
 
 function DashboardLayout() {
@@ -40,6 +45,8 @@ function DashboardLayout() {
   const [officeAdminReports, setOfficeAdminReports] = useState<OfficeAdminReport[]>([]);
   const [placementReports, setPlacementReports] = useState<PlacementReport[]>([]);
   const [placementWorkReports, setPlacementWorkReports] = useState<PlacementWorkReport[]>([]);
+  const [officeDailyReports, setOfficeDailyReports] = useState<OfficeAdminDailyReport[]>([]);
+  const [officeWeeklyReports, setOfficeWeeklyReports] = useState<OfficeAdminWeeklyReport[]>([]);
   const [branchStudentCounts, setBranchStudentCounts] = useState<BranchStudentCount[]>([]);
   const [loading, setLoading] = useState(true);
   const [notifications, setNotifications] = useState<Notification[]>([]);
@@ -53,7 +60,11 @@ function DashboardLayout() {
   const loadData = useCallback(async () => {
     setLoading(true);
     try {
-      const data = await fetchSheetData();
+      const [data, officeDailyData, officeWeeklyData] = await Promise.all([
+        fetchSheetData(),
+        fetchOfficeAdminDailyReports().catch(() => [] as OfficeAdminDailyReport[]),
+        fetchOfficeAdminWeeklyReports().catch(() => [] as OfficeAdminWeeklyReport[]),
+      ]);
       setMembers(data.members);
       setTrainingReports(data.trainingReports);
       setWorkReports(data.workReports);
@@ -61,6 +72,8 @@ function DashboardLayout() {
       setPlacementReports(data.placementReports);
       setPlacementWorkReports(data.placementWorkReports);
       setBranchStudentCounts(data.branchStudentCounts);
+      setOfficeDailyReports(officeDailyData);
+      setOfficeWeeklyReports(officeWeeklyData);
       setNotifications(generateNotifications(data.workReports, data.trainingReports));
     } catch (err) {
       console.error('Failed to load data:', err);
@@ -205,6 +218,12 @@ function DashboardLayout() {
             <Route path="/portal/placement-work" element={
               <ErrorBoundary><PlacementWorkReportFormPage /></ErrorBoundary>
             } />
+            <Route path="/portal/office-daily" element={
+              <ErrorBoundary><OfficeAdminDailyReportFormPage /></ErrorBoundary>
+            } />
+            <Route path="/portal/office-weekly" element={
+              <ErrorBoundary><OfficeAdminWeeklyReportFormPage /></ErrorBoundary>
+            } />
             <Route path="/admin/work-report" element={
               member?.role !== 'SuperAdmin' ? <Navigate to="/" replace /> : (
                 <ErrorBoundary><WorkReportFormPage adminMembers={members} /></ErrorBoundary>
@@ -214,6 +233,14 @@ function DashboardLayout() {
               member?.role !== 'SuperAdmin' ? <Navigate to="/" replace /> : (
                 <ErrorBoundary><PlacementWorkReportFormPage adminMembers={members} /></ErrorBoundary>
               )
+            } />
+            <Route path="/admin/office-daily-report" element={
+              member?.role !== 'SuperAdmin' ? <Navigate to="/" replace /> :
+              <ErrorBoundary><OfficeAdminDailyReportFormPage adminMembers={members} /></ErrorBoundary>
+            } />
+            <Route path="/admin/office-weekly-report" element={
+              member?.role !== 'SuperAdmin' ? <Navigate to="/" replace /> :
+              <ErrorBoundary><OfficeAdminWeeklyReportFormPage adminMembers={members} /></ErrorBoundary>
             } />
             <Route path="/training" element={
               <ErrorBoundary><TrainingReportsPage reports={filteredTraining} /></ErrorBoundary>
@@ -251,6 +278,12 @@ function DashboardLayout() {
             } />
             <Route path="/placement-work" element={
               <ErrorBoundary><PlacementWorkReportsPage reports={placementWorkReports} /></ErrorBoundary>
+            } />
+            <Route path="/office-daily" element={
+              <ErrorBoundary><OfficeDailyReportsPage reports={officeDailyReports} /></ErrorBoundary>
+            } />
+            <Route path="/office-weekly" element={
+              <ErrorBoundary><OfficeWeeklyReportsPage reports={officeWeeklyReports} /></ErrorBoundary>
             } />
             <Route path="/settings" element={
               <ErrorBoundary><SettingsPage /></ErrorBoundary>

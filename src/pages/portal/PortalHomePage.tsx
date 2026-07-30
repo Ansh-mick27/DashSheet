@@ -2,7 +2,7 @@
 // DashSheet — Portal Home Page
 // ==========================================
 import { Link } from 'react-router-dom';
-import { BookOpen, ClipboardList, Package, Briefcase, FileText, Settings } from 'lucide-react';
+import { BookOpen, ClipboardList, Package, Briefcase, FileText, Settings, ClipboardCheck, CalendarDays } from 'lucide-react';
 import { useAuth } from '../../contexts/AuthContext';
 
 export default function PortalHomePage() {
@@ -40,11 +40,23 @@ export default function PortalHomePage() {
         )}
 
         {role === 'OfficeAdmin' && (
-          <Link to="/portal/inventory" className="portal-card">
-            <div className="portal-card__icon"><Package size={22} /></div>
-            <div className="portal-card__title">Inventory Report</div>
-            <p className="portal-card__desc">Log inventory items added, removed, repaired, or audited.</p>
-          </Link>
+          <>
+            <Link to="/portal/inventory" className="portal-card">
+              <div className="portal-card__icon"><Package size={22} /></div>
+              <div className="portal-card__title">Inventory Report</div>
+              <p className="portal-card__desc">Log inventory items added, removed, repaired, or audited.</p>
+            </Link>
+            <Link to="/portal/office-daily" className="portal-card">
+              <div className="portal-card__icon"><ClipboardCheck size={22} /></div>
+              <div className="portal-card__title">Daily Work Report</div>
+              <p className="portal-card__desc">Log daily office tasks, housekeeping, MIS updates, and campus support activities.</p>
+            </Link>
+            <Link to="/portal/office-weekly" className="portal-card">
+              <div className="portal-card__icon"><CalendarDays size={22} /></div>
+              <div className="portal-card__title">Weekly Work Report</div>
+              <p className="portal-card__desc">Submit weekly inventory stock and infrastructure readiness report.</p>
+            </Link>
+          </>
         )}
 
         {role === 'Placement' && (
