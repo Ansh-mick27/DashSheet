@@ -21,8 +21,8 @@ import {
 } from '../../types';
 import FormField from '../../components/form/FormField';
 
-const TH: React.CSSProperties = { padding: '6px 8px', background: 'var(--color-surface)', fontWeight: 600, fontSize: 12, textAlign: 'left', whiteSpace: 'nowrap', borderBottom: '1px solid var(--color-border)' };
-const TD: React.CSSProperties = { padding: '4px 6px', verticalAlign: 'top', borderBottom: '1px solid var(--color-border)' };
+const TH: React.CSSProperties = { padding: '6px 8px', background: 'var(--bg-card)', fontWeight: 600, fontSize: 12, textAlign: 'left', whiteSpace: 'nowrap', borderBottom: '1px solid var(--border-color)' };
+const TD: React.CSSProperties = { padding: '4px 6px', verticalAlign: 'top', borderBottom: '1px solid var(--border-color)' };
 
 const INFRA_ROWS = [
   { utility: 'Electricity', statusOptions: ['Available', 'Issue'] },
@@ -303,8 +303,8 @@ function MultiSelect({
         width: dropPos.width,
         minWidth: 260,
         maxWidth: 360,
-        background: 'var(--color-surface)',
-        border: '1px solid var(--color-border)',
+        background: 'var(--bg-secondary)',
+        border: '1px solid var(--border-color)',
         borderRadius: 6,
         boxShadow: '0 4px 20px rgba(0,0,0,0.22)',
         maxHeight: 240,
@@ -318,7 +318,7 @@ function MultiSelect({
           {opt}
         </label>
       ))}
-      <div style={{ borderTop: '1px solid var(--color-border)', marginTop: 4 }}>
+      <div style={{ borderTop: '1px solid var(--border-color)', marginTop: 4 }}>
         <label style={{ display: 'flex', alignItems: 'center', gap: 8, padding: '5px 12px', cursor: 'pointer', fontSize: 12 }}>
           <input type="checkbox" checked={hasCustom} onChange={() => hasCustom ? setCustom('') : setCustom('Other')} style={{ margin: 0, cursor: 'pointer' }} />
           Other
