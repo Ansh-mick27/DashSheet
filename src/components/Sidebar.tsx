@@ -17,6 +17,7 @@ const ADMIN_NAV_ITEMS = [
   { path: '/work', icon: ClipboardList, label: 'Daily Work Reports' },
   { path: '/members', icon: Users, label: 'Members' },
   { path: '/inventory', icon: Package, label: 'Inventory' },
+  { path: '/inventory-stock', icon: ClipboardList, label: 'Stock Overview' },
   { path: '/placement', icon: Briefcase, label: 'CRP Process' },
   { path: '/placement-work', icon: FileText, label: 'Placement Work' },
   { path: '/office-daily', icon: ClipboardCheck, label: 'Office Daily' },

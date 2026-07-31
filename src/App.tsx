@@ -29,12 +29,13 @@ import OfficeAdminDailyReportFormPage from './pages/portal/OfficeAdminDailyRepor
 import OfficeAdminWeeklyReportFormPage from './pages/portal/OfficeAdminWeeklyReportFormPage';
 import OfficeDailyReportsPage from './pages/OfficeDailyReportsPage';
 import OfficeWeeklyReportsPage from './pages/OfficeWeeklyReportsPage';
+import InventoryStockPage from './pages/InventoryStockPage';
 import { useAuth } from './contexts/AuthContext';
-import { fetchSheetData, refreshData, parseDate, generateNotifications, fetchOfficeAdminDailyReports, fetchOfficeAdminWeeklyReports } from './services/dataApi';
+import { fetchSheetData, refreshData, parseDate, generateNotifications, fetchOfficeAdminDailyReports, fetchOfficeAdminWeeklyReports, fetchInventoryStock } from './services/dataApi';
 import {
   Member, TrainingReport, WorkReport, OfficeAdminReport,
   PlacementReport, PlacementWorkReport, DashboardFilters, Notification, BranchStudentCount,
-  OfficeAdminDailyReport, OfficeAdminWeeklyReport
+  OfficeAdminDailyReport, OfficeAdminWeeklyReport, InventoryStock
 } from './types';
 
 function DashboardLayout() {
@@ -48,6 +49,7 @@ function DashboardLayout() {
   const [officeDailyReports, setOfficeDailyReports] = useState<OfficeAdminDailyReport[]>([]);
   const [officeWeeklyReports, setOfficeWeeklyReports] = useState<OfficeAdminWeeklyReport[]>([]);
   const [branchStudentCounts, setBranchStudentCounts] = useState<BranchStudentCount[]>([]);
+  const [inventoryStock, setInventoryStock] = useState<InventoryStock[]>([]);
   const [loading, setLoading] = useState(true);
   const [notifications, setNotifications] = useState<Notification[]>([]);
   const [autoRefreshMins, setAutoRefreshMins] = useState(0);
@@ -60,10 +62,11 @@ function DashboardLayout() {
   const loadData = useCallback(async () => {
     setLoading(true);
     try {
-      const [data, officeDailyData, officeWeeklyData] = await Promise.all([
+      const [data, officeDailyData, officeWeeklyData, stockData] = await Promise.all([
         fetchSheetData(),
         fetchOfficeAdminDailyReports().catch(() => [] as OfficeAdminDailyReport[]),
         fetchOfficeAdminWeeklyReports().catch(() => [] as OfficeAdminWeeklyReport[]),
+        fetchInventoryStock().catch(() => [] as InventoryStock[]),
       ]);
       setMembers(data.members);
       setTrainingReports(data.trainingReports);
@@ -74,6 +77,7 @@ function DashboardLayout() {
       setBranchStudentCounts(data.branchStudentCounts);
       setOfficeDailyReports(officeDailyData);
       setOfficeWeeklyReports(officeWeeklyData);
+      setInventoryStock(stockData);
       setNotifications(generateNotifications(data.workReports, data.trainingReports));
     } catch (err) {
       console.error('Failed to load data:', err);
@@ -224,6 +228,9 @@ function DashboardLayout() {
             <Route path="/portal/office-weekly" element={
               <ErrorBoundary><OfficeAdminWeeklyReportFormPage /></ErrorBoundary>
             } />
+            <Route path="/portal/inventory-stock" element={
+              <ErrorBoundary><InventoryStockPage reports={filteredOfficeAdmin} memberName={member?.name} /></ErrorBoundary>
+            } />
             <Route path="/admin/work-report" element={
               member?.role !== 'SuperAdmin' ? <Navigate to="/" replace /> : (
                 <ErrorBoundary><WorkReportFormPage adminMembers={members} /></ErrorBoundary>
@@ -272,6 +279,9 @@ function DashboardLayout() {
             } />
             <Route path="/inventory" element={
               <ErrorBoundary><OfficeAdminPage reports={filteredOfficeAdmin} /></ErrorBoundary>
+            } />
+            <Route path="/inventory-stock" element={
+              <ErrorBoundary><InventoryStockPage reports={filteredOfficeAdmin} /></ErrorBoundary>
             } />
             <Route path="/placement" element={
               <ErrorBoundary><PlacementPage reports={filteredPlacement} /></ErrorBoundary>

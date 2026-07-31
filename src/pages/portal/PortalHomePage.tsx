@@ -56,6 +56,11 @@ export default function PortalHomePage() {
               <div className="portal-card__title">Weekly Work Report</div>
               <p className="portal-card__desc">Submit weekly inventory stock and infrastructure readiness report.</p>
             </Link>
+            <Link to="/portal/inventory-stock" className="portal-card">
+              <div className="portal-card__icon"><ClipboardList size={22} /></div>
+              <div className="portal-card__title">Stock Overview</div>
+              <p className="portal-card__desc">View and update current stock counts and see allocation history.</p>
+            </Link>
           </>
         )}
 

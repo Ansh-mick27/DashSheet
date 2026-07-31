@@ -65,9 +65,23 @@ export const TASKS = [
 export const TASK_STATUSES = ['Completed', 'Pending'];
 
 export const INVENTORY_ITEMS = [
-  'Laptop', 'Desktop PC', 'Projector', 'Whiteboard', 'Printer', 'UPS Battery',
-  'Extension Board', 'HDMI Cable', 'Webcam', 'Headset', 'Office Chair', 'Study Table',
-  'Marker Set', 'Notebook Stack', 'Speaker System', 'Router', 'Switch', 'External HDD', 'Other'
+  'Ball Pen - Blue', 'Ball Pen - Black', 'Ball Pen - Red', 'Gel Pen',
+  'Permanent Marker - Black', 'Whiteboard Marker - Black', 'Whiteboard Marker - Blue',
+  'Whiteboard Marker - Red', 'Highlighter', 'Pencil', 'Sticker Paper', 'Eraser',
+  'Sharpener', 'Bond Paper', 'A4 Paper', 'Legal Size Paper', 'Color Paper - A4',
+  'Glossy Paper', 'Photo Paper', 'Sticky Notes - Small', 'Sticky Notes - Large',
+  'Stock Register', 'Office File', 'Box File', 'L-File', 'Document Folder',
+  'Binder Clips', 'Paper Clips', 'Bulldog Clips', 'Glue Stick', 'Fevicol',
+  'Flex kwik', 'Cello Tape - Small', 'Cello Tape - Large', 'Double-Sided Tape',
+  'Masking Tape', 'Packing Tape', 'Scissors - Small', 'Scissors - Large',
+  'Paper Cutter', 'Utility Knife', 'Ruler - 15 cm', 'Ruler - 30 cm',
+  'Stapler - Small', 'Stapler - Heavy Duty', 'Stapler Pins - Small / large',
+  'Punch Machine - Hole Small / Large', 'Calculator', 'Correction Pen',
+  'Stamp Pad - Blue', 'Stamp Pad - Red', 'Stamp Pad - Black', 'Stamp Pad Ink',
+  'Paper Tray', 'USB Flash Drive', 'CD/DVD Marker', 'Brown Envelope - Small',
+  'Brown Envelope - A4', 'White Envelope - A4', 'Document Envelope',
+  'Courier Envelope', 'Rubber Bands', 'Thumb Pins', 'Calculator Batteries',
+  'AA Batteries', 'AAA Batteries', 'Other',
 ];
 
 export const ITEM_CATEGORIES = ['Electronics', 'Furniture', 'Stationery', 'Equipment', 'Other'];
