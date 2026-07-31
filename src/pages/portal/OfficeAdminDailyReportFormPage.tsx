@@ -109,6 +109,7 @@ function initStudentSupport(): OAStudentSupportRow[] {
     'Training attendance updated',
     'Placement drive attendance updated',
     'Student list shared with CDC / company / department',
+    'Student Calling',
   ].map(p => ({ particular: p, countStatus: '', remarks: '' }));
 }
 
@@ -193,6 +194,44 @@ function initVendorCoordination(): OAVendorRow[] {
 
 function initChecklist(points: string[]): OAChecklistRow[] {
   return points.map(p => ({ point: p, status: '', remarks: '' }));
+}
+
+function OtherSelect({
+  value,
+  options,
+  onChange,
+  style,
+}: {
+  value: string;
+  options: string[];
+  onChange: (v: string) => void;
+  style?: React.CSSProperties;
+}) {
+  const isOtherMode = value !== '' && !options.includes(value);
+  return (
+    <div>
+      <select
+        className="settings-form__input"
+        style={style}
+        value={isOtherMode ? 'Other' : value}
+        onChange={e => onChange(e.target.value)}
+      >
+        <option value="">Select...</option>
+        {options.map(o => <option key={o} value={o}>{o}</option>)}
+        <option value="Other">Other</option>
+      </select>
+      {isOtherMode && (
+        <input
+          type="text"
+          className="settings-form__input"
+          style={{ marginTop: 4, ...(style ?? {}) }}
+          placeholder="Specify..."
+          value={value === 'Other' ? '' : value}
+          onChange={e => onChange(e.target.value || 'Other')}
+        />
+      )}
+    </div>
+  );
 }
 
 interface Props { adminMembers?: Member[]; }
@@ -379,26 +418,28 @@ export default function OfficeAdminDailyReportFormPage({ adminMembers }: Props =
                   <tr key={i}>
                     <td style={{ ...TD, minWidth: 130 }}><span style={{ fontSize: 12, opacity: 0.85 }}>{row.timeSlot}</span></td>
                     <td style={{ ...TD, minWidth: 220 }}>
-                      <select className="settings-form__input" style={{ minWidth: 200 }} value={row.taskActivity}
-                        onChange={e => setTimeSlotLog(prev => prev.map((r, j) => j === i ? { ...r, taskActivity: e.target.value } : r))}>
-                        <option value="">Select activity...</option>
-                        {OA_TASK_ACTIVITIES.map(a => <option key={a} value={a}>{a}</option>)}
-                      </select>
+                      <OtherSelect
+                        style={{ minWidth: 200 }}
+                        options={OA_TASK_ACTIVITIES}
+                        value={row.taskActivity}
+                        onChange={v => setTimeSlotLog(prev => prev.map((r, j) => j === i ? { ...r, taskActivity: v } : r))}
+                      />
                     </td>
                     <td style={{ ...TD, minWidth: 160 }}>
-                      <select className="settings-form__input" style={{ minWidth: 140 }} value={row.relatedArea}
-                        onChange={e => setTimeSlotLog(prev => prev.map((r, j) => j === i ? { ...r, relatedArea: e.target.value } : r))}>
-                        <option value="">Select area...</option>
-                        {OA_RELATED_AREAS.map(a => <option key={a} value={a}>{a}</option>)}
-                      </select>
+                      <OtherSelect
+                        style={{ minWidth: 140 }}
+                        options={OA_RELATED_AREAS}
+                        value={row.relatedArea}
+                        onChange={v => setTimeSlotLog(prev => prev.map((r, j) => j === i ? { ...r, relatedArea: v } : r))}
+                      />
                     </td>
                     <td style={{ ...TD, minWidth: 110 }}>
-                      <select className="settings-form__input" style={{ minWidth: 90 }} value={row.status}
-                        onChange={e => setTimeSlotLog(prev => prev.map((r, j) => j === i ? { ...r, status: e.target.value } : r))}>
-                        <option value="">Select...</option>
-                        <option>Completed</option>
-                        <option>Pending</option>
-                      </select>
+                      <OtherSelect
+                        style={{ minWidth: 90 }}
+                        options={['Completed', 'Pending']}
+                        value={row.status}
+                        onChange={v => setTimeSlotLog(prev => prev.map((r, j) => j === i ? { ...r, status: v } : r))}
+                      />
                     </td>
                     <td style={{ ...TD, minWidth: 140 }}>
                       <input className="settings-form__input" style={{ minWidth: 120 }} value={row.remark}
@@ -472,12 +513,12 @@ export default function OfficeAdminDailyReportFormPage({ adminMembers }: Props =
                         placeholder="0" />
                     </td>
                     <td style={{ ...TD, minWidth: 110 }}>
-                      <select className="settings-form__input" style={{ minWidth: 90 }} value={row.status}
-                        onChange={e => setCampusProcess(prev => prev.map((r, j) => j === i ? { ...r, status: e.target.value } : r))}>
-                        <option value="">Select...</option>
-                        <option>Completed</option>
-                        <option>Pending</option>
-                      </select>
+                      <OtherSelect
+                        style={{ minWidth: 90 }}
+                        options={['Completed', 'Pending']}
+                        value={row.status}
+                        onChange={v => setCampusProcess(prev => prev.map((r, j) => j === i ? { ...r, status: v } : r))}
+                      />
                     </td>
                     <td style={{ ...TD, minWidth: 140 }}>
                       <input className="settings-form__input" style={{ minWidth: 120 }} value={row.remarks}
@@ -506,12 +547,12 @@ export default function OfficeAdminDailyReportFormPage({ adminMembers }: Props =
                   <tr key={i}>
                     <td style={{ ...TD, minWidth: 160 }}><span style={{ fontSize: 12, opacity: 0.85 }}>{row.area}</span></td>
                     <td style={{ ...TD, minWidth: 110 }}>
-                      <select className="settings-form__input" style={{ minWidth: 90 }} value={row.status}
-                        onChange={e => setHousekeeping(prev => prev.map((r, j) => j === i ? { ...r, status: e.target.value } : r))}>
-                        <option value="">Select...</option>
-                        <option>Clean</option>
-                        <option>Not Clean</option>
-                      </select>
+                      <OtherSelect
+                        style={{ minWidth: 90 }}
+                        options={['Clean', 'Not Clean']}
+                        value={row.status}
+                        onChange={v => setHousekeeping(prev => prev.map((r, j) => j === i ? { ...r, status: v } : r))}
+                      />
                     </td>
                     <td style={{ ...TD, minWidth: 140 }}>
                       <input className="settings-form__input" style={{ minWidth: 120 }} value={row.issueFound}
@@ -551,28 +592,28 @@ export default function OfficeAdminDailyReportFormPage({ adminMembers }: Props =
                     <td style={{ ...TD, minWidth: 130 }}><span style={{ fontSize: 12, opacity: 0.85 }}>{row.fileType}</span></td>
                     <td style={{ ...TD, minWidth: 180 }}><span style={{ fontSize: 12, opacity: 0.75 }}>{row.purpose}</span></td>
                     <td style={{ ...TD, minWidth: 110 }}>
-                      <select className="settings-form__input" style={{ minWidth: 90 }} value={row.preparedUpdated}
-                        onChange={e => setFileDoc(prev => prev.map((r, j) => j === i ? { ...r, preparedUpdated: e.target.value } : r))}>
-                        <option value="">Select...</option>
-                        <option>Yes</option>
-                        <option>No</option>
-                      </select>
+                      <OtherSelect
+                        style={{ minWidth: 90 }}
+                        options={['Yes', 'No']}
+                        value={row.preparedUpdated}
+                        onChange={v => setFileDoc(prev => prev.map((r, j) => j === i ? { ...r, preparedUpdated: v } : r))}
+                      />
                     </td>
                     <td style={{ ...TD, minWidth: 100 }}>
-                      <select className="settings-form__input" style={{ minWidth: 80 }} value={row.physicalFile}
-                        onChange={e => setFileDoc(prev => prev.map((r, j) => j === i ? { ...r, physicalFile: e.target.value } : r))}>
-                        <option value="">Select...</option>
-                        <option>Yes</option>
-                        <option>No</option>
-                      </select>
+                      <OtherSelect
+                        style={{ minWidth: 80 }}
+                        options={['Yes', 'No']}
+                        value={row.physicalFile}
+                        onChange={v => setFileDoc(prev => prev.map((r, j) => j === i ? { ...r, physicalFile: v } : r))}
+                      />
                     </td>
                     <td style={{ ...TD, minWidth: 110 }}>
-                      <select className="settings-form__input" style={{ minWidth: 90 }} value={row.digitalFolder}
-                        onChange={e => setFileDoc(prev => prev.map((r, j) => j === i ? { ...r, digitalFolder: e.target.value } : r))}>
-                        <option value="">Select...</option>
-                        <option>Yes</option>
-                        <option>No</option>
-                      </select>
+                      <OtherSelect
+                        style={{ minWidth: 90 }}
+                        options={['Yes', 'No']}
+                        value={row.digitalFolder}
+                        onChange={v => setFileDoc(prev => prev.map((r, j) => j === i ? { ...r, digitalFolder: v } : r))}
+                      />
                     </td>
                     <td style={{ ...TD, minWidth: 140 }}>
                       <input className="settings-form__input" style={{ minWidth: 120 }} value={row.remarks}
@@ -606,11 +647,12 @@ export default function OfficeAdminDailyReportFormPage({ adminMembers }: Props =
                         placeholder="Location" />
                     </td>
                     <td style={{ ...TD, minWidth: 120 }}>
-                      <select className="settings-form__input" style={{ minWidth: 100 }} value={row.status}
-                        onChange={e => setInfrastructure(prev => prev.map((r, j) => j === i ? { ...r, status: e.target.value } : r))}>
-                        <option value=""></option>
-                        {INFRA_ROWS[i]?.statusOptions.map(o => <option key={o}>{o}</option>)}
-                      </select>
+                      <OtherSelect
+                        style={{ minWidth: 100 }}
+                        options={INFRA_ROWS[i]?.statusOptions ?? []}
+                        value={row.status}
+                        onChange={v => setInfrastructure(prev => prev.map((r, j) => j === i ? { ...r, status: v } : r))}
+                      />
                     </td>
                     <td style={{ ...TD, minWidth: 140 }}>
                       <input className="settings-form__input" style={{ minWidth: 120 }} value={row.issueFound}
@@ -644,12 +686,12 @@ export default function OfficeAdminDailyReportFormPage({ adminMembers }: Props =
                   <tr key={i}>
                     <td style={{ ...TD, minWidth: 180 }}><span style={{ fontSize: 12, opacity: 0.85 }}>{row.recordType}</span></td>
                     <td style={{ ...TD, minWidth: 90 }}>
-                      <select className="settings-form__input" style={{ minWidth: 70 }} value={row.updated}
-                        onChange={e => setMisRecords(prev => prev.map((r, j) => j === i ? { ...r, updated: e.target.value } : r))}>
-                        <option value="">Select...</option>
-                        <option>Yes</option>
-                        <option>No</option>
-                      </select>
+                      <OtherSelect
+                        style={{ minWidth: 70 }}
+                        options={['Yes', 'No']}
+                        value={row.updated}
+                        onChange={v => setMisRecords(prev => prev.map((r, j) => j === i ? { ...r, updated: v } : r))}
+                      />
                     </td>
                     <td style={{ ...TD, minWidth: 130 }}>
                       <input className="settings-form__input" style={{ minWidth: 110 }} value={row.pending}
@@ -712,11 +754,12 @@ export default function OfficeAdminDailyReportFormPage({ adminMembers }: Props =
                         placeholder="Describe issue" />
                     </td>
                     <td style={{ ...TD, minWidth: 130 }}>
-                      <select className="settings-form__input" style={{ minWidth: 110 }} value={row.relatedArea}
-                        onChange={e => setIssues(prev => prev.map((r, j) => j === i ? { ...r, relatedArea: e.target.value } : r))}>
-                        <option value="">Select...</option>
-                        {OA_ISSUE_AREAS.map(a => <option key={a}>{a}</option>)}
-                      </select>
+                      <OtherSelect
+                        style={{ minWidth: 110 }}
+                        options={OA_ISSUE_AREAS}
+                        value={row.relatedArea}
+                        onChange={v => setIssues(prev => prev.map((r, j) => j === i ? { ...r, relatedArea: v } : r))}
+                      />
                     </td>
                     <td style={{ ...TD, minWidth: 120 }}>
                       <input className="settings-form__input" style={{ minWidth: 100 }} value={row.reportedTo}
@@ -729,13 +772,12 @@ export default function OfficeAdminDailyReportFormPage({ adminMembers }: Props =
                         placeholder="Action required" />
                     </td>
                     <td style={{ ...TD, minWidth: 100 }}>
-                      <select className="settings-form__input" style={{ minWidth: 80 }} value={row.priority}
-                        onChange={e => setIssues(prev => prev.map((r, j) => j === i ? { ...r, priority: e.target.value } : r))}>
-                        <option value="">Select...</option>
-                        <option>High</option>
-                        <option>Medium</option>
-                        <option>Low</option>
-                      </select>
+                      <OtherSelect
+                        style={{ minWidth: 80 }}
+                        options={['High', 'Medium', 'Low']}
+                        value={row.priority}
+                        onChange={v => setIssues(prev => prev.map((r, j) => j === i ? { ...r, priority: v } : r))}
+                      />
                     </td>
                     <td style={{ ...TD, width: 36 }}>
                       {issues.length > 1 && (
@@ -785,13 +827,12 @@ export default function OfficeAdminDailyReportFormPage({ adminMembers }: Props =
                         onChange={e => setPendingWork(prev => prev.map((r, j) => j === i ? { ...r, targetDate: e.target.value } : r))} />
                     </td>
                     <td style={{ ...TD, minWidth: 100 }}>
-                      <select className="settings-form__input" style={{ minWidth: 80 }} value={row.priority}
-                        onChange={e => setPendingWork(prev => prev.map((r, j) => j === i ? { ...r, priority: e.target.value } : r))}>
-                        <option value="">Select...</option>
-                        <option>High</option>
-                        <option>Medium</option>
-                        <option>Low</option>
-                      </select>
+                      <OtherSelect
+                        style={{ minWidth: 80 }}
+                        options={['High', 'Medium', 'Low']}
+                        value={row.priority}
+                        onChange={v => setPendingWork(prev => prev.map((r, j) => j === i ? { ...r, priority: v } : r))}
+                      />
                     </td>
                   </tr>
                 ))}
@@ -838,11 +879,12 @@ export default function OfficeAdminDailyReportFormPage({ adminMembers }: Props =
                             placeholder="Location" />
                         </td>
                         <td style={{ ...TD, minWidth: 120 }}>
-                          <select className="settings-form__input" style={{ minWidth: 100 }} value={row.workingStatus}
-                            onChange={e => setItPeripherals(prev => prev.map((r, j) => j === i ? { ...r, workingStatus: e.target.value } : r))}>
-                            <option value=""></option>
-                            {IT_PERIPHERAL_ROWS[i]?.statusOptions.map(o => <option key={o}>{o}</option>)}
-                          </select>
+                          <OtherSelect
+                            style={{ minWidth: 100 }}
+                            options={IT_PERIPHERAL_ROWS[i]?.statusOptions ?? []}
+                            value={row.workingStatus}
+                            onChange={v => setItPeripherals(prev => prev.map((r, j) => j === i ? { ...r, workingStatus: v } : r))}
+                          />
                         </td>
                         <td style={{ ...TD, minWidth: 140 }}>
                           <input className="settings-form__input" style={{ minWidth: 120 }} value={row.issueReported}
@@ -880,11 +922,12 @@ export default function OfficeAdminDailyReportFormPage({ adminMembers }: Props =
                             placeholder="Name" />
                         </td>
                         <td style={{ ...TD, minWidth: 120 }}>
-                          <select className="settings-form__input" style={{ minWidth: 100 }} value={row.purposeOfVisit}
-                            onChange={e => setReceptionRows(prev => prev.map((r, j) => j === i ? { ...r, purposeOfVisit: e.target.value } : r))}>
-                            <option value="">Select...</option>
-                            {OA_RECEPTION_PURPOSES.map(p => <option key={p}>{p}</option>)}
-                          </select>
+                          <OtherSelect
+                            style={{ minWidth: 100 }}
+                            options={OA_RECEPTION_PURPOSES}
+                            value={row.purposeOfVisit}
+                            onChange={v => setReceptionRows(prev => prev.map((r, j) => j === i ? { ...r, purposeOfVisit: v } : r))}
+                          />
                         </td>
                         <td style={{ ...TD, minWidth: 110 }}>
                           <input className="settings-form__input" style={{ minWidth: 90 }} value={row.expectedTime}
@@ -892,28 +935,28 @@ export default function OfficeAdminDailyReportFormPage({ adminMembers }: Props =
                             placeholder="e.g. 10:00 AM" />
                         </td>
                         <td style={{ ...TD, minWidth: 90 }}>
-                          <select className="settings-form__input" style={{ minWidth: 70 }} value={row.receptionInformed}
-                            onChange={e => setReceptionRows(prev => prev.map((r, j) => j === i ? { ...r, receptionInformed: e.target.value } : r))}>
-                            <option value="">—</option>
-                            <option>Yes</option>
-                            <option>No</option>
-                          </select>
+                          <OtherSelect
+                            style={{ minWidth: 70 }}
+                            options={['Yes', 'No']}
+                            value={row.receptionInformed}
+                            onChange={v => setReceptionRows(prev => prev.map((r, j) => j === i ? { ...r, receptionInformed: v } : r))}
+                          />
                         </td>
                         <td style={{ ...TD, minWidth: 90 }}>
-                          <select className="settings-form__input" style={{ minWidth: 70 }} value={row.gateSecurityInformed}
-                            onChange={e => setReceptionRows(prev => prev.map((r, j) => j === i ? { ...r, gateSecurityInformed: e.target.value } : r))}>
-                            <option value="">—</option>
-                            <option>Yes</option>
-                            <option>No</option>
-                          </select>
+                          <OtherSelect
+                            style={{ minWidth: 70 }}
+                            options={['Yes', 'No']}
+                            value={row.gateSecurityInformed}
+                            onChange={v => setReceptionRows(prev => prev.map((r, j) => j === i ? { ...r, gateSecurityInformed: v } : r))}
+                          />
                         </td>
                         <td style={{ ...TD, minWidth: 90 }}>
-                          <select className="settings-form__input" style={{ minWidth: 70 }} value={row.parkingRequired}
-                            onChange={e => setReceptionRows(prev => prev.map((r, j) => j === i ? { ...r, parkingRequired: e.target.value } : r))}>
-                            <option value="">—</option>
-                            <option>Yes</option>
-                            <option>No</option>
-                          </select>
+                          <OtherSelect
+                            style={{ minWidth: 70 }}
+                            options={['Yes', 'No']}
+                            value={row.parkingRequired}
+                            onChange={v => setReceptionRows(prev => prev.map((r, j) => j === i ? { ...r, parkingRequired: v } : r))}
+                          />
                         </td>
                         <td style={{ ...TD, minWidth: 130 }}>
                           <input className="settings-form__input" style={{ minWidth: 110 }} value={row.remarks}
@@ -983,12 +1026,12 @@ export default function OfficeAdminDailyReportFormPage({ adminMembers }: Props =
                             placeholder="Vehicle / Driver" />
                         </td>
                         <td style={{ ...TD, minWidth: 110 }}>
-                          <select className="settings-form__input" style={{ minWidth: 90 }} value={row.status}
-                            onChange={e => setTravelRows(prev => prev.map((r, j) => j === i ? { ...r, status: e.target.value } : r))}>
-                            <option value="">Select...</option>
-                            <option>Completed</option>
-                            <option>Pending</option>
-                          </select>
+                          <OtherSelect
+                            style={{ minWidth: 90 }}
+                            options={['Completed', 'Pending']}
+                            value={row.status}
+                            onChange={v => setTravelRows(prev => prev.map((r, j) => j === i ? { ...r, status: v } : r))}
+                          />
                         </td>
                         <td style={{ ...TD, minWidth: 120 }}>
                           <input className="settings-form__input" style={{ minWidth: 100 }} value={row.remarks}
@@ -1042,21 +1085,19 @@ export default function OfficeAdminDailyReportFormPage({ adminMembers }: Props =
                   </div>
                   <div className="settings-form__field">
                     <label className="settings-form__label">Security Informed</label>
-                    <select className="settings-form__input" value={travelDetails.securityInformed}
-                      onChange={e => setTravelDetails(prev => ({ ...prev, securityInformed: e.target.value }))}>
-                      <option value="">Select...</option>
-                      <option>Yes</option>
-                      <option>No</option>
-                    </select>
+                    <OtherSelect
+                      options={['Yes', 'No']}
+                      value={travelDetails.securityInformed}
+                      onChange={v => setTravelDetails(prev => ({ ...prev, securityInformed: v }))}
+                    />
                   </div>
                   <div className="settings-form__field">
                     <label className="settings-form__label">Parking Arranged</label>
-                    <select className="settings-form__input" value={travelDetails.parkingArranged}
-                      onChange={e => setTravelDetails(prev => ({ ...prev, parkingArranged: e.target.value }))}>
-                      <option value="">Select...</option>
-                      <option>Yes</option>
-                      <option>No</option>
-                    </select>
+                    <OtherSelect
+                      options={['Yes', 'No']}
+                      value={travelDetails.parkingArranged}
+                      onChange={v => setTravelDetails(prev => ({ ...prev, parkingArranged: v }))}
+                    />
                   </div>
                 </div>
               </div>
@@ -1081,11 +1122,12 @@ export default function OfficeAdminDailyReportFormPage({ adminMembers }: Props =
                             placeholder="Guest / Company" />
                         </td>
                         <td style={{ ...TD, minWidth: 150 }}>
-                          <select className="settings-form__input" style={{ minWidth: 130 }} value={row.requirement}
-                            onChange={e => setHospitalityRows(prev => prev.map((r, j) => j === i ? { ...r, requirement: e.target.value } : r))}>
-                            <option value="">Select...</option>
-                            {OA_HOSPITALITY_REQUIREMENTS.map(r => <option key={r}>{r}</option>)}
-                          </select>
+                          <OtherSelect
+                            style={{ minWidth: 130 }}
+                            options={OA_HOSPITALITY_REQUIREMENTS}
+                            value={row.requirement}
+                            onChange={v => setHospitalityRows(prev => prev.map((r, j) => j === i ? { ...r, requirement: v } : r))}
+                          />
                         </td>
                         <td style={{ ...TD, minWidth: 90 }}>
                           <input className="settings-form__input" style={{ minWidth: 70 }} value={row.time}
@@ -1098,12 +1140,12 @@ export default function OfficeAdminDailyReportFormPage({ adminMembers }: Props =
                             placeholder="Arranged By" />
                         </td>
                         <td style={{ ...TD, minWidth: 100 }}>
-                          <select className="settings-form__input" style={{ minWidth: 80 }} value={row.status}
-                            onChange={e => setHospitalityRows(prev => prev.map((r, j) => j === i ? { ...r, status: e.target.value } : r))}>
-                            <option value="">Select...</option>
-                            <option>Done</option>
-                            <option>Pending</option>
-                          </select>
+                          <OtherSelect
+                            style={{ minWidth: 80 }}
+                            options={['Done', 'Pending']}
+                            value={row.status}
+                            onChange={v => setHospitalityRows(prev => prev.map((r, j) => j === i ? { ...r, status: v } : r))}
+                          />
                         </td>
                         <td style={{ ...TD, minWidth: 120 }}>
                           <input className="settings-form__input" style={{ minWidth: 100 }} value={row.remarks}
@@ -1164,12 +1206,12 @@ export default function OfficeAdminDailyReportFormPage({ adminMembers }: Props =
                             placeholder="Time" />
                         </td>
                         <td style={{ ...TD, minWidth: 100 }}>
-                          <select className="settings-form__input" style={{ minWidth: 80 }} value={row.status}
-                            onChange={e => setPrintingMaterial(prev => prev.map((r, j) => j === i ? { ...r, status: e.target.value } : r))}>
-                            <option value="">Select...</option>
-                            <option>Done</option>
-                            <option>Pending</option>
-                          </select>
+                          <OtherSelect
+                            style={{ minWidth: 80 }}
+                            options={['Done', 'Pending']}
+                            value={row.status}
+                            onChange={v => setPrintingMaterial(prev => prev.map((r, j) => j === i ? { ...r, status: v } : r))}
+                          />
                         </td>
                         <td style={{ ...TD, minWidth: 120 }}>
                           <input className="settings-form__input" style={{ minWidth: 100 }} value={row.remarks}
@@ -1213,12 +1255,12 @@ export default function OfficeAdminDailyReportFormPage({ adminMembers }: Props =
                             placeholder="Time" />
                         </td>
                         <td style={{ ...TD, minWidth: 100 }}>
-                          <select className="settings-form__input" style={{ minWidth: 80 }} value={row.status}
-                            onChange={e => setInstallationDisplay(prev => prev.map((r, j) => j === i ? { ...r, status: e.target.value } : r))}>
-                            <option value="">Select...</option>
-                            <option>Done</option>
-                            <option>Pending</option>
-                          </select>
+                          <OtherSelect
+                            style={{ minWidth: 80 }}
+                            options={['Done', 'Pending']}
+                            value={row.status}
+                            onChange={v => setInstallationDisplay(prev => prev.map((r, j) => j === i ? { ...r, status: v } : r))}
+                          />
                         </td>
                         <td style={{ ...TD, minWidth: 120 }}>
                           <input className="settings-form__input" style={{ minWidth: 100 }} value={row.remarks}
@@ -1258,12 +1300,12 @@ export default function OfficeAdminDailyReportFormPage({ adminMembers }: Props =
                             placeholder="Time" />
                         </td>
                         <td style={{ ...TD, minWidth: 100 }}>
-                          <select className="settings-form__input" style={{ minWidth: 80 }} value={row.status}
-                            onChange={e => setVendorCoordination(prev => prev.map((r, j) => j === i ? { ...r, status: e.target.value } : r))}>
-                            <option value="">Select...</option>
-                            <option>Done</option>
-                            <option>Pending</option>
-                          </select>
+                          <OtherSelect
+                            style={{ minWidth: 80 }}
+                            options={['Done', 'Pending']}
+                            value={row.status}
+                            onChange={v => setVendorCoordination(prev => prev.map((r, j) => j === i ? { ...r, status: v } : r))}
+                          />
                         </td>
                         <td style={{ ...TD, minWidth: 120 }}>
                           <input className="settings-form__input" style={{ minWidth: 100 }} value={row.remarks}
@@ -1292,12 +1334,12 @@ export default function OfficeAdminDailyReportFormPage({ adminMembers }: Props =
                       <tr key={i}>
                         <td style={{ ...TD, minWidth: 220 }}><span style={{ fontSize: 12, opacity: 0.85 }}>{row.point}</span></td>
                         <td style={{ ...TD, minWidth: 100 }}>
-                          <select className="settings-form__input" style={{ minWidth: 80 }} value={row.status}
-                            onChange={e => setPreChecklist(prev => prev.map((r, j) => j === i ? { ...r, status: e.target.value } : r))}>
-                            <option value="">Select...</option>
-                            <option>Done</option>
-                            <option>Pending</option>
-                          </select>
+                          <OtherSelect
+                            style={{ minWidth: 80 }}
+                            options={['Done', 'Pending']}
+                            value={row.status}
+                            onChange={v => setPreChecklist(prev => prev.map((r, j) => j === i ? { ...r, status: v } : r))}
+                          />
                         </td>
                         <td style={{ ...TD, minWidth: 160 }}>
                           <input className="settings-form__input" style={{ minWidth: 140 }} value={row.remarks}
@@ -1326,12 +1368,12 @@ export default function OfficeAdminDailyReportFormPage({ adminMembers }: Props =
                       <tr key={i}>
                         <td style={{ ...TD, minWidth: 220 }}><span style={{ fontSize: 12, opacity: 0.85 }}>{row.point}</span></td>
                         <td style={{ ...TD, minWidth: 100 }}>
-                          <select className="settings-form__input" style={{ minWidth: 80 }} value={row.status}
-                            onChange={e => setPostChecklist(prev => prev.map((r, j) => j === i ? { ...r, status: e.target.value } : r))}>
-                            <option value="">Select...</option>
-                            <option>Done</option>
-                            <option>Pending</option>
-                          </select>
+                          <OtherSelect
+                            style={{ minWidth: 80 }}
+                            options={['Done', 'Pending']}
+                            value={row.status}
+                            onChange={v => setPostChecklist(prev => prev.map((r, j) => j === i ? { ...r, status: v } : r))}
+                          />
                         </td>
                         <td style={{ ...TD, minWidth: 160 }}>
                           <input className="settings-form__input" style={{ minWidth: 140 }} value={row.remarks}
@@ -1360,12 +1402,12 @@ export default function OfficeAdminDailyReportFormPage({ adminMembers }: Props =
                       <tr key={i}>
                         <td style={{ ...TD, minWidth: 220 }}><span style={{ fontSize: 12, opacity: 0.85 }}>{row.point}</span></td>
                         <td style={{ ...TD, minWidth: 100 }}>
-                          <select className="settings-form__input" style={{ minWidth: 80 }} value={row.status}
-                            onChange={e => setNextDayReadiness(prev => prev.map((r, j) => j === i ? { ...r, status: e.target.value } : r))}>
-                            <option value="">Select...</option>
-                            <option>Done</option>
-                            <option>Pending</option>
-                          </select>
+                          <OtherSelect
+                            style={{ minWidth: 80 }}
+                            options={['Done', 'Pending']}
+                            value={row.status}
+                            onChange={v => setNextDayReadiness(prev => prev.map((r, j) => j === i ? { ...r, status: v } : r))}
+                          />
                         </td>
                         <td style={{ ...TD, minWidth: 160 }}>
                           <input className="settings-form__input" style={{ minWidth: 140 }} value={row.remarks}
