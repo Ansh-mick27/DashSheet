@@ -1,7 +1,7 @@
 // ==========================================
 // DashSheet — Office Admin Daily Task Report Form
 // ==========================================
-import { useState, FormEvent } from 'react';
+import { useState, useRef, useEffect, FormEvent } from 'react';
 import { CheckCircle2, AlertCircle, Send, Plus, Trash2 } from 'lucide-react';
 import { useAuth } from '../../contexts/AuthContext';
 import { submitOfficeAdminDailyReport } from '../../services/dataApi';
@@ -96,7 +96,7 @@ const NEXT_DAY_POINTS = [
 ];
 
 function initTimeSlotLog(): OATimeSlotEntry[] {
-  return OA_TIME_SLOTS.map(ts => ({ timeSlot: ts, taskActivity: '', relatedArea: '', status: '', remark: '' }));
+  return OA_TIME_SLOTS.map(ts => ({ timeSlot: ts, taskActivity: [], relatedArea: '', status: '', remark: '' }));
 }
 
 function initStudentSupport(): OAStudentSupportRow[] {
@@ -229,6 +229,91 @@ function OtherSelect({
           value={value === 'Other' ? '' : value}
           onChange={e => onChange(e.target.value || 'Other')}
         />
+      )}
+    </div>
+  );
+}
+
+function MultiSelect({
+  values,
+  options,
+  onChange,
+  style,
+}: {
+  values: string[];
+  options: string[];
+  onChange: (v: string[]) => void;
+  style?: React.CSSProperties;
+}) {
+  const [open, setOpen] = useState(false);
+  const ref = useRef<HTMLDivElement>(null);
+  const customValue = values.find(v => !options.includes(v)) ?? '';
+  const hasCustom = customValue !== '';
+
+  useEffect(() => {
+    if (!open) return;
+    const handler = (e: MouseEvent) => {
+      if (ref.current && !ref.current.contains(e.target as Node)) setOpen(false);
+    };
+    document.addEventListener('mousedown', handler);
+    return () => document.removeEventListener('mousedown', handler);
+  }, [open]);
+
+  const toggle = (opt: string) => {
+    onChange(values.includes(opt) ? values.filter(v => v !== opt) : [...values, opt]);
+  };
+
+  const setCustom = (text: string) => {
+    const base = values.filter(v => options.includes(v));
+    onChange(text ? [...base, text] : base);
+  };
+
+  const displayText = values.length === 0 ? 'Select activities...' : values.join(', ');
+
+  return (
+    <div ref={ref} style={{ position: 'relative', minWidth: (style?.minWidth as number) ?? 200 }}>
+      <div
+        className="settings-form__input"
+        style={{ cursor: 'pointer', display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', userSelect: 'none', minHeight: 34, padding: '5px 8px', ...style }}
+        onClick={() => setOpen(o => !o)}
+      >
+        <span style={{ fontSize: 11, flex: 1, lineHeight: 1.5, wordBreak: 'break-word' }}>{displayText}</span>
+        <span style={{ opacity: 0.5, fontSize: 10, marginLeft: 4, flexShrink: 0 }}>▾</span>
+      </div>
+      {open && (
+        <div style={{
+          position: 'absolute', zIndex: 200, top: '100%', left: 0,
+          minWidth: 260, maxWidth: 340,
+          background: 'var(--color-surface)', border: '1px solid var(--color-border)',
+          borderRadius: 6, boxShadow: '0 4px 16px rgba(0,0,0,0.2)',
+          maxHeight: 240, overflowY: 'auto', padding: '4px 0',
+        }}>
+          {options.map(opt => (
+            <label key={opt} style={{ display: 'flex', alignItems: 'center', gap: 8, padding: '5px 12px', cursor: 'pointer', fontSize: 12 }}>
+              <input type="checkbox" checked={values.includes(opt)} onChange={() => toggle(opt)} style={{ margin: 0, cursor: 'pointer' }} />
+              {opt}
+            </label>
+          ))}
+          <div style={{ borderTop: '1px solid var(--color-border)', marginTop: 4 }}>
+            <label style={{ display: 'flex', alignItems: 'center', gap: 8, padding: '5px 12px', cursor: 'pointer', fontSize: 12 }}>
+              <input type="checkbox" checked={hasCustom} onChange={() => hasCustom ? setCustom('') : setCustom('Other')} style={{ margin: 0, cursor: 'pointer' }} />
+              Other
+            </label>
+            {hasCustom && (
+              <div style={{ padding: '2px 12px 8px' }}>
+                <input
+                  type="text"
+                  className="settings-form__input"
+                  placeholder="Specify other..."
+                  value={customValue === 'Other' ? '' : customValue}
+                  onChange={e => setCustom(e.target.value || 'Other')}
+                  style={{ fontSize: 12 }}
+                  autoFocus
+                />
+              </div>
+            )}
+          </div>
+        </div>
       )}
     </div>
   );
@@ -417,11 +502,11 @@ export default function OfficeAdminDailyReportFormPage({ adminMembers }: Props =
                 {timeSlotLog.map((row, i) => (
                   <tr key={i}>
                     <td style={{ ...TD, minWidth: 130 }}><span style={{ fontSize: 12, opacity: 0.85 }}>{row.timeSlot}</span></td>
-                    <td style={{ ...TD, minWidth: 220 }}>
-                      <OtherSelect
-                        style={{ minWidth: 200 }}
+                    <td style={{ ...TD, minWidth: 260 }}>
+                      <MultiSelect
+                        style={{ minWidth: 240 }}
                         options={OA_TASK_ACTIVITIES}
-                        value={row.taskActivity}
+                        values={row.taskActivity}
                         onChange={v => setTimeSlotLog(prev => prev.map((r, j) => j === i ? { ...r, taskActivity: v } : r))}
                       />
                     </td>

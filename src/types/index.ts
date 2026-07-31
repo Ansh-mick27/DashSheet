@@ -276,7 +276,7 @@ export interface Notification {
   timestamp: Date;
 }
 
-export interface OATimeSlotEntry { timeSlot: string; taskActivity: string; relatedArea: string; status: string; remark: string; }
+export interface OATimeSlotEntry { timeSlot: string; taskActivity: string[]; relatedArea: string; status: string; remark: string; }
 export interface OAStudentSupportRow { particular: string; countStatus: string; remarks: string; }
 export interface OACampusProcessRow { process: string; venue: string; supportProvided: string; noOfStudentsGuests: string; status: string; remarks: string; }
 export interface OAHousekeepingRow { area: string; status: string; issueFound: string; actionTaken: string; remarks: string; }
