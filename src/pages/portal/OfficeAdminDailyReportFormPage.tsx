@@ -2,6 +2,7 @@
 // DashSheet — Office Admin Daily Task Report Form
 // ==========================================
 import { useState, useRef, useEffect, FormEvent } from 'react';
+import { createPortal } from 'react-dom';
 import { CheckCircle2, AlertCircle, Send, Plus, Trash2 } from 'lucide-react';
 import { useAuth } from '../../contexts/AuthContext';
 import { submitOfficeAdminDailyReport } from '../../services/dataApi';
@@ -246,14 +247,35 @@ function MultiSelect({
   style?: React.CSSProperties;
 }) {
   const [open, setOpen] = useState(false);
-  const ref = useRef<HTMLDivElement>(null);
+  const [dropPos, setDropPos] = useState({ top: 0, left: 0, width: 0, openUp: false });
+  const triggerRef = useRef<HTMLDivElement>(null);
+  const dropRef = useRef<HTMLDivElement>(null);
   const customValue = values.find(v => !options.includes(v)) ?? '';
   const hasCustom = customValue !== '';
+
+  const handleToggle = () => {
+    if (!open && triggerRef.current) {
+      const rect = triggerRef.current.getBoundingClientRect();
+      const dropH = 240;
+      const spaceBelow = window.innerHeight - rect.bottom;
+      const openUp = spaceBelow < dropH && rect.top > dropH;
+      setDropPos({
+        top: openUp ? rect.top - dropH : rect.bottom,
+        left: rect.left,
+        width: Math.max(rect.width, 260),
+        openUp,
+      });
+    }
+    setOpen(o => !o);
+  };
 
   useEffect(() => {
     if (!open) return;
     const handler = (e: MouseEvent) => {
-      if (ref.current && !ref.current.contains(e.target as Node)) setOpen(false);
+      if (
+        triggerRef.current && !triggerRef.current.contains(e.target as Node) &&
+        dropRef.current && !dropRef.current.contains(e.target as Node)
+      ) setOpen(false);
     };
     document.addEventListener('mousedown', handler);
     return () => document.removeEventListener('mousedown', handler);
@@ -270,51 +292,66 @@ function MultiSelect({
 
   const displayText = values.length === 0 ? 'Select activities...' : values.join(', ');
 
+  const dropdown = (
+    <div
+      ref={dropRef}
+      style={{
+        position: 'fixed',
+        zIndex: 9999,
+        top: dropPos.top,
+        left: dropPos.left,
+        width: dropPos.width,
+        minWidth: 260,
+        maxWidth: 360,
+        background: 'var(--color-surface)',
+        border: '1px solid var(--color-border)',
+        borderRadius: 6,
+        boxShadow: '0 4px 20px rgba(0,0,0,0.22)',
+        maxHeight: 240,
+        overflowY: 'auto',
+        padding: '4px 0',
+      }}
+    >
+      {options.map(opt => (
+        <label key={opt} style={{ display: 'flex', alignItems: 'center', gap: 8, padding: '5px 12px', cursor: 'pointer', fontSize: 12 }}>
+          <input type="checkbox" checked={values.includes(opt)} onChange={() => toggle(opt)} style={{ margin: 0, cursor: 'pointer' }} />
+          {opt}
+        </label>
+      ))}
+      <div style={{ borderTop: '1px solid var(--color-border)', marginTop: 4 }}>
+        <label style={{ display: 'flex', alignItems: 'center', gap: 8, padding: '5px 12px', cursor: 'pointer', fontSize: 12 }}>
+          <input type="checkbox" checked={hasCustom} onChange={() => hasCustom ? setCustom('') : setCustom('Other')} style={{ margin: 0, cursor: 'pointer' }} />
+          Other
+        </label>
+        {hasCustom && (
+          <div style={{ padding: '2px 12px 8px' }}>
+            <input
+              type="text"
+              className="settings-form__input"
+              placeholder="Specify other..."
+              value={customValue === 'Other' ? '' : customValue}
+              onChange={e => setCustom(e.target.value || 'Other')}
+              style={{ fontSize: 12 }}
+              autoFocus
+            />
+          </div>
+        )}
+      </div>
+    </div>
+  );
+
   return (
-    <div ref={ref} style={{ position: 'relative', minWidth: (style?.minWidth as number) ?? 200 }}>
+    <div style={{ position: 'relative', minWidth: (style?.minWidth as number) ?? 200 }}>
       <div
+        ref={triggerRef}
         className="settings-form__input"
         style={{ cursor: 'pointer', display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', userSelect: 'none', minHeight: 34, padding: '5px 8px', ...style }}
-        onClick={() => setOpen(o => !o)}
+        onClick={handleToggle}
       >
         <span style={{ fontSize: 11, flex: 1, lineHeight: 1.5, wordBreak: 'break-word' }}>{displayText}</span>
         <span style={{ opacity: 0.5, fontSize: 10, marginLeft: 4, flexShrink: 0 }}>▾</span>
       </div>
-      {open && (
-        <div style={{
-          position: 'absolute', zIndex: 200, top: '100%', left: 0,
-          minWidth: 260, maxWidth: 340,
-          background: 'var(--color-surface)', border: '1px solid var(--color-border)',
-          borderRadius: 6, boxShadow: '0 4px 16px rgba(0,0,0,0.2)',
-          maxHeight: 240, overflowY: 'auto', padding: '4px 0',
-        }}>
-          {options.map(opt => (
-            <label key={opt} style={{ display: 'flex', alignItems: 'center', gap: 8, padding: '5px 12px', cursor: 'pointer', fontSize: 12 }}>
-              <input type="checkbox" checked={values.includes(opt)} onChange={() => toggle(opt)} style={{ margin: 0, cursor: 'pointer' }} />
-              {opt}
-            </label>
-          ))}
-          <div style={{ borderTop: '1px solid var(--color-border)', marginTop: 4 }}>
-            <label style={{ display: 'flex', alignItems: 'center', gap: 8, padding: '5px 12px', cursor: 'pointer', fontSize: 12 }}>
-              <input type="checkbox" checked={hasCustom} onChange={() => hasCustom ? setCustom('') : setCustom('Other')} style={{ margin: 0, cursor: 'pointer' }} />
-              Other
-            </label>
-            {hasCustom && (
-              <div style={{ padding: '2px 12px 8px' }}>
-                <input
-                  type="text"
-                  className="settings-form__input"
-                  placeholder="Specify other..."
-                  value={customValue === 'Other' ? '' : customValue}
-                  onChange={e => setCustom(e.target.value || 'Other')}
-                  style={{ fontSize: 12 }}
-                  autoFocus
-                />
-              </div>
-            )}
-          </div>
-        </div>
-      )}
+      {open && createPortal(dropdown, document.body)}
     </div>
   );
 }
