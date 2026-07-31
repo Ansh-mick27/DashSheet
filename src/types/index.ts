@@ -100,7 +100,7 @@ export interface OfficeAdminReport {
   itemCategory: 'Electronics' | 'Furniture' | 'Stationery' | 'Equipment' | 'Other';
   quantity: number;
   condition: 'New' | 'Good' | 'Fair' | 'Poor' | 'Damaged';
-  actionTaken: 'Added' | 'Removed' | 'Repaired' | 'Maintenance' | 'Audited';
+  actionTaken: 'Added' | 'Removed' | 'Repaired' | 'Maintenance' | 'Audited' | 'Assigned' | 'Returned';
   location: string;
   notes: string;
   assignedTo: string;
@@ -324,6 +324,15 @@ export interface OfficeAdminDailyReport {
   preProcessChecklist: OAChecklistRow[];
   postProcessChecklist: OAChecklistRow[];
   nextDayReadiness: OAChecklistRow[];
+}
+
+export interface InventoryStock {
+  id?: string;
+  itemName: string;
+  currentStock: number;
+  lastUpdated: string;
+  updatedBy: string;
+  notes: string;
 }
 
 export interface OfficeAdminWeeklyReport {

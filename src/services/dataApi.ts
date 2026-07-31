@@ -5,7 +5,7 @@ import { supabase, isSupabaseConfigured } from '../lib/supabaseClient';
 import {
   Member, MemberRole, TrainingReport, WorkReport, OfficeAdminReport, PlacementReport, Notification,
   FieldOption, CustomField, CustomFieldFormType, CustomFieldType, BranchStudentCount, PlacementWorkReport,
-  OfficeAdminDailyReport, OfficeAdminWeeklyReport
+  OfficeAdminDailyReport, OfficeAdminWeeklyReport, InventoryStock
 } from '../types';
 import {
   generateMembers, generateTrainingReports, generateWorkReports,
@@ -686,4 +686,35 @@ export async function changePassword(
   });
   if (error) throw error;
   return Boolean(data);
+}
+
+export async function fetchInventoryStock(): Promise<InventoryStock[]> {
+  if (!isSupabaseConfigured) return [];
+  const { data, error } = await supabase.from('inventory_stock').select('*').order('item_name');
+  if (error) { console.error(error); return []; }
+  return (data ?? []).map(row => ({
+    id: row.id,
+    itemName: row.item_name,
+    currentStock: row.current_stock,
+    lastUpdated: row.last_updated,
+    updatedBy: row.updated_by,
+    notes: row.notes ?? '',
+  }));
+}
+
+export async function upsertInventoryStock(
+  items: { itemName: string; currentStock: number; updatedBy: string; notes: string }[]
+): Promise<void> {
+  if (!isSupabaseConfigured) return;
+  const rows = items.map(i => ({
+    item_name: i.itemName,
+    current_stock: i.currentStock,
+    last_updated: new Date().toISOString(),
+    updated_by: i.updatedBy,
+    notes: i.notes,
+  }));
+  const { error } = await supabase
+    .from('inventory_stock')
+    .upsert(rows, { onConflict: 'item_name' });
+  if (error) throw error;
 }
