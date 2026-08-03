@@ -36,6 +36,7 @@ import TrainingReportDetailPage from './pages/TrainingReportDetailPage';
 import WorkReportDetailPage from './pages/WorkReportDetailPage';
 import { useAuth } from './contexts/AuthContext';
 import { fetchSheetData, refreshData, parseDate, generateNotifications, fetchOfficeAdminDailyReports, fetchOfficeAdminWeeklyReports, fetchInventoryStock } from './services/dataApi';
+import { getAdminAccess } from './config/adminAccess';
 import {
   Member, TrainingReport, WorkReport, OfficeAdminReport,
   PlacementReport, PlacementWorkReport, DashboardFilters, Notification, BranchStudentCount,
@@ -109,6 +110,34 @@ function DashboardLayout() {
     loadData();
   }, [loadData]);
 
+  // Per-admin access config
+  const accessConfig = useMemo(() => {
+    if (!member || member.role === 'SuperAdmin') return null;
+    return getAdminAccess(member.name);
+  }, [member]);
+
+  // Members visible to the logged-in admin (used for filtering all report data)
+  const accessVisibleMembers = useMemo(() => {
+    if (!member || member.role === 'SuperAdmin') return members;
+    if (!accessConfig) {
+      // Default Admin: all except SuperAdmin
+      return members.filter(m => m.role !== 'SuperAdmin');
+    }
+    const included = new Set((accessConfig.includedMembers || []).map(n => n.toLowerCase()));
+    const excluded = new Set((accessConfig.excludedMembers || []).map(n => n.toLowerCase()));
+    return members.filter(m => {
+      const nameLow = m.name.toLowerCase();
+      if (excluded.has(nameLow)) return false;
+      if (included.has(nameLow)) return true;
+      return (accessConfig.visibleRoles as string[]).includes(m.role);
+    });
+  }, [members, member, accessConfig]);
+
+  const accessVisibleNames = useMemo(
+    () => new Set(accessVisibleMembers.map(m => m.name)),
+    [accessVisibleMembers]
+  );
+
   // Filter helpers
   const inDateRange = useCallback((dateStr: string) => {
     if (!filters.dateFrom && !filters.dateTo) return true;
@@ -122,46 +151,62 @@ function DashboardLayout() {
 
   const filteredTraining = useMemo(() => {
     return trainingReports.filter(r => {
+      if (!accessVisibleNames.has(r.trainerName)) return false;
       if (filters.trainer && r.trainerName !== filters.trainer) return false;
       if (!inDateRange(r.date)) return false;
       return true;
     });
-  }, [trainingReports, filters, inDateRange]);
+  }, [trainingReports, filters, inDateRange, accessVisibleNames]);
 
   const filteredWork = useMemo(() => {
     return workReports.filter(r => {
+      if (!accessVisibleNames.has(r.trainerName)) return false;
       if (filters.trainer && r.trainerName !== filters.trainer) return false;
       if (filters.batch && r.batch !== filters.batch) return false;
       if (filters.department && r.department !== filters.department) return false;
       if (!inDateRange(r.date)) return false;
       return true;
     });
-  }, [workReports, filters, inDateRange]);
+  }, [workReports, filters, inDateRange, accessVisibleNames]);
 
   const filteredMembers = useMemo(() => {
-    return members.filter(m => {
+    return accessVisibleMembers.filter(m => {
       if (filters.department && m.department !== filters.department) return false;
       if (filters.batch && m.batch !== filters.batch) return false;
       if (filters.role && m.role !== filters.role) return false;
       return true;
     });
-  }, [members, filters]);
+  }, [accessVisibleMembers, filters]);
 
   const filteredOfficeAdmin = useMemo(() => {
     return officeAdminReports.filter(r => {
+      if (!accessVisibleNames.has(r.staffName)) return false;
       if (filters.trainer && r.staffName !== filters.trainer) return false;
       if (!inDateRange(r.date)) return false;
       return true;
     });
-  }, [officeAdminReports, filters, inDateRange]);
+  }, [officeAdminReports, filters, inDateRange, accessVisibleNames]);
 
   const filteredPlacement = useMemo(() => {
     return placementReports.filter(r => {
+      if (!accessVisibleNames.has(r.staffName)) return false;
       if (filters.trainer && r.staffName !== filters.trainer) return false;
       if (!inDateRange(r.dateOfFirstContact)) return false;
       return true;
     });
-  }, [placementReports, filters, inDateRange]);
+  }, [placementReports, filters, inDateRange, accessVisibleNames]);
+
+  const filteredPlacementWork = useMemo(() => {
+    return placementWorkReports.filter(r => accessVisibleNames.has(r.staffName));
+  }, [placementWorkReports, accessVisibleNames]);
+
+  const filteredOfficeDaily = useMemo(() => {
+    return officeDailyReports.filter(r => accessVisibleNames.has(r.staffName));
+  }, [officeDailyReports, accessVisibleNames]);
+
+  const filteredOfficeWeekly = useMemo(() => {
+    return officeWeeklyReports.filter(r => accessVisibleNames.has(r.staffName));
+  }, [officeWeeklyReports, accessVisibleNames]);
 
   if (loading) {
     return (
@@ -297,19 +342,19 @@ function DashboardLayout() {
               <ErrorBoundary><PlacementPage reports={filteredPlacement} /></ErrorBoundary>
             } />
             <Route path="/placement-work" element={
-              <ErrorBoundary><PlacementWorkReportsPage reports={placementWorkReports} /></ErrorBoundary>
+              <ErrorBoundary><PlacementWorkReportsPage reports={filteredPlacementWork} /></ErrorBoundary>
             } />
             <Route path="/placement-work/:id" element={
-              <ErrorBoundary><PlacementWorkReportDetailPage reports={placementWorkReports} /></ErrorBoundary>
+              <ErrorBoundary><PlacementWorkReportDetailPage reports={filteredPlacementWork} /></ErrorBoundary>
             } />
             <Route path="/office-daily" element={
-              <ErrorBoundary><OfficeDailyReportsPage reports={officeDailyReports} /></ErrorBoundary>
+              <ErrorBoundary><OfficeDailyReportsPage reports={filteredOfficeDaily} /></ErrorBoundary>
             } />
             <Route path="/office-daily/:id" element={
-              <ErrorBoundary><OfficeDailyReportDetailPage reports={officeDailyReports} /></ErrorBoundary>
+              <ErrorBoundary><OfficeDailyReportDetailPage reports={filteredOfficeDaily} /></ErrorBoundary>
             } />
             <Route path="/office-weekly" element={
-              <ErrorBoundary><OfficeWeeklyReportsPage reports={officeWeeklyReports} /></ErrorBoundary>
+              <ErrorBoundary><OfficeWeeklyReportsPage reports={filteredOfficeWeekly} /></ErrorBoundary>
             } />
             <Route path="/settings" element={
               <ErrorBoundary><SettingsPage /></ErrorBoundary>

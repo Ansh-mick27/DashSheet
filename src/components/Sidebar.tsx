@@ -9,30 +9,29 @@ import {
 } from 'lucide-react';
 import { useAuth } from '../contexts/AuthContext';
 import { useTheme } from '../contexts/ThemeContext';
-import { useState } from 'react';
+import { useMemo, useState } from 'react';
+import { getAdminAccess } from '../config/adminAccess';
+import { MemberRole } from '../types';
 
-const ADMIN_NAV_ITEMS = [
-  { path: '/', icon: LayoutDashboard, label: 'Overview' },
-  { path: '/training', icon: BookOpen, label: 'Session Reports' },
-  { path: '/work', icon: ClipboardList, label: 'Daily Work Reports' },
-  { path: '/members', icon: Users, label: 'Members' },
-  { path: '/inventory', icon: Package, label: 'Inventory' },
-  { path: '/inventory-stock', icon: ClipboardList, label: 'Stock Overview' },
-  { path: '/placement', icon: Briefcase, label: 'CRP Process' },
-  { path: '/placement-work', icon: FileText, label: 'Placement Work' },
-  { path: '/office-daily', icon: ClipboardCheck, label: 'Office Daily' },
-  { path: '/office-weekly', icon: CalendarDays, label: 'Office Weekly' },
-  { path: '/portal', icon: ClipboardPlus, label: 'Portal' },
-  { path: '/settings', icon: Settings, label: 'Settings' },
+const ALL_ADMIN_NAV_ITEMS = [
+  { path: '/', icon: LayoutDashboard, label: 'Overview', roles: null },
+  { path: '/training', icon: BookOpen, label: 'Session Reports', roles: ['Trainer'] as MemberRole[] },
+  { path: '/work', icon: ClipboardList, label: 'Daily Work Reports', roles: ['Trainer'] as MemberRole[] },
+  { path: '/members', icon: Users, label: 'Members', roles: null },
+  { path: '/inventory', icon: Package, label: 'Inventory', roles: ['OfficeAdmin'] as MemberRole[] },
+  { path: '/inventory-stock', icon: ClipboardList, label: 'Stock Overview', roles: ['OfficeAdmin'] as MemberRole[] },
+  { path: '/placement', icon: Briefcase, label: 'CRP Process', roles: ['Placement'] as MemberRole[] },
+  { path: '/placement-work', icon: FileText, label: 'Placement Work', roles: ['Placement'] as MemberRole[] },
+  { path: '/office-daily', icon: ClipboardCheck, label: 'Office Daily', roles: ['OfficeAdmin'] as MemberRole[] },
+  { path: '/office-weekly', icon: CalendarDays, label: 'Office Weekly', roles: ['OfficeAdmin'] as MemberRole[] },
+  { path: '/portal', icon: ClipboardPlus, label: 'Portal', roles: null },
+  { path: '/settings', icon: Settings, label: 'Settings', roles: null },
 ];
 
-const SUPERADMIN_NAV_ITEMS = [
-  ...ADMIN_NAV_ITEMS,
-  { path: '/admin', icon: ShieldCheck, label: 'SuperAdmin' },
-];
+const SUPERADMIN_EXTRA = { path: '/admin', icon: ShieldCheck, label: 'SuperAdmin', roles: null };
 
 const PORTAL_NAV_ITEMS = [
-  { path: '/portal', icon: ClipboardPlus, label: 'Portal' },
+  { path: '/portal', icon: ClipboardPlus, label: 'Portal', roles: null },
 ];
 
 interface SidebarProps {
@@ -45,11 +44,25 @@ export default function Sidebar({ onSearch }: SidebarProps) {
   const [collapsed, setCollapsed] = useState(false);
   const [searchVal, setSearchVal] = useState('');
   const navigate = useNavigate();
-  const navItems = member?.role === 'SuperAdmin'
-    ? SUPERADMIN_NAV_ITEMS
-    : member?.role === 'Admin'
-      ? ADMIN_NAV_ITEMS
-      : PORTAL_NAV_ITEMS;
+
+  const navItems = useMemo(() => {
+    if (member?.role === 'SuperAdmin') {
+      return [...ALL_ADMIN_NAV_ITEMS, SUPERADMIN_EXTRA];
+    }
+    if (member?.role === 'Admin') {
+      const access = getAdminAccess(member.name);
+      if (!access) return ALL_ADMIN_NAV_ITEMS;
+      return ALL_ADMIN_NAV_ITEMS.filter(item =>
+        item.roles === null || item.roles.some(r => (access.visibleRoles as string[]).includes(r))
+      );
+    }
+    return PORTAL_NAV_ITEMS;
+  }, [member]);
+
+  const memberTitle = useMemo(() => {
+    if (!member || member.role !== 'Admin') return null;
+    return getAdminAccess(member.name)?.title ?? null;
+  }, [member]);
 
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();
@@ -127,7 +140,14 @@ export default function Sidebar({ onSearch }: SidebarProps) {
             <div className="sidebar__avatar">
               {(member?.name || 'U').charAt(0).toUpperCase()}
             </div>
-            <span className="sidebar__username">{member?.name || 'User'}</span>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 1, minWidth: 0 }}>
+              <span className="sidebar__username">{member?.name || 'User'}</span>
+              {memberTitle && (
+                <span style={{ fontSize: 10, opacity: 0.65, lineHeight: 1.2, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+                  {memberTitle}
+                </span>
+              )}
+            </div>
           </div>
         )}
         <button className="sidebar__logout" onClick={logout} aria-label="Logout">
