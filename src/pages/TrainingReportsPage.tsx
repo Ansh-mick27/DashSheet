@@ -7,6 +7,8 @@ import {
   BarChart, Bar, XAxis, YAxis, Tooltip, CartesianGrid,
   LineChart, Line, Legend
 } from 'recharts';
+import { Eye } from 'lucide-react';
+import { Link } from 'react-router-dom';
 import ChartCard from '../components/ChartCard';
 import DataTable from '../components/DataTable';
 import { TrainingReport } from '../types';
@@ -105,6 +107,15 @@ export default function TrainingReportsPage({ reports }: TrainingReportsPageProp
         <span className={`badge badge--${r.participationLevel.toLowerCase()}`}>
           {r.participationLevel}
         </span>
+      )
+    },
+    {
+      key: '_view', header: '', width: '70px',
+      render: (r: TrainingReport) => (
+        <Link to={`/training/${encodeURIComponent(r.timestamp)}`}
+          className="btn btn--ghost btn--sm" style={{ display: 'inline-flex', alignItems: 'center', gap: 4 }}>
+          <Eye size={14} /> View
+        </Link>
       )
     }
   ];

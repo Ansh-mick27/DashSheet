@@ -6,7 +6,8 @@ import {
   BarChart, Bar, XAxis, YAxis, Tooltip, CartesianGrid,
   PieChart, Pie, Cell, ResponsiveContainer, LineChart, Line
 } from 'recharts';
-import { ClipboardCheck, CalendarDays, AlertTriangle, CheckCircle2 } from 'lucide-react';
+import { ClipboardCheck, CalendarDays, AlertTriangle, CheckCircle2, Eye } from 'lucide-react';
+import { Link } from 'react-router-dom';
 import ChartCard from '../components/ChartCard';
 import DataTable from '../components/DataTable';
 import StatCard from '../components/StatCard';
@@ -123,6 +124,15 @@ export default function OfficeDailyReportsPage({ reports }: OfficeDailyReportsPa
         const first = r.keyWorkCompleted?.[0] ?? '';
         return first ? (first.length > 60 ? first.slice(0, 60) + '…' : first) : '—';
       }
+    },
+    {
+      key: '_view', header: '', width: '70px',
+      render: (r: OfficeAdminDailyReport) => (
+        <Link to={`/office-daily/${encodeURIComponent(r.id ?? r.timestamp)}`}
+          className="btn btn--ghost btn--sm" style={{ display: 'inline-flex', alignItems: 'center', gap: 4 }}>
+          <Eye size={14} /> View
+        </Link>
+      )
     }
   ];
 
