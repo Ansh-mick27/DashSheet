@@ -95,6 +95,15 @@ export default function PlacementWorkReportsPage({ reports }: PlacementWorkRepor
   }, [reports]);
 
   const columns = [
+    {
+      key: '_view', header: '', width: '70px',
+      render: (r: PlacementWorkReport) => (
+        <Link to={`/placement-work/${encodeURIComponent(r.id ?? r.timestamp)}`}
+          className="btn btn--ghost btn--sm" style={{ display: 'inline-flex', alignItems: 'center', gap: 4 }}>
+          <Eye size={14} /> View
+        </Link>
+      )
+    },
     { key: 'date', header: 'Date', sortable: true, width: '90px' },
     { key: 'staffName', header: 'Staff', sortable: true, width: '130px' },
     { key: 'department', header: 'Dept', sortable: true, width: '120px' },
@@ -133,15 +142,6 @@ export default function PlacementWorkReportsPage({ reports }: PlacementWorkRepor
         return first ? (first.length > 60 ? first.slice(0, 60) + '…' : first) : '—';
       }
     },
-    {
-      key: '_view', header: '', width: '70px',
-      render: (r: PlacementWorkReport) => (
-        <Link to={`/placement-work/${encodeURIComponent(r.id ?? r.timestamp)}`}
-          className="btn btn--ghost btn--sm" style={{ display: 'inline-flex', alignItems: 'center', gap: 4 }}>
-          <Eye size={14} /> View
-        </Link>
-      )
-    }
   ];
 
   if (reports.length === 0) {

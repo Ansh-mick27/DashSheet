@@ -88,6 +88,15 @@ export default function TrainingReportsPage({ reports }: TrainingReportsPageProp
   const CHART_COLORS = ['#6366f1', '#22d3ee', '#f59e0b', '#ef4444', '#10b981', '#8b5cf6', '#ec4899', '#14b8a6'];
 
   const columns = [
+    {
+      key: '_view', header: '', width: '70px',
+      render: (r: TrainingReport) => (
+        <Link to={`/training/${encodeURIComponent(r.timestamp)}`}
+          className="btn btn--ghost btn--sm" style={{ display: 'inline-flex', alignItems: 'center', gap: 4 }}>
+          <Eye size={14} /> View
+        </Link>
+      )
+    },
     { key: 'date', header: 'Date', sortable: true, width: '90px' },
     { key: 'trainerName', header: 'Trainer', sortable: true, width: '140px' },
     { key: 'college', header: 'College', sortable: true },
@@ -109,15 +118,6 @@ export default function TrainingReportsPage({ reports }: TrainingReportsPageProp
         </span>
       )
     },
-    {
-      key: '_view', header: '', width: '70px',
-      render: (r: TrainingReport) => (
-        <Link to={`/training/${encodeURIComponent(r.timestamp)}`}
-          className="btn btn--ghost btn--sm" style={{ display: 'inline-flex', alignItems: 'center', gap: 4 }}>
-          <Eye size={14} /> View
-        </Link>
-      )
-    }
   ];
 
   return (

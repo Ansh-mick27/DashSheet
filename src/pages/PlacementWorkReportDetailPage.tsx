@@ -29,7 +29,7 @@ const TD: React.CSSProperties = {
 export default function PlacementWorkReportDetailPage({ reports }: Props) {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
-  const report = reports.find(r => encodeURIComponent(r.id ?? r.timestamp) === id);
+  const report = reports.find(r => (r.id ?? r.timestamp) === id);
 
   if (!report) {
     return (

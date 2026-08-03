@@ -21,7 +21,7 @@ const Field = ({ label, value }: { label: string; value: string }) => (
 export default function TrainingReportDetailPage({ reports }: Props) {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
-  const report = reports.find(r => encodeURIComponent(r.timestamp) === id);
+  const report = reports.find(r => r.timestamp === id);
 
   if (!report) {
     return (

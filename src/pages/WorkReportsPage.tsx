@@ -105,6 +105,15 @@ export default function WorkReportsPage({ reports }: WorkReportsPageProps) {
   }, [reports]);
 
   const columns = [
+    {
+      key: '_view', header: '', width: '70px',
+      render: (r: WorkReport) => (
+        <Link to={`/work/${encodeURIComponent(r.timestamp)}`}
+          className="btn btn--ghost btn--sm" style={{ display: 'inline-flex', alignItems: 'center', gap: 4 }}>
+          <Eye size={14} /> View
+        </Link>
+      )
+    },
     { key: 'date', header: 'Date', sortable: true, width: '90px' },
     { key: 'trainerName', header: 'Trainer', sortable: true, width: '140px' },
     { key: 'department', header: 'Department', sortable: true },
@@ -131,15 +140,6 @@ export default function WorkReportsPage({ reports }: WorkReportsPageProps) {
       }
     },
     { key: 'keyAccomplishments', header: 'Accomplishments' },
-    {
-      key: '_view', header: '', width: '70px',
-      render: (r: WorkReport) => (
-        <Link to={`/work/${encodeURIComponent(r.timestamp)}`}
-          className="btn btn--ghost btn--sm" style={{ display: 'inline-flex', alignItems: 'center', gap: 4 }}>
-          <Eye size={14} /> View
-        </Link>
-      )
-    }
   ];
 
   return (
