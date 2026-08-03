@@ -86,6 +86,19 @@ export default function OfficeAdminPage({ reports }: OfficeAdminPageProps) {
     return entries.sort((a, b) => parseDate(b.from).getTime() - parseDate(a.from).getTime());
   }, [reports]);
 
+  // Top 10 most-logged items by frequency
+  const topItems = useMemo(() => {
+    const counts: Record<string, number> = {};
+    reports.forEach(r => { counts[r.itemName] = (counts[r.itemName] || 0) + 1; });
+    return Object.entries(counts)
+      .sort(([, a], [, b]) => b - a)
+      .slice(0, 10)
+      .map(([name, count]) => ({
+        name: name.length > 25 ? name.substring(0, 25) + '…' : name,
+        count
+      }));
+  }, [reports]);
+
   // Activity over time (last 14 days)
   const timelineData = useMemo(() => {
     const dayMap: Record<string, number> = {};
@@ -232,6 +245,18 @@ export default function OfficeAdminPage({ reports }: OfficeAdminPageProps) {
             </ChartCard>
           </div>
 
+          <ChartCard title="Most Logged Items" subtitle="By number of log entries" className="mt-24">
+            <ResponsiveContainer width="100%" height={260}>
+              <BarChart data={topItems} layout="vertical">
+                <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.06)" />
+                <XAxis type="number" stroke="rgba(255,255,255,0.4)" fontSize={11} />
+                <YAxis dataKey="name" type="category" stroke="rgba(255,255,255,0.4)" fontSize={10} width={160} />
+                <Tooltip contentStyle={CHART_TOOLTIP_STYLE} itemStyle={{ color: '#e2e8f0' }} labelStyle={{ color: '#e2e8f0' }} />
+                <Bar dataKey="count" fill="#6366f1" radius={[0, 4, 4, 0]} />
+              </BarChart>
+            </ResponsiveContainer>
+          </ChartCard>
+
           {currentAssignments.length > 0 && (
             <ChartCard title="Currently Assigned Items" subtitle="Items presently held by a member" className="mt-24">
               <DataTable
@@ -263,9 +288,9 @@ export default function OfficeAdminPage({ reports }: OfficeAdminPageProps) {
               data={reports}
               rowKey={(r, i) => `inv-${r.date}-${i}`}
               pageSize={12}
-              exportFilename="inventory_report"
+              exportFilename="inventory_log"
               emptyMessage="No inventory records found"
-              searchKeys={['itemName', 'itemCode']}
+              searchKeys={['itemName', 'staffName']}
             />
           </ChartCard>
         </>
