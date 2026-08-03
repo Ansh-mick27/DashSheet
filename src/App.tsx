@@ -30,6 +30,10 @@ import OfficeAdminWeeklyReportFormPage from './pages/portal/OfficeAdminWeeklyRep
 import OfficeDailyReportsPage from './pages/OfficeDailyReportsPage';
 import OfficeWeeklyReportsPage from './pages/OfficeWeeklyReportsPage';
 import InventoryStockPage from './pages/InventoryStockPage';
+import OfficeDailyReportDetailPage from './pages/OfficeDailyReportDetailPage';
+import PlacementWorkReportDetailPage from './pages/PlacementWorkReportDetailPage';
+import TrainingReportDetailPage from './pages/TrainingReportDetailPage';
+import WorkReportDetailPage from './pages/WorkReportDetailPage';
 import { useAuth } from './contexts/AuthContext';
 import { fetchSheetData, refreshData, parseDate, generateNotifications, fetchOfficeAdminDailyReports, fetchOfficeAdminWeeklyReports, fetchInventoryStock } from './services/dataApi';
 import {
@@ -252,8 +256,14 @@ function DashboardLayout() {
             <Route path="/training" element={
               <ErrorBoundary><TrainingReportsPage reports={filteredTraining} /></ErrorBoundary>
             } />
+            <Route path="/training/:id" element={
+              <ErrorBoundary><TrainingReportDetailPage reports={trainingReports} /></ErrorBoundary>
+            } />
             <Route path="/work" element={
               <ErrorBoundary><WorkReportsPage reports={filteredWork} /></ErrorBoundary>
+            } />
+            <Route path="/work/:id" element={
+              <ErrorBoundary><WorkReportDetailPage reports={workReports} /></ErrorBoundary>
             } />
             <Route path="/members" element={
               <ErrorBoundary>
@@ -289,8 +299,14 @@ function DashboardLayout() {
             <Route path="/placement-work" element={
               <ErrorBoundary><PlacementWorkReportsPage reports={placementWorkReports} /></ErrorBoundary>
             } />
+            <Route path="/placement-work/:id" element={
+              <ErrorBoundary><PlacementWorkReportDetailPage reports={placementWorkReports} /></ErrorBoundary>
+            } />
             <Route path="/office-daily" element={
               <ErrorBoundary><OfficeDailyReportsPage reports={officeDailyReports} /></ErrorBoundary>
+            } />
+            <Route path="/office-daily/:id" element={
+              <ErrorBoundary><OfficeDailyReportDetailPage reports={officeDailyReports} /></ErrorBoundary>
             } />
             <Route path="/office-weekly" element={
               <ErrorBoundary><OfficeWeeklyReportsPage reports={officeWeeklyReports} /></ErrorBoundary>

@@ -6,6 +6,8 @@ import {
   BarChart, Bar, XAxis, YAxis, Tooltip, CartesianGrid,
   ResponsiveContainer, PieChart, Pie, Cell, Legend
 } from 'recharts';
+import { Eye } from 'lucide-react';
+import { Link } from 'react-router-dom';
 import ChartCard from '../components/ChartCard';
 import DataTable from '../components/DataTable';
 import { WorkReport } from '../types';
@@ -128,7 +130,16 @@ export default function WorkReportsPage({ reports }: WorkReportsPageProps) {
         return count > 0 ? <span className="badge badge--pending">{count}</span> : '0';
       }
     },
-    { key: 'keyAccomplishments', header: 'Accomplishments' }
+    { key: 'keyAccomplishments', header: 'Accomplishments' },
+    {
+      key: '_view', header: '', width: '70px',
+      render: (r: WorkReport) => (
+        <Link to={`/work/${encodeURIComponent(r.timestamp)}`}
+          className="btn btn--ghost btn--sm" style={{ display: 'inline-flex', alignItems: 'center', gap: 4 }}>
+          <Eye size={14} /> View
+        </Link>
+      )
+    }
   ];
 
   return (
