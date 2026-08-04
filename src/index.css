@@ -1420,6 +1420,45 @@ input, select { font: inherit; color: inherit; }
 
 
 /* ============================================
+   MOBILE OVERLAY & HAMBURGER TRIGGER
+   ============================================ */
+.sidebar__overlay {
+  display: none;
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.55);
+  z-index: 98;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.25s ease;
+  backdrop-filter: blur(2px);
+}
+
+.sidebar__mobile-trigger {
+  display: none;
+  position: fixed;
+  top: 12px;
+  left: 12px;
+  z-index: 97;
+  width: 40px;
+  height: 40px;
+  border-radius: var(--radius-md);
+  background: var(--bg-sidebar);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  align-items: center;
+  justify-content: center;
+  color: #e2e8f0;
+  cursor: pointer;
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.4);
+  transition: opacity 0.2s;
+}
+
+/* Desktop: only show the desktop toggle, hide mobile X */
+.sidebar__toggle--mobile { display: none; }
+.sidebar__toggle--desktop { display: flex; }
+
+
+/* ============================================
    RESPONSIVE
    ============================================ */
 @media (max-width: 1200px) {
@@ -1463,25 +1502,90 @@ input, select { font: inherit; color: inherit; }
   }
 }
 
-@media (max-width: 600px) {
+/* ── Mobile: off-canvas drawer ─────────────────────── */
+@media (max-width: 768px) {
+  /* Sidebar slides in from the left */
   .sidebar {
-    display: none;
+    transform: translateX(-100%);
+    width: 260px !important;
+    transition: transform 0.25s ease;
+    z-index: 99;
+    /* Restore text that 900px hid */
+    display: flex;
   }
 
+  .sidebar .sidebar__brand,
+  .sidebar .sidebar__username,
+  .sidebar .sidebar__link span,
+  .sidebar .sidebar__logout span {
+    display: revert;
+  }
+
+  .sidebar--mobile-open {
+    transform: translateX(0);
+    box-shadow: 6px 0 32px rgba(0, 0, 0, 0.5);
+  }
+
+  /* Overlay */
+  .sidebar__overlay {
+    display: block;
+  }
+
+  .sidebar__overlay--active {
+    opacity: 1;
+    pointer-events: auto;
+  }
+
+  /* Hamburger trigger */
+  .sidebar__mobile-trigger {
+    display: flex;
+  }
+
+  .sidebar__mobile-trigger--hidden {
+    opacity: 0;
+    pointer-events: none;
+  }
+
+  /* Toggle button visibility */
+  .sidebar__toggle--mobile { display: flex; }
+  .sidebar__toggle--desktop { display: none; }
+
+  /* Main content: full width, top padding for hamburger */
   .dashboard-main {
-    margin-left: 0;
+    margin-left: 0 !important;
+  }
+
+  .dashboard-content {
+    padding: 60px 16px 16px;
+  }
+
+  .filter-bar {
+    padding: 10px 16px;
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .filter-bar__group {
+    flex-wrap: wrap;
+    gap: 6px;
+  }
+
+  .filter-bar__actions {
+    width: 100%;
+    justify-content: flex-end;
   }
 
   .stats-grid {
-    grid-template-columns: 1fr;
+    grid-template-columns: repeat(2, 1fr);
   }
 
   .page-title {
     font-size: 1.3rem;
   }
 
-  .dashboard-content {
-    padding: 16px;
+  .page-header {
+    flex-direction: column;
+    align-items: flex-start;
   }
 
   .login-card {
@@ -1493,10 +1597,28 @@ input, select { font: inherit; color: inherit; }
     flex-direction: column;
     text-align: center;
   }
+}
 
-  .page-header {
-    flex-direction: column;
-    align-items: flex-start;
+@media (max-width: 480px) {
+  .stats-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .filter-bar__select,
+  .filter-bar__input {
+    min-width: 120px;
+    font-size: 0.76rem;
+  }
+
+  .notif-dropdown {
+    width: calc(100vw - 32px);
+    right: -80px;
+  }
+
+  .member-detail__avatar {
+    width: 48px;
+    height: 48px;
+    font-size: 1rem;
   }
 }
 
@@ -2344,21 +2466,7 @@ input, select { font: inherit; color: inherit; }
   .sidebar__search,
   .sidebar__theme-toggle span { display: none; }
 
-  .filter-bar {
-    flex-direction: column;
-    align-items: flex-start;
-  }
-
-  .filter-bar__actions { width: 100%; justify-content: flex-end; }
   .notif-dropdown { right: 0; width: 300px; }
-}
-
-@media (max-width: 600px) {
-  .filter-bar__group { gap: 6px; }
-  .filter-bar__select, .filter-bar__input { min-width: 120px; font-size: 0.76rem; }
-  .stats-grid { grid-template-columns: repeat(2, 1fr); }
-  .notif-dropdown { width: calc(100vw - 32px); right: -80px; }
-  .member-detail__avatar { width: 48px; height: 48px; font-size: 1rem; }
 }
 
 
