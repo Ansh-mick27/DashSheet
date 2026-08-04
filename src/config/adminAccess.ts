@@ -3,8 +3,9 @@ import { MemberRole } from '../types';
 export interface AdminAccessConfig {
   title?: string;
   visibleRoles: MemberRole[];
+  visibleDepartments?: string[];  // when set, only members in these departments are shown
   excludedMembers?: string[];
-  includedMembers?: string[];  // specific names to include regardless of role
+  includedMembers?: string[];  // specific names to include regardless of role/department
 }
 
 // Per-user admin access rules (keyed by lowercase member name).
@@ -17,16 +18,16 @@ export const ADMIN_ACCESS_CONFIG: Record<string, AdminAccessConfig> = {
   'amit mishra': {
     title: 'Training Head',
     visibleRoles: ['Trainer'],
-    includedMembers: ['Shweta Mehrani'],
+    includedMembers: ['Shweta Bahrani'],
   },
   'rajesh tyagi': {
     title: 'Placement Head',
     visibleRoles: ['Placement', 'OfficeAdmin'],
   },
-  'shweta mehrani': {
+  'shweta bahrani': {
     title: 'Training Head Soft Skill & Communication',
     visibleRoles: ['Trainer'],
-    excludedMembers: ['Amit Mishra', 'Anshul Oza', 'Khyati Koranne'],
+    visibleDepartments: ['Soft Skills', 'Communication Skills', 'Cognitive Skills'],
   },
 };
 

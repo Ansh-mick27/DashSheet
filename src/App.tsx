@@ -129,7 +129,11 @@ function DashboardLayout() {
       const nameLow = m.name.toLowerCase();
       if (excluded.has(nameLow)) return false;
       if (included.has(nameLow)) return true;
-      return (accessConfig.visibleRoles as string[]).includes(m.role);
+      if (!(accessConfig.visibleRoles as string[]).includes(m.role)) return false;
+      if (accessConfig.visibleDepartments?.length) {
+        if (!accessConfig.visibleDepartments.includes(m.department)) return false;
+      }
+      return true;
     });
   }, [members, member, accessConfig]);
 
@@ -229,7 +233,7 @@ function DashboardLayout() {
           <FilterBar
             filters={filters}
             onFilterChange={setFilters}
-            members={members}
+            members={accessVisibleMembers}
             onRefresh={handleRefresh}
             notifications={notifications}
             autoRefreshInterval={autoRefreshMins}
