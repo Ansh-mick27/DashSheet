@@ -1,9 +1,9 @@
 // ==========================================
 // DashSheet — Placement Page (Company Sourcing Tracker)
 // ==========================================
-import { useMemo } from 'react';
+import { useState, useMemo } from 'react';
 import {
-  Building2, Users, TrendingUp, Star, CheckCircle2, AlertCircle, Clock
+  Building2, Users, TrendingUp, Star, CheckCircle2, AlertCircle, Clock, Trash2
 } from 'lucide-react';
 import {
   BarChart, Bar, XAxis, YAxis, Tooltip, CartesianGrid,
@@ -14,9 +14,12 @@ import ChartCard from '../components/ChartCard';
 import DataTable from '../components/DataTable';
 import EmptyState from '../components/EmptyState';
 import { PlacementReport } from '../types';
+import { deletePlacementReport } from '../services/dataApi';
 
 interface PlacementPageProps {
   reports: PlacementReport[];
+  isSuperAdmin?: boolean;
+  onDelete?: (id: string) => void;
 }
 
 const PIE_COLORS = ['#6366f1', '#22d3ee', '#f59e0b', '#10b981', '#8b5cf6', '#ef4444', '#ec4899', '#f97316', '#14b8a6', '#a78bfa'];
@@ -58,7 +61,22 @@ function parseDDMMYYYY(s: string): Date | null {
   return new Date(parseInt(p[2]), parseInt(p[1]) - 1, parseInt(p[0]));
 }
 
-export default function PlacementPage({ reports }: PlacementPageProps) {
+export default function PlacementPage({ reports, isSuperAdmin, onDelete }: PlacementPageProps) {
+  const [deleting, setDeleting] = useState<string | null>(null);
+
+  const handleDelete = async (id: string) => {
+    if (!window.confirm('Delete this report permanently? This cannot be undone.')) return;
+    setDeleting(id);
+    try {
+      await deletePlacementReport(id);
+      onDelete?.(id);
+    } catch {
+      alert('Failed to delete report. Please try again.');
+    } finally {
+      setDeleting(null);
+    }
+  };
+
   const today = useMemo(() => {
     const d = new Date(); d.setHours(0, 0, 0, 0); return d;
   }, []);
@@ -137,6 +155,20 @@ export default function PlacementPage({ reports }: PlacementPageProps) {
 
   // ── Main sourcing tracker columns ─────────────────────
   const sourcingColumns = [
+    ...(isSuperAdmin ? [{
+      key: '_delete', header: '', width: '40px',
+      render: (r: PlacementReport) => (
+        <button
+          className="btn btn--ghost btn--sm"
+          style={{ color: '#ef4444', display: 'inline-flex', alignItems: 'center' }}
+          disabled={deleting === r.timestamp}
+          onClick={() => handleDelete(r.timestamp)}
+          title="Delete permanently"
+        >
+          <Trash2 size={14} />
+        </button>
+      )
+    }] : []),
     { key: 'dateOfFirstContact', header: 'Date', sortable: true, width: '90px' },
     { key: 'companyName', header: 'Company', sortable: true },
     { key: 'industrySector', header: 'Sector', width: '110px' },

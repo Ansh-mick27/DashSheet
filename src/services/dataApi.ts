@@ -718,3 +718,49 @@ export async function upsertInventoryStock(
     .upsert(rows, { onConflict: 'item_name' });
   if (error) throw error;
 }
+
+// ==========================================
+// SuperAdmin: permanent-delete report rows
+// ==========================================
+
+export async function deleteTrainingReport(timestamp: string): Promise<void> {
+  const { error } = await supabase.from('training_reports').delete().eq('timestamp', timestamp);
+  if (error) throw error;
+  refreshData();
+}
+
+export async function deleteWorkReport(timestamp: string): Promise<void> {
+  const { error } = await supabase.from('work_reports').delete().eq('timestamp', timestamp);
+  if (error) throw error;
+  refreshData();
+}
+
+export async function deleteOfficeAdminReport(timestamp: string): Promise<void> {
+  const { error } = await supabase.from('office_admin_reports').delete().eq('timestamp', timestamp);
+  if (error) throw error;
+  refreshData();
+}
+
+export async function deletePlacementReport(timestamp: string): Promise<void> {
+  const { error } = await supabase.from('placement_reports').delete().eq('timestamp', timestamp);
+  if (error) throw error;
+  refreshData();
+}
+
+export async function deletePlacementWorkReport(id: string): Promise<void> {
+  const { error } = await supabase.from('placement_work_reports').delete().eq('id', id);
+  if (error) throw error;
+  refreshData();
+}
+
+export async function deleteOfficeDailyReport(id: string): Promise<void> {
+  const { error } = await supabase.from('office_admin_daily_reports').delete().eq('id', id);
+  if (error) throw error;
+  refreshData();
+}
+
+export async function deleteOfficeWeeklyReport(id: string): Promise<void> {
+  const { error } = await supabase.from('office_admin_weekly_reports').delete().eq('id', id);
+  if (error) throw error;
+  refreshData();
+}

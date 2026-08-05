@@ -1,22 +1,24 @@
 // ==========================================
 // DashSheet — Training Reports Page
 // ==========================================
-import { useMemo } from 'react';
+import { useState, useMemo } from 'react';
 import {
   PieChart, Pie, Cell, ResponsiveContainer,
   BarChart, Bar, XAxis, YAxis, Tooltip, CartesianGrid,
   LineChart, Line, Legend
 } from 'recharts';
-import { Eye } from 'lucide-react';
+import { Eye, Trash2 } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import ChartCard from '../components/ChartCard';
 import DataTable from '../components/DataTable';
 import { TrainingReport } from '../types';
-import { getAttendanceRate } from '../services/dataApi';
+import { getAttendanceRate, deleteTrainingReport } from '../services/dataApi';
 import { getSelectedMethods } from '../lib/options';
 
 interface TrainingReportsPageProps {
   reports: TrainingReport[];
+  isSuperAdmin?: boolean;
+  onDelete?: (id: string) => void;
 }
 
 const LEVEL_COLORS: Record<string, string> = {
@@ -25,8 +27,23 @@ const LEVEL_COLORS: Record<string, string> = {
   Low: '#ef4444'
 };
 
-export default function TrainingReportsPage({ reports }: TrainingReportsPageProps) {
+export default function TrainingReportsPage({ reports, isSuperAdmin, onDelete }: TrainingReportsPageProps) {
   const attendanceRate = useMemo(() => getAttendanceRate(reports), [reports]);
+
+  const [deleting, setDeleting] = useState<string | null>(null);
+
+  const handleDelete = async (id: string) => {
+    if (!window.confirm('Delete this report permanently? This cannot be undone.')) return;
+    setDeleting(id);
+    try {
+      await deleteTrainingReport(id);
+      onDelete?.(id);
+    } catch {
+      alert('Failed to delete report. Please try again.');
+    } finally {
+      setDeleting(null);
+    }
+  };
 
   // Attendance over time
   const attendanceTimeline = useMemo(() => {
@@ -89,12 +106,26 @@ export default function TrainingReportsPage({ reports }: TrainingReportsPageProp
 
   const columns = [
     {
-      key: '_view', header: '', width: '70px',
+      key: '_actions', header: '', width: isSuperAdmin ? '130px' : '70px',
       render: (r: TrainingReport) => (
-        <Link to={`/training/${encodeURIComponent(r.timestamp)}`}
-          className="btn btn--ghost btn--sm" style={{ display: 'inline-flex', alignItems: 'center', gap: 4 }}>
-          <Eye size={14} /> View
-        </Link>
+        <div style={{ display: 'flex', gap: 4, alignItems: 'center' }}>
+          <Link to={`/training/${encodeURIComponent(r.timestamp)}`}
+            className="btn btn--ghost btn--sm"
+            style={{ display: 'inline-flex', alignItems: 'center', gap: 4 }}>
+            <Eye size={14} /> View
+          </Link>
+          {isSuperAdmin && (
+            <button
+              className="btn btn--ghost btn--sm"
+              style={{ color: '#ef4444', display: 'inline-flex', alignItems: 'center' }}
+              disabled={deleting === r.timestamp}
+              onClick={() => handleDelete(r.timestamp)}
+              title="Delete permanently"
+            >
+              <Trash2 size={14} />
+            </button>
+          )}
+        </div>
       )
     },
     { key: 'date', header: 'Date', sortable: true, width: '90px' },

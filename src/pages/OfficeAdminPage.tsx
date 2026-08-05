@@ -1,9 +1,9 @@
 // ==========================================
 // DashSheet — Office Admin Page (Inventory)
 // ==========================================
-import { useMemo } from 'react';
+import { useState, useMemo } from 'react';
 import {
-  Package, CheckCircle2, AlertTriangle, Wrench, BarChart3
+  Package, CheckCircle2, AlertTriangle, Wrench, BarChart3, Trash2
 } from 'lucide-react';
 import {
   BarChart, Bar, XAxis, YAxis, Tooltip, CartesianGrid, Legend,
@@ -14,11 +14,13 @@ import ChartCard from '../components/ChartCard';
 import DataTable from '../components/DataTable';
 import EmptyState from '../components/EmptyState';
 import { OfficeAdminReport } from '../types';
-import { parseDate } from '../services/dataApi';
+import { parseDate, deleteOfficeAdminReport } from '../services/dataApi';
 import { getCurrentAssignment, getItemHistory, CurrentAssignment, AssignmentHistoryEntry } from '../lib/inventoryAssignments';
 
 interface OfficeAdminPageProps {
   reports: OfficeAdminReport[];
+  isSuperAdmin?: boolean;
+  onDelete?: (id: string) => void;
 }
 
 const PIE_COLORS = ['#6366f1', '#22d3ee', '#f59e0b', '#10b981', '#8b5cf6', '#ef4444', '#ec4899'];
@@ -30,7 +32,22 @@ const CHART_TOOLTIP_STYLE = {
   color: '#e2e8f0'
 };
 
-export default function OfficeAdminPage({ reports }: OfficeAdminPageProps) {
+export default function OfficeAdminPage({ reports, isSuperAdmin, onDelete }: OfficeAdminPageProps) {
+  const [deleting, setDeleting] = useState<string | null>(null);
+
+  const handleDelete = async (id: string) => {
+    if (!window.confirm('Delete this report permanently? This cannot be undone.')) return;
+    setDeleting(id);
+    try {
+      await deleteOfficeAdminReport(id);
+      onDelete?.(id);
+    } catch {
+      alert('Failed to delete report. Please try again.');
+    } finally {
+      setDeleting(null);
+    }
+  };
+
   // KPIs
   const totalItems = useMemo(() => reports.reduce((s, r) => s + r.quantity, 0), [reports]);
   const uniqueItems = useMemo(() => new Set(reports.map(r => r.itemName)).size, [reports]);
@@ -115,6 +132,20 @@ export default function OfficeAdminPage({ reports }: OfficeAdminPageProps) {
   }, [reports]);
 
   const columns = [
+    ...(isSuperAdmin ? [{
+      key: '_delete', header: '', width: '40px',
+      render: (r: OfficeAdminReport) => (
+        <button
+          className="btn btn--ghost btn--sm"
+          style={{ color: '#ef4444', display: 'inline-flex', alignItems: 'center' }}
+          disabled={deleting === r.timestamp}
+          onClick={() => handleDelete(r.timestamp)}
+          title="Delete permanently"
+        >
+          <Trash2 size={14} />
+        </button>
+      )
+    }] : []),
     { key: 'date', header: 'Date', sortable: true, width: '90px' },
     { key: 'staffName', header: 'Member', sortable: true, width: '130px' },
     { key: 'itemName', header: 'Item', sortable: true },

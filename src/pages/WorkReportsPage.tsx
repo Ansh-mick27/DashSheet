@@ -1,24 +1,41 @@
 // ==========================================
 // DashSheet — Work Reports Page
 // ==========================================
-import { useMemo } from 'react';
+import { useState, useMemo } from 'react';
 import {
   BarChart, Bar, XAxis, YAxis, Tooltip, CartesianGrid,
   ResponsiveContainer, PieChart, Pie, Cell, Legend
 } from 'recharts';
-import { Eye } from 'lucide-react';
+import { Eye, Trash2 } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import ChartCard from '../components/ChartCard';
 import DataTable from '../components/DataTable';
 import { WorkReport } from '../types';
-import { getCompletionRate } from '../services/dataApi';
+import { getCompletionRate, deleteWorkReport } from '../services/dataApi';
 
 interface WorkReportsPageProps {
   reports: WorkReport[];
+  isSuperAdmin?: boolean;
+  onDelete?: (id: string) => void;
 }
 
-export default function WorkReportsPage({ reports }: WorkReportsPageProps) {
+export default function WorkReportsPage({ reports, isSuperAdmin, onDelete }: WorkReportsPageProps) {
   const completionRate = useMemo(() => getCompletionRate(reports), [reports]);
+
+  const [deleting, setDeleting] = useState<string | null>(null);
+
+  const handleDelete = async (id: string) => {
+    if (!window.confirm('Delete this report permanently? This cannot be undone.')) return;
+    setDeleting(id);
+    try {
+      await deleteWorkReport(id);
+      onDelete?.(id);
+    } catch {
+      alert('Failed to delete report. Please try again.');
+    } finally {
+      setDeleting(null);
+    }
+  };
 
   // Task status pie
   const statusData = useMemo(() => {
@@ -106,12 +123,26 @@ export default function WorkReportsPage({ reports }: WorkReportsPageProps) {
 
   const columns = [
     {
-      key: '_view', header: '', width: '70px',
+      key: '_actions', header: '', width: isSuperAdmin ? '130px' : '70px',
       render: (r: WorkReport) => (
-        <Link to={`/work/${encodeURIComponent(r.timestamp)}`}
-          className="btn btn--ghost btn--sm" style={{ display: 'inline-flex', alignItems: 'center', gap: 4 }}>
-          <Eye size={14} /> View
-        </Link>
+        <div style={{ display: 'flex', gap: 4, alignItems: 'center' }}>
+          <Link to={`/work/${encodeURIComponent(r.timestamp)}`}
+            className="btn btn--ghost btn--sm"
+            style={{ display: 'inline-flex', alignItems: 'center', gap: 4 }}>
+            <Eye size={14} /> View
+          </Link>
+          {isSuperAdmin && (
+            <button
+              className="btn btn--ghost btn--sm"
+              style={{ color: '#ef4444', display: 'inline-flex', alignItems: 'center' }}
+              disabled={deleting === r.timestamp}
+              onClick={() => handleDelete(r.timestamp)}
+              title="Delete permanently"
+            >
+              <Trash2 size={14} />
+            </button>
+          )}
+        </div>
       )
     },
     { key: 'date', header: 'Date', sortable: true, width: '90px' },

@@ -35,7 +35,7 @@ import PlacementWorkReportDetailPage from './pages/PlacementWorkReportDetailPage
 import TrainingReportDetailPage from './pages/TrainingReportDetailPage';
 import WorkReportDetailPage from './pages/WorkReportDetailPage';
 import { useAuth } from './contexts/AuthContext';
-import { fetchSheetData, refreshData, parseDate, generateNotifications, fetchOfficeAdminDailyReports, fetchOfficeAdminWeeklyReports, fetchInventoryStock } from './services/dataApi';
+import { fetchSheetData, refreshData, parseDate, generateNotifications, fetchOfficeAdminDailyReports, fetchOfficeAdminWeeklyReports, fetchInventoryStock, deleteTrainingReport, deleteWorkReport, deleteOfficeAdminReport, deletePlacementReport, deletePlacementWorkReport, deleteOfficeDailyReport, deleteOfficeWeeklyReport } from './services/dataApi';
 import { getAdminAccess } from './config/adminAccess';
 import {
   Member, TrainingReport, WorkReport, OfficeAdminReport,
@@ -115,6 +115,8 @@ function DashboardLayout() {
     if (!member || member.role === 'SuperAdmin') return null;
     return getAdminAccess(member.name);
   }, [member]);
+
+  const isSuperAdmin = member?.role === 'SuperAdmin';
 
   // Members visible to the logged-in admin (used for filtering all report data)
   const accessVisibleMembers = useMemo(() => {
@@ -212,6 +214,34 @@ function DashboardLayout() {
     return officeWeeklyReports.filter(r => accessVisibleNames.has(r.staffName));
   }, [officeWeeklyReports, accessVisibleNames]);
 
+  const handleDeleteTraining = useCallback((timestamp: string) => {
+    setTrainingReports(prev => prev.filter(r => r.timestamp !== timestamp));
+  }, []);
+
+  const handleDeleteWork = useCallback((timestamp: string) => {
+    setWorkReports(prev => prev.filter(r => r.timestamp !== timestamp));
+  }, []);
+
+  const handleDeleteOfficeAdmin = useCallback((timestamp: string) => {
+    setOfficeAdminReports(prev => prev.filter(r => r.timestamp !== timestamp));
+  }, []);
+
+  const handleDeletePlacement = useCallback((timestamp: string) => {
+    setPlacementReports(prev => prev.filter(r => r.timestamp !== timestamp));
+  }, []);
+
+  const handleDeletePlacementWork = useCallback((id: string) => {
+    setPlacementWorkReports(prev => prev.filter(r => r.id !== id));
+  }, []);
+
+  const handleDeleteOfficeDaily = useCallback((id: string) => {
+    setOfficeDailyReports(prev => prev.filter(r => r.id !== id));
+  }, []);
+
+  const handleDeleteOfficeWeekly = useCallback((id: string) => {
+    setOfficeWeeklyReports(prev => prev.filter(r => r.id !== id));
+  }, []);
+
   if (loading) {
     return (
       <div className="dashboard-layout">
@@ -303,13 +333,13 @@ function DashboardLayout() {
               <ErrorBoundary><OfficeAdminWeeklyReportFormPage adminMembers={members} /></ErrorBoundary>
             } />
             <Route path="/training" element={
-              <ErrorBoundary><TrainingReportsPage reports={filteredTraining} /></ErrorBoundary>
+              <ErrorBoundary><TrainingReportsPage reports={filteredTraining} isSuperAdmin={isSuperAdmin} onDelete={handleDeleteTraining} /></ErrorBoundary>
             } />
             <Route path="/training/:id" element={
               <ErrorBoundary><TrainingReportDetailPage reports={trainingReports} /></ErrorBoundary>
             } />
             <Route path="/work" element={
-              <ErrorBoundary><WorkReportsPage reports={filteredWork} /></ErrorBoundary>
+              <ErrorBoundary><WorkReportsPage reports={filteredWork} isSuperAdmin={isSuperAdmin} onDelete={handleDeleteWork} /></ErrorBoundary>
             } />
             <Route path="/work/:id" element={
               <ErrorBoundary><WorkReportDetailPage reports={workReports} /></ErrorBoundary>
@@ -337,28 +367,28 @@ function DashboardLayout() {
               </ErrorBoundary>
             } />
             <Route path="/inventory" element={
-              <ErrorBoundary><OfficeAdminPage reports={filteredOfficeAdmin} /></ErrorBoundary>
+              <ErrorBoundary><OfficeAdminPage reports={filteredOfficeAdmin} isSuperAdmin={isSuperAdmin} onDelete={handleDeleteOfficeAdmin} /></ErrorBoundary>
             } />
             <Route path="/inventory-stock" element={
               <ErrorBoundary><InventoryStockPage reports={filteredOfficeAdmin} /></ErrorBoundary>
             } />
             <Route path="/placement" element={
-              <ErrorBoundary><PlacementPage reports={filteredPlacement} /></ErrorBoundary>
+              <ErrorBoundary><PlacementPage reports={filteredPlacement} isSuperAdmin={isSuperAdmin} onDelete={handleDeletePlacement} /></ErrorBoundary>
             } />
             <Route path="/placement-work" element={
-              <ErrorBoundary><PlacementWorkReportsPage reports={filteredPlacementWork} /></ErrorBoundary>
+              <ErrorBoundary><PlacementWorkReportsPage reports={filteredPlacementWork} isSuperAdmin={isSuperAdmin} onDelete={handleDeletePlacementWork} /></ErrorBoundary>
             } />
             <Route path="/placement-work/:id" element={
               <ErrorBoundary><PlacementWorkReportDetailPage reports={filteredPlacementWork} /></ErrorBoundary>
             } />
             <Route path="/office-daily" element={
-              <ErrorBoundary><OfficeDailyReportsPage reports={filteredOfficeDaily} /></ErrorBoundary>
+              <ErrorBoundary><OfficeDailyReportsPage reports={filteredOfficeDaily} isSuperAdmin={isSuperAdmin} onDelete={handleDeleteOfficeDaily} /></ErrorBoundary>
             } />
             <Route path="/office-daily/:id" element={
               <ErrorBoundary><OfficeDailyReportDetailPage reports={filteredOfficeDaily} /></ErrorBoundary>
             } />
             <Route path="/office-weekly" element={
-              <ErrorBoundary><OfficeWeeklyReportsPage reports={filteredOfficeWeekly} /></ErrorBoundary>
+              <ErrorBoundary><OfficeWeeklyReportsPage reports={filteredOfficeWeekly} isSuperAdmin={isSuperAdmin} onDelete={handleDeleteOfficeWeekly} /></ErrorBoundary>
             } />
             <Route path="/settings" element={
               <ErrorBoundary><SettingsPage /></ErrorBoundary>

@@ -1,28 +1,45 @@
 // ==========================================
 // DashSheet — Placement Work Reports Admin View
 // ==========================================
-import { useMemo } from 'react';
+import { useState, useMemo } from 'react';
 import {
   BarChart, Bar, XAxis, YAxis, Tooltip, CartesianGrid,
   PieChart, Pie, Cell, ResponsiveContainer, LineChart, Line
 } from 'recharts';
-import { FileText, Briefcase, Users, CheckCircle2, Eye } from 'lucide-react';
+import { FileText, Briefcase, Users, CheckCircle2, Eye, Trash2 } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import ChartCard from '../components/ChartCard';
 import DataTable from '../components/DataTable';
 import StatCard from '../components/StatCard';
 import EmptyState from '../components/EmptyState';
 import { PlacementWorkReport } from '../types';
-import { parseDate } from '../services/dataApi';
+import { parseDate, deletePlacementWorkReport } from '../services/dataApi';
 
 interface PlacementWorkReportsPageProps {
   reports: PlacementWorkReport[];
+  isSuperAdmin?: boolean;
+  onDelete?: (id: string) => void;
 }
 
 const CHART_COLORS = ['#6366f1', '#22d3ee', '#f59e0b', '#10b981', '#8b5cf6', '#ef4444', '#ec4899', '#14b8a6'];
 const TOOLTIP_STYLE = { background: 'rgba(15,23,42,0.95)', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '8px', color: '#e2e8f0' };
 
-export default function PlacementWorkReportsPage({ reports }: PlacementWorkReportsPageProps) {
+export default function PlacementWorkReportsPage({ reports, isSuperAdmin, onDelete }: PlacementWorkReportsPageProps) {
+  const [deleting, setDeleting] = useState<string | null>(null);
+
+  const handleDelete = async (id: string) => {
+    if (!window.confirm('Delete this report permanently? This cannot be undone.')) return;
+    setDeleting(id);
+    try {
+      await deletePlacementWorkReport(id);
+      onDelete?.(id);
+    } catch {
+      alert('Failed to delete report. Please try again.');
+    } finally {
+      setDeleting(null);
+    }
+  };
+
   // KPIs
   const totalCompanies = useMemo(() => reports.reduce((s, r) => s + (r.totalCompaniesContacted || 0), 0), [reports]);
   const totalStudents = useMemo(() => reports.reduce((s, r) => s + (r.totalStudentsInteracted || 0), 0), [reports]);
@@ -96,12 +113,26 @@ export default function PlacementWorkReportsPage({ reports }: PlacementWorkRepor
 
   const columns = [
     {
-      key: '_view', header: '', width: '70px',
+      key: '_actions', header: '', width: isSuperAdmin ? '130px' : '70px',
       render: (r: PlacementWorkReport) => (
-        <Link to={`/placement-work/${encodeURIComponent(r.id ?? r.timestamp)}`}
-          className="btn btn--ghost btn--sm" style={{ display: 'inline-flex', alignItems: 'center', gap: 4 }}>
-          <Eye size={14} /> View
-        </Link>
+        <div style={{ display: 'flex', gap: 4, alignItems: 'center' }}>
+          <Link to={`/placement-work/${encodeURIComponent(r.id ?? r.timestamp)}`}
+            className="btn btn--ghost btn--sm"
+            style={{ display: 'inline-flex', alignItems: 'center', gap: 4 }}>
+            <Eye size={14} /> View
+          </Link>
+          {isSuperAdmin && (
+            <button
+              className="btn btn--ghost btn--sm"
+              style={{ color: '#ef4444', display: 'inline-flex', alignItems: 'center' }}
+              disabled={deleting === (r.id ?? r.timestamp)}
+              onClick={() => handleDelete(r.id ?? r.timestamp)}
+              title="Delete permanently"
+            >
+              <Trash2 size={14} />
+            </button>
+          )}
+        </div>
       )
     },
     { key: 'date', header: 'Date', sortable: true, width: '90px' },
