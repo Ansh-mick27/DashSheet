@@ -2,6 +2,7 @@ import { MemberRole } from '../types';
 
 export interface AdminAccessConfig {
   title?: string;
+  portalRole?: 'Trainer' | 'Placement' | 'OfficeAdmin';  // overrides which portal cards are shown
   visibleRoles: MemberRole[];
   visibleDepartments?: string[];  // when set, only members in these departments are shown
   excludedMembers?: string[];
@@ -22,6 +23,7 @@ export const ADMIN_ACCESS_CONFIG: Record<string, AdminAccessConfig> = {
   },
   'rajesh tyagi': {
     title: 'Placement Head',
+    portalRole: 'Placement',
     visibleRoles: ['Placement', 'OfficeAdmin'],
   },
   'shweta bahrani': {

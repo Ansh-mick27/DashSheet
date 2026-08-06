@@ -4,10 +4,15 @@
 import { Link } from 'react-router-dom';
 import { BookOpen, ClipboardList, Package, Briefcase, FileText, Settings, ClipboardCheck, CalendarDays } from 'lucide-react';
 import { useAuth } from '../../contexts/AuthContext';
+import { getAdminAccess } from '../../config/adminAccess';
 
 export default function PortalHomePage() {
   const { member } = useAuth();
   const role = member?.role;
+  // Admin users may have a portalRole override defining what reports they submit
+  const portalRole = role === 'Admin'
+    ? (getAdminAccess(member?.name ?? '')?.portalRole ?? 'Trainer')
+    : role;
 
   return (
     <div className="portal-page">
@@ -24,7 +29,7 @@ export default function PortalHomePage() {
       </div>
 
       <div className="portal-grid">
-        {(role === 'Trainer' || role === 'Admin') && (
+        {portalRole === 'Trainer' && (
           <>
             <Link to="/portal/training" className="portal-card">
               <div className="portal-card__icon"><BookOpen size={22} /></div>
@@ -39,7 +44,7 @@ export default function PortalHomePage() {
           </>
         )}
 
-        {role === 'OfficeAdmin' && (
+        {portalRole === 'OfficeAdmin' && (
           <>
             <Link to="/portal/inventory" className="portal-card">
               <div className="portal-card__icon"><Package size={22} /></div>
@@ -64,7 +69,7 @@ export default function PortalHomePage() {
           </>
         )}
 
-        {role === 'Placement' && (
+        {portalRole === 'Placement' && (
           <>
             <Link to="/portal/placement" className="portal-card">
               <div className="portal-card__icon"><Briefcase size={22} /></div>
