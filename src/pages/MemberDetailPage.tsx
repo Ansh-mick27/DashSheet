@@ -12,7 +12,7 @@ import ChartCard from '../components/ChartCard';
 import DataTable from '../components/DataTable';
 import StatCard from '../components/StatCard';
 import EmptyState from '../components/EmptyState';
-import { Member, TrainingReport, WorkReport, OfficeAdminReport, PlacementReport } from '../types';
+import { Member, TrainingReport, WorkReport, OfficeAdminReport, PlacementReport, PlacementWorkReport, OfficeAdminDailyReport, OfficeAdminWeeklyReport } from '../types';
 import { getCompletionRate, getAttendanceRate } from '../services/dataApi';
 import { getCurrentHoldings, getItemHistory } from '../lib/inventoryAssignments';
 
@@ -22,6 +22,9 @@ interface MemberDetailPageProps {
   workReports: WorkReport[];
   officeAdminReports: OfficeAdminReport[];
   placementReports: PlacementReport[];
+  placementWorkReports?: PlacementWorkReport[];
+  officeDailyReports?: OfficeAdminDailyReport[];
+  officeWeeklyReports?: OfficeAdminWeeklyReport[];
 }
 
 const CHART_TOOLTIP = {
@@ -32,7 +35,8 @@ const CHART_TOOLTIP = {
 };
 
 export default function MemberDetailPage({
-  members, trainingReports, workReports, officeAdminReports, placementReports
+  members, trainingReports, workReports, officeAdminReports, placementReports,
+  placementWorkReports = [], officeDailyReports = [], officeWeeklyReports = []
 }: MemberDetailPageProps) {
   const { name } = useParams<{ name: string }>();
   const navigate = useNavigate();
@@ -55,6 +59,18 @@ export default function MemberDetailPage({
   const memberPlacement = useMemo(
     () => placementReports.filter(r => r.staffName === decodedName),
     [placementReports, decodedName]
+  );
+  const memberPlacementWork = useMemo(
+    () => placementWorkReports.filter(r => r.staffName === decodedName),
+    [placementWorkReports, decodedName]
+  );
+  const memberOADaily = useMemo(
+    () => officeDailyReports.filter(r => r.staffName === decodedName),
+    [officeDailyReports, decodedName]
+  );
+  const memberOAWeekly = useMemo(
+    () => officeWeeklyReports.filter(r => r.staffName === decodedName),
+    [officeWeeklyReports, decodedName]
   );
 
   const completionRate = useMemo(() => getCompletionRate(memberWork), [memberWork]);
@@ -230,6 +246,30 @@ export default function MemberDetailPage({
     { key: 'studentsSelected', header: 'Selected', width: '80px' }
   ];
 
+  const placWorkCols = [
+    { key: 'date', header: 'Date', sortable: true, width: '90px' },
+    { key: 'totalCompaniesContacted', header: 'Companies', width: '100px' },
+    { key: 'newCompaniesApproached', header: 'New', width: '70px' },
+    { key: 'confirmedOpportunities', header: 'Confirmed', width: '90px' },
+    { key: 'totalStudentsInteracted', header: 'Students', width: '80px' },
+    { key: 'resumeReviewsDone', header: 'Resumes', width: '80px' },
+    { key: 'mockInterviewsSupport', header: 'Mock Int.', width: '80px' },
+  ];
+
+  const oaDailyCols = [
+    { key: 'date', header: 'Date', sortable: true, width: '90px' },
+    { key: 'department', header: 'Department', sortable: true },
+    { key: 'keyWorkCompleted', header: 'Key Work',
+      render: (r: OfficeAdminDailyReport) => r.keyWorkCompleted?.join(', ') || '—' },
+  ];
+
+  const oaWeeklyCols = [
+    { key: 'date', header: 'Week', sortable: true, width: '90px' },
+    { key: 'department', header: 'Department', sortable: true },
+    { key: 'inventoryStock', header: 'Items Tracked', width: '110px',
+      render: (r: OfficeAdminWeeklyReport) => r.inventoryStock?.length ?? 0 },
+  ];
+
   return (
     <div className="member-detail">
       <button className="back-btn" onClick={() => navigate('/members')}>
@@ -315,34 +355,50 @@ export default function MemberDetailPage({
       {isOfficeAdmin && (
         <>
           <div className="stats-grid stats-grid--4">
-            <StatCard title="Total Logs" value={memberInv.length} icon={Package} color="orange" />
+            <StatCard title="Daily Reports" value={memberOADaily.length} icon={ClipboardList} color="cyan" />
+            <StatCard title="Weekly Reports" value={memberOAWeekly.length} icon={CheckCircle2} color="green" />
+            <StatCard title="Inventory Logs" value={memberInv.length} icon={Package} color="orange" />
             <StatCard title="Items Managed" value={new Set(memberInv.map(r => r.itemName)).size} icon={Package} color="blue" subtitle="Unique items" />
-            <StatCard title="Maintenance" value={memberInv.filter(r => r.actionTaken === 'Maintenance' || r.actionTaken === 'Repaired').length} icon={Package} color="red" />
-            <StatCard title="This Month" value={memberInv.filter(r => {
-              const d = r.date.split('/'); return d[1] === String(new Date().getMonth() + 1).padStart(2, '0');
-            }).length} icon={CheckCircle2} color="green" />
           </div>
-          <div className="charts-grid charts-grid--2">
-            <ChartCard title="Items by Category">
-              <ResponsiveContainer width="100%" height={240}>
-                <PieChart>
-                  <Pie data={invCategoryData} cx="50%" cy="50%" outerRadius={80} dataKey="value"
-                    label={({ name, percent }) => percent > 0 ? `${name} ${(percent * 100).toFixed(0)}%` : ''} labelLine={false}>
-                    {invCategoryData.map((_, i) => (
-                      <Cell key={i} fill={['#6366f1','#22d3ee','#f59e0b','#10b981','#8b5cf6'][i % 5]} />
-                    ))}
-                  </Pie>
-                  <Tooltip contentStyle={CHART_TOOLTIP} itemStyle={{ color: '#e2e8f0' }} labelStyle={{ color: '#e2e8f0' }} />
-                </PieChart>
-              </ResponsiveContainer>
-            </ChartCard>
-          </div>
-          <ChartCard title="Inventory Log" className="mt-24">
-            <DataTable columns={invCols} data={memberInv}
-              rowKey={(r, i) => `inv-${r.date}-${i}`} pageSize={10}
-              exportFilename={`inventory_${member.name.replace(' ', '_')}`}
-              emptyMessage="No inventory logs found" />
+          <ChartCard title="Daily Work Report History" className="mt-24">
+            <DataTable columns={oaDailyCols} data={memberOADaily}
+              rowKey={(r, i) => `oad-${r.date}-${i}`} pageSize={10}
+              exportFilename={`oa_daily_${member.name.replace(' ', '_')}`}
+              emptyMessage="No daily reports found" />
           </ChartCard>
+          {memberOAWeekly.length > 0 && (
+            <ChartCard title="Weekly Work Report History" className="mt-24">
+              <DataTable columns={oaWeeklyCols} data={memberOAWeekly}
+                rowKey={(r, i) => `oaw-${r.date}-${i}`} pageSize={10}
+                exportFilename={`oa_weekly_${member.name.replace(' ', '_')}`}
+                emptyMessage="No weekly reports found" />
+            </ChartCard>
+          )}
+          {memberInv.length > 0 && (
+            <>
+              <div className="charts-grid charts-grid--2 mt-24">
+                <ChartCard title="Items by Category">
+                  <ResponsiveContainer width="100%" height={240}>
+                    <PieChart>
+                      <Pie data={invCategoryData} cx="50%" cy="50%" outerRadius={80} dataKey="value"
+                        label={({ name, percent }) => percent > 0 ? `${name} ${(percent * 100).toFixed(0)}%` : ''} labelLine={false}>
+                        {invCategoryData.map((_, i) => (
+                          <Cell key={i} fill={['#6366f1','#22d3ee','#f59e0b','#10b981','#8b5cf6'][i % 5]} />
+                        ))}
+                      </Pie>
+                      <Tooltip contentStyle={CHART_TOOLTIP} itemStyle={{ color: '#e2e8f0' }} labelStyle={{ color: '#e2e8f0' }} />
+                    </PieChart>
+                  </ResponsiveContainer>
+                </ChartCard>
+              </div>
+              <ChartCard title="Inventory Log" className="mt-24">
+                <DataTable columns={invCols} data={memberInv}
+                  rowKey={(r, i) => `inv-${r.date}-${i}`} pageSize={10}
+                  exportFilename={`inventory_${member.name.replace(' ', '_')}`}
+                  emptyMessage="No inventory logs found" />
+              </ChartCard>
+            </>
+          )}
         </>
       )}
 
@@ -350,43 +406,53 @@ export default function MemberDetailPage({
       {isPlacement && (
         <>
           <div className="stats-grid stats-grid--4">
-            <StatCard title="Companies Tracked" value={memberPlacement.length} icon={Briefcase} color="blue" />
-            <StatCard title="Unique Companies" value={new Set(memberPlacement.map(r => r.companyName)).size} icon={Briefcase} color="cyan" />
-            <StatCard title="Students Selected" value={memberPlacement.reduce((s, r) => s + r.studentsSelected, 0)} icon={Users} color="green" />
-            <StatCard title="Total Openings" value={memberPlacement.reduce((s, r) => s + r.numberOfOpenings, 0)} icon={CheckCircle2} color="purple" />
+            <StatCard title="Daily Task Reports" value={memberPlacementWork.length} icon={ClipboardList} color="cyan" />
+            <StatCard title="Companies Contacted" value={memberPlacementWork.reduce((s, r) => s + (r.totalCompaniesContacted || 0), 0)} icon={Briefcase} color="blue" />
+            <StatCard title="Students Interacted" value={memberPlacementWork.reduce((s, r) => s + (r.totalStudentsInteracted || 0), 0)} icon={Users} color="green" />
+            <StatCard title="CRP Reports" value={memberPlacement.length} icon={CheckCircle2} color="purple" />
           </div>
-          <div className="charts-grid charts-grid--2">
-            <ChartCard title="Outcome Breakdown">
-              <ResponsiveContainer width="100%" height={240}>
-                <PieChart>
-                  <Pie data={placementOutcomeData} cx="50%" cy="50%" outerRadius={80} dataKey="value"
-                    label={({ name, percent }) => percent > 0 ? `${name} ${(percent * 100).toFixed(0)}%` : ''} labelLine={false}>
-                    {placementOutcomeData.map((_, i) => (
-                      <Cell key={i} fill={['#10b981','#6366f1','#f59e0b','#ef4444','#22d3ee','#8b5cf6','#ec4899'][i % 7]} />
-                    ))}
-                  </Pie>
-                  <Tooltip contentStyle={CHART_TOOLTIP} itemStyle={{ color: '#e2e8f0' }} labelStyle={{ color: '#e2e8f0' }} />
-                </PieChart>
-              </ResponsiveContainer>
-            </ChartCard>
-            <ChartCard title="Daily Interactions" subtitle="Last 10 activity days">
-              <ResponsiveContainer width="100%" height={240}>
-                <LineChart data={placementTimeline}>
-                  <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.06)" />
-                  <XAxis dataKey="date" stroke="rgba(255,255,255,0.4)" fontSize={11} />
-                  <YAxis stroke="rgba(255,255,255,0.4)" fontSize={11} />
-                  <Tooltip contentStyle={CHART_TOOLTIP} itemStyle={{ color: '#e2e8f0' }} labelStyle={{ color: '#e2e8f0' }} />
-                  <Line type="monotone" dataKey="Interactions" stroke="#22d3ee" strokeWidth={2} dot={false} />
-                </LineChart>
-              </ResponsiveContainer>
-            </ChartCard>
-          </div>
-          <ChartCard title="CRP Process Activity Log" className="mt-24">
-            <DataTable columns={placCols} data={memberPlacement}
-              rowKey={(r, i) => `pl-${r.dateOfFirstContact}-${i}`} pageSize={10}
-              exportFilename={`placement_${member.name.replace(' ', '_')}`}
-              emptyMessage="No placement logs found" />
+          {memberPlacementWork.length > 0 && (
+            <div className="charts-grid charts-grid--2">
+              <ChartCard title="Outcome Breakdown">
+                <ResponsiveContainer width="100%" height={240}>
+                  <PieChart>
+                    <Pie data={placementOutcomeData} cx="50%" cy="50%" outerRadius={80} dataKey="value"
+                      label={({ name, percent }) => percent > 0 ? `${name} ${(percent * 100).toFixed(0)}%` : ''} labelLine={false}>
+                      {placementOutcomeData.map((_, i) => (
+                        <Cell key={i} fill={['#10b981','#6366f1','#f59e0b','#ef4444','#22d3ee','#8b5cf6','#ec4899'][i % 7]} />
+                      ))}
+                    </Pie>
+                    <Tooltip contentStyle={CHART_TOOLTIP} itemStyle={{ color: '#e2e8f0' }} labelStyle={{ color: '#e2e8f0' }} />
+                  </PieChart>
+                </ResponsiveContainer>
+              </ChartCard>
+              <ChartCard title="Daily Interactions" subtitle="Last 10 activity days">
+                <ResponsiveContainer width="100%" height={240}>
+                  <LineChart data={placementTimeline}>
+                    <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.06)" />
+                    <XAxis dataKey="date" stroke="rgba(255,255,255,0.4)" fontSize={11} />
+                    <YAxis stroke="rgba(255,255,255,0.4)" fontSize={11} />
+                    <Tooltip contentStyle={CHART_TOOLTIP} itemStyle={{ color: '#e2e8f0' }} labelStyle={{ color: '#e2e8f0' }} />
+                    <Line type="monotone" dataKey="Interactions" stroke="#22d3ee" strokeWidth={2} dot={false} />
+                  </LineChart>
+                </ResponsiveContainer>
+              </ChartCard>
+            </div>
+          )}
+          <ChartCard title="Daily Task Report History" className="mt-24">
+            <DataTable columns={placWorkCols} data={memberPlacementWork}
+              rowKey={(r, i) => `pw-${r.date}-${i}`} pageSize={10}
+              exportFilename={`placement_work_${member.name.replace(' ', '_')}`}
+              emptyMessage="No daily task reports found" />
           </ChartCard>
+          {memberPlacement.length > 0 && (
+            <ChartCard title="CRP Process Activity Log" className="mt-24">
+              <DataTable columns={placCols} data={memberPlacement}
+                rowKey={(r, i) => `pl-${r.dateOfFirstContact}-${i}`} pageSize={10}
+                exportFilename={`placement_crp_${member.name.replace(' ', '_')}`}
+                emptyMessage="No CRP logs found" />
+            </ChartCard>
+          )}
         </>
       )}
 

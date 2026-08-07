@@ -363,6 +363,9 @@ function DashboardLayout() {
                   workReports={workReports}
                   officeAdminReports={officeAdminReports}
                   placementReports={placementReports}
+                  placementWorkReports={placementWorkReports}
+                  officeDailyReports={officeDailyReports}
+                  officeWeeklyReports={officeWeeklyReports}
                 />
               </ErrorBoundary>
             } />
